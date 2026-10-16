@@ -2,163 +2,271 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
 <style>
-/* Layout: Demo-Leiste oben (Rollenwechsel), darunter die App im Produkt-Branding; eine Spalte auf dem Handy, Raster ab Tablet.
-   Bewusst nur helles Theme: die Demo zeigt das Produkt so, wie es live aussieht. Alle Farben sind explizit gesetzt. */
+/* Layout: dunkle Demo-Leiste (Rollenwechsel) über der App. Kund:innen sehen eine Marktplatz-Startseite,
+   Anbieterin und Admin arbeiten in einem Dashboard mit Seitenleiste. Ein Theme, bewusst hell wie das Live-Produkt;
+   alle Farben sind explizit gesetzt und im Admin änderbar. */
 :root {
   color-scheme: light;
-  --brand: #0f766e;
-  --accent: #f59e0b;
-  --bg: #f8fafc;
-  --ink: #0f172a;
-  --muted: #5b6b7f;
-  --line: #e2e8f0;
+  --brand: #0d5c56;
+  --accent: #ff6b4a;
+  --bg: #f5f7f6;
+  --ink: #10201e;
+  --muted: #5d6f6c;
+  --faint: #8a9a97;
+  --line: #e1e7e5;
   --surface: #ffffff;
-  --soft: #f1f5f9;
-  --demo-bar: #132a2e;
-  --demo-ink: #e6f1ef;
-  --ok-bg: #ecfdf5; --ok-ink: #047857;
-  --err-bg: #fef2f2; --err-ink: #b91c1c;
-  --warn-bg: #fffbeb; --warn-ink: #92400e;
-  --radius: 12px;
-  --font-head: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --soft: #eef2f1;
+  --night: #0b1d1b;
+  --night-ink: #e7f0ee;
+  --ok-bg: #e7f6ef; --ok-ink: #0b6b45;
+  --warn-bg: #fff4e0; --warn-ink: #8a5300;
+  --err-bg: #fdecec; --err-ink: #b42318;
+  --radius: 14px;
+  --font-head: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --shadow: 0 1px 2px rgba(16,32,30,.05), 0 8px 24px -12px rgba(16,32,30,.12);
+  --shadow-lift: 0 22px 44px -20px rgba(16,32,30,.38);
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--demo-bar); }
-h1, h2, h3, .head { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--night); }
+h1, h2, h3, .head { font-family: var(--font-head); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-
-/* Demo-Leiste */
-.demobar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--demo-bar); color: var(--demo-ink); font-size: 13px; }
-.demobar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding-block: 8px; }
-.demobar .tag { letter-spacing: .08em; text-transform: uppercase; font-weight: 600; font-size: 11px; opacity: .75; }
-.seg { display: inline-flex; background: rgba(255,255,255,.08); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
-.seg button { border: 0; background: transparent; color: var(--demo-ink); padding: 5px 12px; border-radius: 999px; font-weight: 500; }
-.seg button[aria-pressed="true"] { background: var(--demo-ink); color: var(--demo-bar); }
-.demobar .reset { margin-left: auto; background: transparent; border: 1px solid rgba(255,255,255,.25); color: var(--demo-ink); border-radius: 999px; padding: 4px 12px; }
-
-/* App-Header */
-.apphead { background: var(--surface); border-bottom: 1px solid var(--line); }
-.apphead .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-block: 12px; }
-.logo { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; text-align: left; }
-.logo .mark { width: 38px; height: 38px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-family: var(--font-head); font-weight: 700; font-size: 18px; flex: none; }
-.logo .name { display: block; font-family: var(--font-head); font-weight: 700; font-size: 20px; color: var(--brand); line-height: 1.1; }
-.logo .tagline { display: block; font-size: 12px; color: var(--muted); }
-nav.main { display: flex; flex-wrap: wrap; gap: 2px; align-items: center; }
-nav.main button { border: 0; background: none; padding: 8px 12px; border-radius: 8px; font-size: 14px; }
-nav.main button:hover { background: var(--soft); }
-nav.main button[aria-current="page"] { color: var(--brand); font-weight: 600; }
-.pill { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; background: var(--accent); color: #fff; font-variant-numeric: tabular-nums; }
-
-main { padding-block: 28px 48px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: var(--brand); color: #fff; padding: 9px 16px; border-radius: var(--radius); font-weight: 500; transition: opacity .15s; }
-.btn:hover { opacity: .9; }
-.btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn.accent { background: var(--accent); }
-.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
-.btn.danger { background: #dc2626; }
-.btn.block { width: 100%; }
-.input { width: 100%; border: 1px solid #cbd5e1; background: var(--surface); padding: 9px 12px; border-radius: calc(var(--radius) * .6); }
-.input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
-label.lbl { display: block; font-size: 13px; font-weight: 500; color: #334155; margin-bottom: 4px; }
-.badge { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; }
-.b-brand { background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand); }
-.b-accent { background: color-mix(in srgb, var(--accent) 18%, transparent); color: color-mix(in srgb, var(--accent) 70%, #000); }
-.b-ok { background: var(--ok-bg); color: var(--ok-ink); }
-.b-warn { background: var(--warn-bg); color: var(--warn-ink); }
-.b-mute { background: var(--soft); color: var(--muted); }
-.note { border-radius: 8px; padding: 9px 12px; font-size: 14px; }
-.note.ok { background: var(--ok-bg); color: var(--ok-ink); }
-.note.err { background: var(--err-bg); color: var(--err-ink); }
-.note.warn { background: var(--warn-bg); color: var(--warn-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.num { font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
-.num { font-variant-numeric: tabular-nums; }
+.xs { font-size: 12px; }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .between { justify-content: space-between; }
+.grow { flex: 1; min-width: 0; }
+svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-/* Hero + Suche */
-.hero { background: var(--brand); color: #fff; border-radius: var(--radius); padding: 36px clamp(20px, 4vw, 44px); }
-.hero h1 { font-size: clamp(26px, 4vw, 38px); line-height: 1.15; max-width: 22ch; }
-.hero p { max-width: 60ch; opacity: .88; margin: 10px 0 0; }
-.search { margin-top: 22px; background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: 10px; display: grid; gap: 8px; grid-template-columns: 2fr 1.3fr 1.4fr 1fr auto; }
-@media (max-width: 860px) { .search { grid-template-columns: 1fr 1fr; } .search .q { grid-column: 1 / -1; } }
-@media (max-width: 460px) { .search { grid-template-columns: 1fr; } }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-.chips button { border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; border-radius: 999px; padding: 4px 12px; font-size: 13px; }
-.chips button:hover { background: rgba(255,255,255,.12); }
+/* Demo-Leiste */
+.demobar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--night); color: var(--night-ink); font-size: 13px; }
+.demobar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding-block: 8px; }
+.demobar .tag { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.seg { display: inline-flex; flex-wrap: wrap; background: rgba(255,255,255,.08); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; color: var(--night-ink); padding: 5px 14px; border-radius: 999px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--night-ink); color: var(--night); }
+.demobar .reset { margin-left: auto; background: transparent; border: 1px solid rgba(255,255,255,.22); color: var(--night-ink); border-radius: 999px; padding: 4px 14px; }
 
-.grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
-.listing { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); transition: box-shadow .15s, transform .15s; }
-.listing:hover { box-shadow: 0 6px 22px rgba(15,23,42,.08); transform: translateY(-1px); }
-.thumb { aspect-ratio: 4 / 3; max-width: 100%; display: grid; place-items: center; font-family: var(--font-head); font-size: 40px; font-weight: 700; color: var(--brand); background: color-mix(in srgb, var(--brand) 9%, var(--surface)); position: relative; }
-.thumb .kind { position: absolute; top: 10px; left: 10px; font-family: var(--font-body); font-size: 11px; font-weight: 600; }
-.listing .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.listing h3 { font-size: 16px; line-height: 1.3; }
-.price { font-family: var(--font-head); font-weight: 700; color: var(--brand); font-size: 18px; margin-top: auto; }
-.verified { color: var(--ok-ink); font-size: 12px; font-weight: 500; }
+/* App-Header */
+.apphead { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 44px); z-index: 20; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.apphead .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-block: 11px; }
+.logo { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; text-align: left; }
+.mark { width: 38px; height: 38px; border-radius: 12px; background: var(--brand); color: #fff; display: grid; place-items: center; font-family: var(--font-head); font-weight: 700; font-size: 20px; flex: none; }
+.logo .name { display: block; font-family: var(--font-head); font-weight: 700; font-size: 21px; color: var(--ink); line-height: 1.1; }
+.logo .tagline { display: block; font-size: 12px; color: var(--muted); }
+nav.top { display: flex; flex-wrap: wrap; gap: 2px; align-items: center; }
+nav.top button { border: 0; background: none; padding: 8px 12px; border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--muted); }
+nav.top button:hover { background: var(--soft); color: var(--ink); }
+nav.top button[aria-current="page"] { color: var(--ink); background: var(--soft); }
+.pill { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 3px 11px; font-size: 13px; font-weight: 700; background: var(--accent); color: #fff; font-variant-numeric: tabular-nums; }
+
+main { padding-block: 28px 56px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+.card.flush { padding: 0; overflow: hidden; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; background: var(--brand); color: #fff; padding: 10px 18px; border-radius: calc(var(--radius) * .8); font-weight: 600; font-size: 14px; transition: transform .15s, opacity .15s, background .15s; white-space: nowrap; }
+.btn:hover { opacity: .92; }
+.btn:active { transform: translateY(1px); }
+.btn.accent { background: var(--accent); }
+.btn.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { background: var(--soft); opacity: 1; }
+.btn.danger { background: #c4321f; }
+.btn.sm { padding: 6px 12px; font-size: 13px; }
+.btn.block { width: 100%; }
+.input { width: 100%; border: 1px solid #cfd8d6; background: var(--surface); padding: 10px 12px; border-radius: calc(var(--radius) * .6); }
+.input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+label.lbl { display: block; font-size: 13px; font-weight: 600; color: #34433f; margin-bottom: 5px; }
+.badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.b-ok { background: var(--ok-bg); color: var(--ok-ink); }
+.b-warn { background: var(--warn-bg); color: var(--warn-ink); }
+.b-err { background: var(--err-bg); color: var(--err-ink); }
+.b-mute { background: var(--soft); color: var(--muted); }
+.b-brand { background: color-mix(in srgb, var(--brand) 11%, transparent); color: var(--brand); }
+.note { border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.note.ok { background: var(--ok-bg); color: var(--ok-ink); }
+.note.err { background: var(--err-bg); color: var(--err-ink); }
+.note.warn { background: var(--warn-bg); color: var(--warn-ink); }
+.avatar { border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; flex: none; overflow: hidden; font-family: var(--font-head); }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Startseite */
+.hero { position: relative; overflow: hidden; background: var(--brand); color: #fff; border-radius: calc(var(--radius) * 2); padding: clamp(36px, 6vw, 76px) clamp(22px, 5vw, 64px); }
+.hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; filter: blur(40px); }
+.hero::before { width: 420px; height: 420px; right: -120px; top: -160px; background: rgba(255,255,255,.14); }
+.hero::after { width: 360px; height: 360px; left: 38%; bottom: -220px; background: color-mix(in srgb, var(--accent) 55%, transparent); }
+.hero > * { position: relative; }
+.hero .kicker { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.14); border-radius: 999px; padding: 5px 14px; font-size: 13px; font-weight: 500; }
+.hero h1 { font-size: clamp(36px, 6.4vw, 68px); line-height: 1.02; max-width: 16ch; margin-top: 18px; font-weight: 700; }
+.hero h1 em { font-style: italic; color: color-mix(in srgb, var(--accent) 70%, #fff); }
+.hero .lead { max-width: 58ch; opacity: .86; margin-top: 16px; font-size: 17px; }
+.search { margin-top: 28px; background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: 8px; display: grid; gap: 6px; grid-template-columns: 2fr 1.3fr 1.4fr 1fr auto; box-shadow: 0 30px 60px -30px rgba(0,0,0,.5); }
+.search .input { border: 0; background: var(--soft); }
+@media (max-width: 900px) { .search { grid-template-columns: 1fr 1fr; } .search .q { grid-column: 1 / -1; } }
+@media (max-width: 480px) { .search { grid-template-columns: 1fr; } }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chips button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,.28); background: transparent; color: #fff; border-radius: 999px; padding: 6px 14px; font-size: 13px; }
+.chips button:hover, .chips button[aria-pressed="true"] { background: #fff; color: var(--ink); border-color: #fff; }
+.trust { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.trust .card { display: flex; gap: 14px; align-items: flex-start; padding: 18px; }
+.ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--brand) 10%, transparent); color: var(--brand); flex: none; }
+.ico.acc { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.ico svg.i { width: 22px; height: 22px; }
+
+.grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.listing { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); transition: transform .3s, box-shadow .3s; }
+.listing:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+.cover { position: relative; aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden; background: var(--soft); }
+.cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s; }
+.listing:hover .cover img { transform: scale(1.06); }
+.cover .shade { position: absolute; inset: 50% 0 0; background: linear-gradient(to top, rgba(0,0,0,.42), transparent); }
+.cover .price { position: absolute; left: 12px; bottom: 12px; background: #fff; color: #10201e; border-radius: 999px; padding: 4px 12px; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; box-shadow: 0 4px 12px rgba(0,0,0,.18); }
+.cover .tl { position: absolute; left: 12px; top: 12px; }
+.cover .tr { position: absolute; right: 12px; top: 12px; display: inline-flex; align-items: center; gap: 4px; background: rgba(0,0,0,.55); color: #fff; border-radius: 999px; padding: 2px 9px; font-size: 12px; }
+.cover .tr svg.i { width: 13px; height: 13px; }
+.tag-video { background: var(--accent); color: #fff; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+.listing .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+.listing h3 { font-size: 18px; line-height: 1.25; font-weight: 600; }
+.listing .foot { margin-top: auto; padding-top: 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.listing .foot .where { margin-left: auto; display: inline-flex; align-items: center; gap: 3px; }
+.listing .foot svg.i { width: 14px; height: 14px; }
+.verified { display: inline-flex; align-items: center; gap: 4px; color: var(--ok-ink); font-size: 12px; font-weight: 600; }
+.verified svg.i { width: 14px; height: 14px; }
 
 /* Dialog */
-dialog { border: 0; padding: 0; border-radius: var(--radius); width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 48px); background: var(--surface); color: var(--ink); }
-dialog::backdrop { background: rgba(15,23,42,.45); }
-.dlg { display: grid; grid-template-columns: 1.6fr 1fr; }
-@media (max-width: 720px) { .dlg { grid-template-columns: 1fr; } }
-.dlg > div { padding: 22px; min-width: 0; }
+dialog { border: 0; padding: 0; border-radius: calc(var(--radius) * 1.4); width: min(980px, calc(100vw - 24px)); max-height: calc(100vh - 32px); background: var(--surface); color: var(--ink); box-shadow: 0 40px 80px -30px rgba(0,0,0,.5); }
+dialog::backdrop { background: rgba(11,29,27,.55); backdrop-filter: blur(3px); }
+.dlg { display: grid; grid-template-columns: 1.55fr 1fr; }
+@media (max-width: 760px) { .dlg { grid-template-columns: 1fr; } }
+.dlg > div { padding: 24px; min-width: 0; }
 .dlg aside { background: var(--soft); display: flex; flex-direction: column; gap: 14px; }
-.close { position: absolute; right: 10px; top: 10px; border: 0; background: var(--surface); width: 34px; height: 34px; border-radius: 50%; font-size: 18px; }
+.close { position: absolute; right: 12px; top: 12px; z-index: 2; border: 0; background: var(--surface); width: 36px; height: 36px; border-radius: 50%; font-size: 20px; box-shadow: var(--shadow); }
+.gal { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 3; background: var(--soft); }
+.gal img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gal .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); font-size: 22px; box-shadow: var(--shadow); }
+.gal .prev { left: 12px; } .gal .next { right: 12px; }
+.gal .count { position: absolute; right: 12px; bottom: 12px; background: rgba(0,0,0,.6); color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+.thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.thumbs button { border: 0; padding: 0; width: 76px; height: 58px; border-radius: 10px; overflow: hidden; flex: none; opacity: .6; outline: 2px solid transparent; outline-offset: 0; }
+.thumbs button[aria-current="true"] { opacity: 1; outline-color: var(--brand); }
+.thumbs img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Chat */
-.chat { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
-@media (max-width: 760px) { .chat { grid-template-columns: 1fr; } }
-.convlist button { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px; }
-.convlist button[aria-current="true"] { border-color: var(--brand); box-shadow: inset 3px 0 0 var(--brand); }
-.msgs { display: flex; flex-direction: column; gap: 10px; min-height: 280px; max-height: 420px; overflow-y: auto; padding: 4px; }
-.msg { max-width: 80%; padding: 9px 14px; border-radius: 18px; background: var(--soft); align-self: flex-start; }
-.msg.me { align-self: flex-end; background: var(--brand); color: #fff; }
-.msg .meta { font-size: 11px; opacity: .7; margin-top: 2px; }
-.typing { font-size: 13px; color: var(--muted); font-style: italic; }
-
-/* Konto / Admin */
-.stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
-.stat .v { font-family: var(--font-head); font-weight: 700; font-size: 26px; color: var(--brand); font-variant-numeric: tabular-nums; }
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
-.tabs button { border: 0; background: none; padding: 7px 12px; border-radius: 8px; font-size: 14px; }
-.tabs button[aria-selected="true"] { background: var(--brand); color: #fff; }
+/* Dashboard */
+.dash { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 28px; }
+.dash > * { min-width: 0; }
+@media (max-width: 960px) { .dash { grid-template-columns: minmax(0, 1fr); gap: 18px; } }
+.side { position: sticky; top: 132px; align-self: start; display: flex; flex-direction: column; gap: 3px; }
+@media (max-width: 960px) { .side { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 4px; } .side .side-title, .side .side-card { display: none; } }
+.side-title { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); padding: 0 12px 8px; }
+.side button { display: flex; align-items: center; gap: 11px; border: 0; background: none; padding: 10px 12px; border-radius: 12px; font-size: 14px; font-weight: 500; color: var(--muted); text-align: left; white-space: nowrap; flex: none; }
+.side button:hover { background: var(--surface); color: var(--ink); }
+.side button[aria-current="page"] { background: var(--brand); color: #fff; box-shadow: 0 8px 18px -10px var(--brand); }
+.side button .cnt { margin-left: auto; background: var(--accent); color: #fff; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 1px 8px; }
+.side button[aria-current="page"] .cnt { background: rgba(255,255,255,.25); }
+.side-card { margin-top: 14px; padding: 16px; border-radius: var(--radius); background: var(--night); color: var(--night-ink); font-size: 13px; }
+.side-card strong { display: block; font-family: var(--font-head); font-size: 17px; margin-bottom: 4px; color: #fff; }
+.content { min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+.ph { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px; }
+.ph h1 { font-size: clamp(26px, 3.4vw, 34px); font-weight: 700; }
+.ph p { color: var(--muted); margin-top: 4px; }
+.stats { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.stat { display: flex; gap: 14px; align-items: flex-start; }
+.stat .lab { font-size: 13px; color: var(--muted); }
+.stat .val { font-family: var(--font-head); font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.stat .hint { font-size: 12px; color: var(--muted); }
+.stat .up { color: var(--ok-ink); font-weight: 600; }
+.cols { display: grid; gap: 22px; grid-template-columns: 1.5fr 1fr; }
+.cols.even { grid-template-columns: 1fr 1fr; }
+@media (max-width: 900px) { .cols, .cols.even { grid-template-columns: 1fr; } }
+.panel-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.panel-h h2 { font-size: 19px; font-weight: 600; }
 .list > * + * { border-top: 1px solid var(--line); }
-.list > * { padding-block: 12px; }
-.two { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
-@media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
-.editor { display: grid; gap: 22px; grid-template-columns: 1.5fr 1fr; align-items: start; }
-@media (max-width: 860px) { .editor { grid-template-columns: 1fr; } }
-.fields { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-.fields .full { grid-column: 1 / -1; }
-@media (max-width: 460px) { .fields { grid-template-columns: 1fr; } }
-.colorrow { display: flex; gap: 8px; }
-.colorrow input[type=color] { width: 44px; height: 40px; padding: 2px; border: 1px solid #cbd5e1; border-radius: 8px; background: var(--surface); flex: none; }
-.packs { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-.pack { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.pack .big { font-family: var(--font-head); font-size: 40px; font-weight: 700; color: var(--brand); line-height: 1; font-variant-numeric: tabular-nums; }
+.list > * { padding-block: 13px; }
+.thumb { width: 64px; height: 50px; border-radius: 10px; object-fit: cover; flex: none; background: var(--soft); }
 .tablewrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th { text-align: left; color: var(--muted); font-weight: 500; padding: 8px 6px; }
-td { padding: 10px 6px; border-top: 1px solid var(--line); }
-.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 50; max-width: calc(100vw - 32px); }
+th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 12px 14px; border-top: 1px solid var(--line); vertical-align: middle; }
+tr:first-child td { border-top: 0; }
+.stackimgs { display: flex; }
+.stackimgs img { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; border: 2px solid var(--surface); margin-left: -8px; }
+.stackimgs img:first-child { margin-left: 0; }
+
+/* Diagramm */
+.chart { position: relative; padding-left: 40px; }
+.chart .plot { position: relative; height: 190px; display: flex; gap: 8px; align-items: flex-end; }
+.chart .gl { position: absolute; left: -40px; right: 0; display: flex; align-items: center; gap: 8px; transform: translateY(50%); pointer-events: none; }
+.chart .gl span { width: 32px; text-align: right; font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.chart .gl i { flex: 1; height: 1px; background: var(--line); }
+.chart .bar { position: relative; flex: 1; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.chart .bar b { display: block; width: 100%; max-width: 30px; background: var(--brand); border-radius: 4px 4px 0 0; transition: opacity .15s; }
+.chart .bar:last-child b { background: var(--accent); }
+.chart .bar:hover b { opacity: .8; }
+.chart .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--night); color: #fff; font-size: 12px; padding: 4px 9px; border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s; z-index: 2; }
+.chart .bar:hover .tip, .chart .bar:focus .tip { opacity: 1; }
+.chart .xl { display: flex; gap: 8px; margin-top: 6px; }
+.chart .xl span { flex: 1; text-align: center; font-size: 11px; color: var(--faint); }
+.meter { height: 8px; border-radius: 999px; background: var(--soft); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--brand); border-radius: 999px; }
+
+/* Foto-Verwaltung */
+.drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; border: 2px dashed #c4d0cd; border-radius: var(--radius); padding: 28px 18px; cursor: pointer; transition: background .15s, border-color .15s; }
+.drop:hover, .drop.over { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 5%, transparent); }
+.drop svg.i { width: 34px; height: 34px; color: var(--brand); }
+.photos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.photo { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.photo .cov { position: absolute; left: 8px; top: 8px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+.photo .del { position: absolute; right: 8px; top: 8px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 16px; line-height: 1; }
+.photo .del:hover { background: #c4321f; }
+.photo .bar2 { display: flex; align-items: center; gap: 4px; padding: 6px 8px; border-top: 1px solid var(--line); }
+.photo .bar2 button { border: 0; background: none; border-radius: 6px; height: 28px; min-width: 28px; font-size: 15px; color: var(--muted); }
+.photo .bar2 button:hover:not(:disabled) { background: var(--soft); color: var(--ink); }
+.photo .bar2 button:disabled { opacity: .3; cursor: default; }
+.photo .bar2 .mk { margin-left: auto; font-size: 12px; font-weight: 600; padding: 0 8px; white-space: nowrap; }
+.fields { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+.fields .full { grid-column: 1 / -1; }
+@media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
+.checklist li { display: flex; gap: 10px; align-items: center; padding-block: 6px; font-size: 14px; }
+.checklist .dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--soft); color: var(--faint); }
+.checklist .dot.done { background: var(--ok-bg); color: var(--ok-ink); }
+.checklist .dot svg.i { width: 14px; height: 14px; }
+.colorrow { display: flex; gap: 8px; }
+.colorrow input[type=color] { width: 46px; height: 42px; padding: 2px; border: 1px solid #cfd8d6; border-radius: 10px; background: var(--surface); flex: none; }
+
+/* Chat */
+.chat { display: grid; grid-template-columns: 270px 1fr; gap: 18px; }
+@media (max-width: 780px) { .chat { grid-template-columns: 1fr; } }
+.conv { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px; }
+.conv[aria-current="true"] { border-color: var(--brand); box-shadow: inset 3px 0 0 var(--brand); }
+.msgs { display: flex; flex-direction: column; gap: 10px; min-height: 300px; max-height: 440px; overflow-y: auto; padding: 4px; }
+.msg { max-width: 78%; padding: 10px 14px; border-radius: 18px 18px 18px 6px; background: var(--soft); align-self: flex-start; }
+.msg.me { align-self: flex-end; background: var(--brand); color: #fff; border-radius: 18px 18px 6px 18px; }
+.msg .meta { font-size: 11px; opacity: .7; margin-top: 3px; }
+.typing { font-size: 13px; color: var(--muted); font-style: italic; }
+
+.packs { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.pack { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; padding-block: 28px; }
+.pack.best { border: 2px solid var(--accent); }
+.pack .big { font-family: var(--font-head); font-size: 50px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--night); color: #fff; padding: 11px 20px; border-radius: 999px; font-size: 14px; z-index: 60; max-width: calc(100vw - 32px); box-shadow: 0 16px 30px -12px rgba(0,0,0,.45); }
 footer.app { border-top: 1px solid var(--line); background: var(--surface); }
-footer.app .wrap { padding-block: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+footer.app .wrap { padding-block: 22px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
 <div class="demobar" role="region" aria-label="Demo-Steuerung">
   <div class="wrap">
-    <span class="tag">Demo</span>
+    <span class="tag">Live-Demo</span>
     <span>Ansicht:</span>
     <div class="seg" id="roles">
       <button data-role="customer" aria-pressed="true">Kund:in</button>
@@ -175,91 +283,170 @@ footer.app .wrap { padding-block: 20px; display: flex; flex-wrap: wrap; justify-
       <span class="mark" id="logo-mark">N</span>
       <span><span class="name" id="site-name">Neighbours.com</span><span class="tagline" id="site-tagline"></span></span>
     </button>
-    <nav class="main" id="nav" aria-label="Hauptnavigation"></nav>
+    <nav class="top" id="nav" aria-label="Hauptnavigation"></nav>
   </div>
 </header>
 
 <main class="wrap" id="app"></main>
 
 <footer class="app">
-  <div class="wrap"><span id="footer-text"></span><span>Klick-Demo mit Beispieldaten · keine echten Zahlungen</span></div>
+  <div class="wrap"><span id="footer-text"></span><span>Klick-Demo mit Beispieldaten und Beispielbildern · keine echten Zahlungen</span></div>
 </footer>
 
 <dialog id="dlg"></dialog>
 <div class="toast" id="toast" hidden></div>
+<input type="file" id="file-photos" accept="image/*" multiple hidden>
+<input type="file" id="file-avatar" accept="image/*" hidden>
 
 <script>
-const FONTS = ["Inter","Poppins","Roboto","Open Sans","Lato","Montserrat","Nunito","Raleway","Playfair Display","Merriweather","DM Sans","Quicksand","Work Sans","Lora"];
-const CATS = ["Einkaufshilfe","Haushalt & Putzen","Kinderbetreuung","Seniorenhilfe","Nachhilfe","Tierbetreuung","Garten","Beauty & Friseur","Nähen & Reparaturen","Kochen & Backen","Grußvideos"];
+/* ================= Daten ================= */
+const ICONS = {
+  home: '<path d="M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10"/>',
+  grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/>',
+  chat: '<path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5A1.5 1.5 0 0 1 19 17h-8l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5Z"/>',
+  wallet: '<path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="4" y="8" width="16.5" height="11" rx="2"/><circle cx="16" cy="13.5" r="1.2"/>',
+  user: '<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/>',
+  users: '<circle cx="9" cy="9" r="3.3"/><path d="M3 19.5c.9-3 3.2-4.6 6-4.6s5.1 1.6 6 4.6"/><path d="M15.5 5.9a3.2 3.2 0 0 1 0 6.2M17.5 14.9c1.8.6 3 2.1 3.5 4.6"/>',
+  shield: '<path d="M12 3.5 5 6v5.5c0 4.3 2.9 7.6 7 9 4.1-1.4 7-4.7 7-9V6l-7-2.5Z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
+  flag: '<path d="M5.5 21V4.5M5.5 5h11l-2 4 2 4h-11"/>',
+  tag: '<path d="M3.5 12.2V4.5h7.7l9 9-7.7 7.7-9-9Z"/><circle cx="8" cy="9" r="1.3"/>',
+  palette: '<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.2-1-1.6-1-2.7 0-1 .8-1.6 1.8-1.6h2.2a3.7 3.7 0 0 0 3.7-3.8C20.5 6.8 16.7 3.5 12 3.5Z"/><circle cx="7.8" cy="11" r="1.1"/><circle cx="10.5" cy="7.4" r="1.1"/><circle cx="15" cy="7.8" r="1.1"/>',
+  image: '<rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.7"/><path d="m20.5 16-5-5-8.5 8"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  receipt: '<path d="M6 3.5h12v17l-2.5-1.5-2 1.5-1.5-1.5-1.5 1.5-2-1.5L6 20.5Z"/><path d="M9 8h6M9 11.5h6M9 15h3.5"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-7M21.5 20h-19"/>',
+  pin: '<path d="M12 21s6.5-5.6 6.5-11a6.5 6.5 0 0 0-13 0c0 5.4 6.5 11 6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/>',
+  lock: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
+  star: '<path d="m12 4 2.4 5 5.4.6-4 3.7 1.1 5.3L12 16l-4.9 2.6 1.1-5.3-4-3.7 5.4-.6L12 4Z"/>',
+  bag: '<path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+  sparkle: '<path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+  baby: '<circle cx="12" cy="9" r="4.5"/><path d="M10.3 9h.01M13.7 9h.01M10.5 11c.9.6 2.1.6 3 0"/><path d="M6.5 20c1-2.8 3-4.3 5.5-4.3s4.5 1.5 5.5 4.3"/>',
+  heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/>',
+  book: '<path d="M4.5 5.5c2.7-1 5.2-1 7.5.6 2.3-1.6 4.8-1.6 7.5-.6v13c-2.7-1-5.2-1-7.5.6-2.3-1.6-4.8-1.6-7.5-.6v-13Z"/><path d="M12 6.1v13.1"/>',
+  paw: '<circle cx="7" cy="9.5" r="1.8"/><circle cx="10.5" cy="6" r="1.8"/><circle cx="14.5" cy="6" r="1.8"/><circle cx="18" cy="9.5" r="1.8"/><path d="M12.5 11.5c-3 0-5.5 3.4-5.5 5.6 0 1.8 1.6 2.4 3 2 1.2-.4 1.8-.6 2.5-.6s1.3.2 2.5.6c1.4.4 3-.2 3-2 0-2.2-2.5-5.6-5.5-5.6Z"/>',
+  leaf: '<path d="M5 19c0-8 5-13.5 14.5-14 .3 9.5-5.5 14.5-13 14.5"/><path d="M5 19c3-4 6-6.5 9.5-8"/>',
+  scissors: '<circle cx="6.5" cy="7" r="2.5"/><circle cx="6.5" cy="17" r="2.5"/><path d="M8.6 8.4 20 17M8.6 15.6 20 7"/>',
+  needle: '<path d="M18.5 3.5 6 16l-2.5 4.5L8 18l12.5-12.5a1.4 1.4 0 0 0-2-2Z"/><path d="M16 6l2 2"/><path d="M3.5 13c2-1 3.5 0 4 1.5"/>',
+  pot: '<path d="M4 10h16v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6v-3Z"/><path d="M2.5 10h19M9 7c0-1 .8-1.5.8-2.5M12.5 7c0-1 .8-1.5.8-2.5"/>',
+  video: '<rect x="3.5" y="6" width="12.5" height="12" rx="2"/><path d="m16 10.5 4.5-2.8v8.6L16 13.5"/>',
+  broom: '<path d="M14.5 3.5 11 11"/><path d="M7.5 10.5 14 13.5l-2.5 7c-3.5 0-6.5-1.5-8-3.5l4-6.5Z"/><path d="M8.5 15.5 7 19M11 16l-.8 4"/>',
+};
+const ic = (n, cls = "") => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ""}</svg>`;
+
+const CAT_META = {
+  "Einkaufshilfe": { icon: "bag", c: ["#f6d9bd", "#e48a4f"] },
+  "Haushalt & Putzen": { icon: "broom", c: ["#d6ecf0", "#4f9fb0"] },
+  "Kinderbetreuung": { icon: "baby", c: ["#fbe0e4", "#e17689"] },
+  "Seniorenhilfe": { icon: "heart", c: ["#f2e0f0", "#a8659e"] },
+  "Nachhilfe": { icon: "book", c: ["#dde3fb", "#6274d6"] },
+  "Tierbetreuung": { icon: "paw", c: ["#f4ead0", "#c1923a"] },
+  "Garten": { icon: "leaf", c: ["#d9ecd2", "#5e9a4f"] },
+  "Beauty & Friseur": { icon: "scissors", c: ["#fde3d8", "#d9734f"] },
+  "Nähen & Reparaturen": { icon: "needle", c: ["#e4e2f7", "#7a6fc4"] },
+  "Kochen & Backen": { icon: "pot", c: ["#fbe7c9", "#d98c2b"] },
+  "Grußvideos": { icon: "video", c: ["#ffe0d8", "#ff6b4a"] },
+};
+let CATS = Object.keys(CAT_META);
+
+/* Illustriertes Beispielbild je Kategorie (SVG als data: URI), damit die Demo ohne externe Bilder auskommt. */
+function coverArt(cat, v = 0) {
+  const m = CAT_META[cat] || { icon: "sparkle", c: ["#e3ece9", "#0d5c56"] };
+  const [a, b] = m.c;
+  const pos = [[600, 120, 480, 820], [80, 640, 760, 200], [700, 700, 140, 160]][v % 3];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
+    <rect width="800" height="600" fill="url(#g)"/>
+    <circle cx="${pos[0]}" cy="${pos[1]}" r="230" fill="#fff" opacity=".22"/>
+    <circle cx="${pos[2]}" cy="${pos[3]}" r="300" fill="#fff" opacity=".12"/>
+    <circle cx="${pos[3] % 800}" cy="${pos[2] % 600}" r="90" fill="${b}" opacity=".35"/>
+    <g transform="translate(${v === 1 ? 470 : 280} ${v === 2 ? 210 : 170}) scale(${v === 1 ? 9 : 10.5})" fill="none" stroke="#fff" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" opacity=".95">${ICONS[m.icon]}</g>
+  </svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+const AV_COLORS = ["#0d5c56", "#b4553a", "#5b5fc7", "#a3497f", "#3f7d3a", "#8a6a1f", "#2f6f8f"];
+const PROVIDERS = {
+  anna:  { name: "Anna",  city: "Köln",    plz: "50667", chat: 3, rating: 4.9, jobs: 87, since: "2024", bio: "Rentnerin mit viel Zeit und Herz. Ich helfe beim Einkaufen, im Garten und bei Behördengängen." },
+  lena:  { name: "Lena",  city: "Berlin",  plz: "10115", chat: 4, rating: 5.0, jobs: 42, since: "2025", bio: "Lehramtsstudentin für Mathe und Englisch. Ich nehme auch persönliche Grußvideos auf." },
+  sevgi: { name: "Sevgi", city: "Köln",    plz: "50823", chat: 3, rating: 4.8, jobs: 133, since: "2023", bio: "Gelernte Friseurin. Ich komme mit Schere und Föhn zu dir nach Hause." },
+  marie: { name: "Marie", city: "Hamburg", plz: "20095", chat: 5, rating: 4.9, jobs: 64, since: "2024", bio: "Erzieherin in Elternzeit. Ich passe abends und am Wochenende auf Kinder auf." },
+  jana:  { name: "Jana",  city: "München", plz: "80331", chat: 4, rating: 5.0, jobs: 58, since: "2025", bio: "Tiermedizinische Fachangestellte. Gassi gehen, Katzen füttern, Urlaubsbetreuung." },
+  fatma: { name: "Fatma", city: "Berlin",  plz: "12043", chat: 3, rating: 4.9, jobs: 101, since: "2023", bio: "Ich nähe, ändere und repariere Kleidung. Und ich koche für eure Feier." },
+  clara: { name: "Clara", city: "Hamburg", plz: "22765", chat: 6, rating: 4.7, jobs: 29, since: "2025", bio: "Schauspielerin. Ich nehme Grußvideos für Geburtstage, Hochzeiten und Prüfungen auf." },
+};
+const SEED_LISTINGS = [
+  { id: 1, p: "anna", cat: "Einkaufshilfe", type: "SERVICE", title: "Wocheneinkauf für Senior:innen", price: 80, n: 2, desc: "Ich erledige Ihren Wocheneinkauf im Veedel und bringe alles bis an die Haustür. Eine Einkaufsliste genügt, gern auch Apotheke und Post." },
+  { id: 2, p: "anna", cat: "Garten", type: "SERVICE", title: "Rasen mähen und Hecke schneiden", price: 150, n: 3, desc: "Kleinere Gartenarbeiten in der Kölner Innenstadt. Werkzeug bringe ich mit, den Grünschnitt nehme ich mit." },
+  { id: 3, p: "lena", cat: "Nachhilfe", type: "SERVICE", title: "Mathe-Nachhilfe 5. bis 10. Klasse", price: 200, n: 2, desc: "Geduldige Nachhilfe für die Mittelstufe, 60 Minuten bei euch zu Hause in Berlin-Mitte oder online. Vor Klassenarbeiten auch kurzfristig." },
+  { id: 4, p: "lena", cat: "Grußvideos", type: "GREETING_VIDEO", title: "Geburtstagsgruß auf Englisch oder Deutsch", price: 90, n: 1, desc: "Ein persönliches Video von etwa einer Minute, mit Namen und euren Wünschen. Lieferung innerhalb von 3 Tagen." },
+  { id: 5, p: "sevgi", cat: "Beauty & Friseur", type: "SERVICE", title: "Haare schneiden bei dir zu Hause", price: 180, n: 3, desc: "Waschen, Schneiden, Föhnen in deiner Wohnung in Köln-Ehrenfeld und Umgebung. Für Damen, Herren und Kinder." },
+  { id: 6, p: "marie", cat: "Kinderbetreuung", type: "SERVICE", title: "Babysitting am Abend, bis 4 Stunden", price: 320, n: 2, desc: "Erfahrene Erzieherin mit Erste-Hilfe-Kurs am Kind. Ich bringe die Kleinen ins Bett, damit ihr einen freien Abend habt." },
+  { id: 7, p: "jana", cat: "Tierbetreuung", type: "SERVICE", title: "Gassi-Service, 45 Minuten", price: 60, n: 2, desc: "Ich gehe mit deinem Hund in der Münchner Altstadt und an der Isar spazieren. Auch für ängstliche oder ältere Hunde." },
+  { id: 8, p: "fatma", cat: "Kochen & Backen", type: "SERVICE", title: "Türkisches Buffet für 10 Personen", price: 600, n: 3, desc: "Börek, Linsensuppe, Sarma und Baklava, frisch gekocht für eure Feier. Lieferung im Umkreis von 5 km." },
+  { id: 9, p: "fatma", cat: "Nähen & Reparaturen", type: "SERVICE", title: "Hosen kürzen, Reißverschluss tauschen", price: 50, n: 1, desc: "Änderungen aller Art in Berlin-Neukölln. Abholung und Rückgabe im Kiez sind möglich." },
+  { id: 10, p: "clara", cat: "Grußvideos", type: "GREETING_VIDEO", title: "Hochzeitsgruß mit kleinem Gedicht", price: 150, n: 2, desc: "Ich schreibe ein kurzes Gedicht über das Brautpaar und trage es im Video vor. Ihr erzählt mir vorher ein paar Anekdoten." },
+  { id: 11, p: "marie", cat: "Haushalt & Putzen", type: "SERVICE", title: "Fensterputzen für die ganze Wohnung", price: 220, n: 2, desc: "Innen und außen, inklusive Rahmen. Putzmittel bringe ich mit. Bis 4 Zimmer in Hamburg-Altona." },
+  { id: 12, p: "anna", cat: "Seniorenhilfe", type: "SERVICE", title: "Begleitung zu Arzt und Behörden", price: 90, n: 1, desc: "Ich begleite Sie zu Terminen, helfe beim Ausfüllen von Formularen und behalte den Überblick." },
+];
 const PACKS = [
   { id: "s", credits: 100, euro: 10, label: "Starter" },
-  { id: "m", credits: 550, euro: 50, label: "Beliebt" },
+  { id: "m", credits: 550, euro: 50, label: "Beliebt", best: true },
   { id: "l", credits: 1200, euro: 100, label: "Vorteil" },
 ];
-const BLOCKED = ["escort","erotik","erotisch","sex","nackt","nude","happy end","taschengeld","sugar daddy","intim","fetisch","domina","bdsm","dessous","onlyfans","date gegen","begleitung gegen"];
+const FONTS = ["Playfair Display", "DM Sans", "Inter", "Poppins", "Roboto", "Open Sans", "Lato", "Montserrat", "Nunito", "Raleway", "Merriweather", "Quicksand", "Work Sans", "Lora"];
 const DEFAULT_SETTINGS = {
   siteName: "Neighbours.com", tagline: "Hilfe aus deiner Nachbarschaft",
-  heroTitle: "Finde Hilfe direkt um die Ecke",
-  heroText: "Frauen aus deiner Nachbarschaft bieten ihre Dienstleistungen an, vom Einkaufsservice bis zur Nachhilfe. Bezahlt wird einfach mit Credits.",
+  heroTitle: "Finde Hilfe direkt *um die Ecke*",
+  heroText: "Frauen aus deiner Nachbarschaft bieten ihre Dienstleistungen an, vom Einkaufsservice bis zur Nachhilfe. Persönlich verifiziert, bezahlt wird einfach mit Credits.",
   footerText: "Neighbours.com · Nachbarschaftshilfe, fair und sicher.",
-  headingFont: "Poppins", bodyFont: "Inter",
-  brand: "#0f766e", accent: "#f59e0b", bg: "#f8fafc", ink: "#0f172a", radius: 12, fee: 20,
+  headingFont: "Playfair Display", bodyFont: "DM Sans",
+  brand: "#0d5c56", accent: "#ff6b4a", bg: "#f5f7f6", ink: "#10201e", radius: 14, fee: 20,
 };
-
-const PROVIDERS = {
-  anna:  { name: "Anna",  city: "Köln",    plz: "50667", chat: 3, bio: "Rentnerin mit viel Zeit. Ich helfe gern beim Einkaufen, im Garten und bei Behördengängen." },
-  lena:  { name: "Lena",  city: "Berlin",  plz: "10115", chat: 4, bio: "Lehramtsstudentin für Mathe und Englisch. Ich nehme auch persönliche Grußvideos auf." },
-  sevgi: { name: "Sevgi", city: "Köln",    plz: "50823", chat: 3, bio: "Gelernte Friseurin. Ich komme mit Schere und Föhn zu dir nach Hause." },
-  marie: { name: "Marie", city: "Hamburg", plz: "20095", chat: 5, bio: "Erzieherin in Elternzeit. Ich passe abends und am Wochenende auf Kinder auf." },
-  jana:  { name: "Jana",  city: "München", plz: "80331", chat: 4, bio: "Tierärztliche Fachangestellte. Gassi gehen, Katzen füttern, Urlaubsbetreuung." },
-  fatma: { name: "Fatma", city: "Berlin",  plz: "12043", chat: 3, bio: "Ich nähe, ändere und repariere Kleidung. Und ich koche für eure Feier." },
-  clara: { name: "Clara", city: "Hamburg", plz: "22765", chat: 6, bio: "Schauspielerin. Ich nehme Grußvideos für Geburtstage, Hochzeiten und Prüfungen auf." },
-};
-
-const LISTINGS = [
-  { id: 1, p: "anna", cat: "Einkaufshilfe", type: "SERVICE", title: "Wocheneinkauf für Senior:innen", price: 80, desc: "Ich erledige Ihren Wocheneinkauf im Veedel und bringe alles bis an die Haustür. Eine Einkaufsliste genügt, gern auch Apotheke und Post." },
-  { id: 2, p: "anna", cat: "Garten", type: "SERVICE", title: "Rasen mähen und Hecke schneiden", price: 150, desc: "Kleinere Gartenarbeiten in der Kölner Innenstadt. Werkzeug bringe ich mit, den Grünschnitt nehme ich mit." },
-  { id: 3, p: "lena", cat: "Nachhilfe", type: "SERVICE", title: "Mathe-Nachhilfe 5. bis 10. Klasse (60 Min.)", price: 200, desc: "Geduldige Nachhilfe für die Mittelstufe, bei euch zu Hause in Berlin-Mitte oder online. Vor Klassenarbeiten auch kurzfristig." },
-  { id: 4, p: "lena", cat: "Grußvideos", type: "GREETING_VIDEO", title: "Geburtstagsgruß auf Englisch", price: 90, desc: "Ein persönliches Video von etwa einer Minute, auf Englisch oder Deutsch, mit Namen und euren Wünschen. Lieferung innerhalb von 3 Tagen." },
-  { id: 5, p: "sevgi", cat: "Beauty & Friseur", type: "SERVICE", title: "Haare schneiden bei dir zu Hause", price: 180, desc: "Waschen, Schneiden, Föhnen in deiner Wohnung in Köln-Ehrenfeld und Umgebung. Für Damen, Herren und Kinder." },
-  { id: 6, p: "marie", cat: "Kinderbetreuung", type: "SERVICE", title: "Babysitting am Abend (bis 4 Std.)", price: 320, desc: "Erfahrene Erzieherin mit Erste-Hilfe-Kurs am Kind. Ich bringe die Kleinen ins Bett, damit ihr einen freien Abend habt." },
-  { id: 7, p: "jana", cat: "Tierbetreuung", type: "SERVICE", title: "Gassi-Service, 45 Minuten", price: 60, desc: "Ich gehe mit deinem Hund in der Münchner Altstadt und an der Isar spazieren. Auch für ängstliche oder ältere Hunde." },
-  { id: 8, p: "jana", cat: "Tierbetreuung", type: "SERVICE", title: "Katzenbetreuung im Urlaub (pro Besuch)", price: 70, desc: "Füttern, Katzenklo, Streicheleinheiten und ein kurzes Foto-Update per Chat bei jedem Besuch." },
-  { id: 9, p: "fatma", cat: "Nähen & Reparaturen", type: "SERVICE", title: "Hosen kürzen und Reißverschluss tauschen", price: 50, desc: "Änderungen aller Art in Berlin-Neukölln. Abholung und Rückgabe im Kiez sind möglich." },
-  { id: 10, p: "fatma", cat: "Kochen & Backen", type: "SERVICE", title: "Türkisches Buffet für 10 Personen", price: 600, desc: "Börek, Linsensuppe, Sarma und Baklava, frisch gekocht für eure Feier. Lieferung im Umkreis von 5 km." },
-  { id: 11, p: "clara", cat: "Grußvideos", type: "GREETING_VIDEO", title: "Hochzeitsgruß mit kleinem Gedicht", price: 150, desc: "Ich schreibe ein kurzes Gedicht über das Brautpaar und trage es im Video vor. Ihr erzählt mir vorher ein paar Anekdoten." },
-  { id: 12, p: "marie", cat: "Haushalt & Putzen", type: "SERVICE", title: "Fensterputzen für die ganze Wohnung", price: 220, desc: "Innen und außen, inklusive Rahmen. Putzmittel bringe ich mit. Bis 4 Zimmer in Hamburg-Altona." },
-  { id: 13, p: "anna", cat: "Seniorenhilfe", type: "SERVICE", title: "Begleitung zum Arzt und zu Behörden", price: 90, desc: "Ich begleite Sie zu Terminen, helfe beim Ausfüllen von Formularen und behalte den Überblick." },
-];
+const BLOCKED = ["escort","erotik","erotisch","sex","nackt","nude","happy end","taschengeld","sugar daddy","intim","fetisch","domina","bdsm","dessous","onlyfans","date gegen","begleitung gegen"];
+const WEEKS = ["4.8.", "11.8.", "18.8.", "25.8.", "1.9.", "8.9.", "15.9.", "22.9.", "29.9.", "6.10.", "13.10.", "jetzt"];
 
 function initialState() {
+  const listings = SEED_LISTINGS.map((l) => ({ ...l, active: true, photos: Array.from({ length: l.n }, (_, v) => coverArt(l.cat, v)) }));
+  const providers = JSON.parse(JSON.stringify(PROVIDERS));
+  Object.values(providers).forEach((p) => (p.avatar = null));
   return {
-    role: "customer", view: "search",
+    role: "customer", view: "home",
     filters: { q: "", place: "", cat: "", type: "" },
-    credits: 250,
-    settings: { ...DEFAULT_SETTINGS },
-    earnings: { anna: 412, lena: 238, sevgi: 96, marie: 540, jana: 188, fatma: 305, clara: 120 },
-    providerAs: "lena",
+    credits: 250, settings: { ...DEFAULT_SETTINGS },
+    listings, providers, nextId: 100,
+    earnings: { anna: 412, lena: 238, sevgi: 960, marie: 540, jana: 188, fatma: 705, clara: 120 },
+    weekly: { anna: [40, 64, 32, 88, 72, 56, 96, 80, 64, 120, 104, 72], lena: [16, 32, 48, 24, 64, 40, 72, 56, 88, 64, 96, 48] },
+    providerAs: "anna", editId: null, gallery: 0,
     orders: [
-      { id: 101, listing: 3, buyer: "Familie Weber", note: "Paul, 8. Klasse, Klassenarbeit über lineare Funktionen am Freitag.", status: "OPEN", price: 200, fee: 40, mine: false },
-      { id: 102, listing: 6, buyer: "Tom K.", note: "Samstag ab 19 Uhr, zwei Kinder (3 und 6).", status: "OPEN", price: 320, fee: 64, mine: false },
+      { id: 1, listing: 3, buyer: "Familie Weber", note: "Paul, 8. Klasse, Klassenarbeit über lineare Funktionen am Freitag.", status: "OPEN", price: 200, fee: 40, mine: false, date: "14.10." },
+      { id: 2, listing: 1, buyer: "Herr Krämer", note: "Bitte auch die Apotheke an der Ecke, Rezept liegt bereit.", status: "OPEN", price: 80, fee: 16, mine: false, date: "15.10." },
+      { id: 3, listing: 2, buyer: "Familie Yilmaz", note: "Hecke vorne zur Straße, ca. 8 m.", status: "DELIVERED", price: 150, fee: 30, mine: false, date: "09.10." },
+      { id: 4, listing: 6, buyer: "Tom K.", note: "Samstag ab 19 Uhr, zwei Kinder (3 und 6).", status: "OPEN", price: 320, fee: 64, mine: false, date: "15.10." },
     ],
+    payouts: { anna: [{ date: "01.10.", amount: 380, status: "PAID" }, { date: "15.09.", amount: 260, status: "PAID" }], lena: [{ date: "02.10.", amount: 200, status: "PAID" }] },
     chats: {
       jana: [
         { me: true, text: "Hallo Jana, geht nächste Woche jeden Morgen Gassi?", cost: 4, t: "09:12" },
         { me: false, text: "Hallo! Ja, Montag bis Freitag um 8 Uhr passt gut. Wie heißt dein Hund?", t: "09:20" },
       ],
+      anna: [
+        { me: true, text: "Guten Tag Anna, können Sie auch Getränkekisten mitbringen?", cost: 3, t: "Gestern" },
+        { me: false, text: "Ja, bis zu zwei Kisten sind kein Problem.", t: "Gestern" },
+      ],
     },
-    activeChat: "jana",
-    stats: { users: 1284, soldCredits: 48200, revenue: 6910 },
+    activeChat: "jana", typing: null,
+    stats: { users: 1284, soldCredits: 48200, revenue: 6910, growth: 18 },
+    revenueWeekly: [380, 420, 465, 440, 520, 610, 585, 660, 720, 690, 780, 545],
     verifications: [
-      { id: 1, name: "Sophie", city: "Leipzig", note: "Videocall gern abends, Tel. hinterlegt" },
-      { id: 2, name: "Ayşe", city: "Dortmund", note: "Ausweis liegt bereit" },
+      { id: 1, name: "Sophie", city: "04109 Leipzig", note: "Videocall gern abends ab 18 Uhr", date: "15.10." },
+      { id: 2, name: "Ayşe", city: "44135 Dortmund", note: "Ausweis liegt bereit, Tel. hinterlegt", date: "16.10." },
     ],
-    reports: [
-      { id: 1, listing: 10, reason: "Preis wirkt sehr niedrig für 10 Personen, bitte prüfen." },
-    ],
-    adminTab: "design",
+    reports: [{ id: 1, listing: 8, reason: "Preis wirkt sehr niedrig für 10 Personen, bitte prüfen.", by: "Nutzer #2231", date: "16.10." }],
+    payoutQueue: [{ id: 1, p: "sevgi", amount: 900, iban: "DE89 3704 0044 0532 0130 00", date: "16.10." }, { id: 2, p: "fatma", amount: 650, iban: "DE12 1001 0010 0123 4567 89", date: "15.10." }],
+    adminFilter: "",
     flash: null,
   };
 }
@@ -267,20 +454,34 @@ function initialState() {
 let S = initialState();
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const fmt = (n) => n.toLocaleString("de-DE");
+const fmt = (n) => Math.round(n).toLocaleString("de-DE");
 const euro = (n) => n.toLocaleString("de-DE", { style: "currency", currency: "EUR" });
 const share = (price) => Math.floor(price * (100 - S.settings.fee) / 100);
 const now = () => new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
-const listingById = (id) => LISTINGS.find((l) => l.id === id);
+const L = (id) => S.listings.find((l) => l.id === id);
+const P = (id) => S.providers[id];
 const blocked = (txt) => { const t = txt.toLowerCase(); return BLOCKED.find((w) => new RegExp("(^|[^a-zäöüß])" + w.replace(/ /g, "\\s+")).test(t)); };
+const visible = () => S.listings.filter((l) => l.active);
 
+function avatar(pid, size = 40) {
+  const p = P(pid) || { name: pid };
+  const color = AV_COLORS[Object.keys(S.providers).indexOf(pid) % AV_COLORS.length] || AV_COLORS[0];
+  const inner = p.avatar ? `<img src="${p.avatar}" alt="">` : esc(p.name[0]);
+  return `<span class="avatar" style="width:${size}px;height:${size}px;font-size:${size * 0.42}px;background:${color}">${inner}</span>`;
+}
+function initials(name, size = 36, color = "#5d6f6c") { return `<span class="avatar" style="width:${size}px;height:${size}px;font-size:${size * 0.42}px;background:${color}">${esc(name[0])}</span>`; }
+function status(s) {
+  const m = { OPEN: ["Offen", "b-warn"], DELIVERED: ["Erledigt", "b-ok"], CANCELLED: ["Storniert", "b-mute"], PAID: ["Überwiesen", "b-ok"], REQUESTED: ["Beantragt", "b-warn"], ACTIVE: ["Aktiv", "b-ok"], PAUSED: ["Pausiert", "b-mute"] }[s];
+  return `<span class="badge ${m[1]}">${m[0]}</span>`;
+}
 function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.hidden = false;
-  clearTimeout(toast.timer); toast.timer = setTimeout(() => (t.hidden = true), 2600);
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => (t.hidden = true), 2800);
 }
+function flashHtml() { return S.flash ? `<p class="note ${S.flash.kind}">${esc(S.flash.text)}</p>` : ""; }
 
-/* ---------- Branding ---------- */
-const loadedFonts = new Set(["Poppins", "Inter"]);
+/* ================= Branding ================= */
+const loadedFonts = new Set(["Playfair Display", "DM Sans"]);
 function ensureFont(f) {
   if (loadedFonts.has(f)) return;
   loadedFonts.add(f);
@@ -295,44 +496,72 @@ function applyBrand() {
   r.setProperty("--brand", s.brand); r.setProperty("--accent", s.accent);
   r.setProperty("--bg", s.bg); r.setProperty("--ink", s.ink);
   r.setProperty("--radius", s.radius + "px");
-  r.setProperty("--font-head", `"${s.headingFont}", ui-sans-serif, system-ui, sans-serif`);
+  const serif = ["Playfair Display", "Merriweather", "Lora"].includes(s.headingFont);
+  r.setProperty("--font-head", `"${s.headingFont}", ${serif ? "Georgia, serif" : "ui-sans-serif, system-ui, sans-serif"}`);
   r.setProperty("--font-body", `"${s.bodyFont}", ui-sans-serif, system-ui, sans-serif`);
   $("#site-name").textContent = s.siteName;
   $("#site-tagline").textContent = s.tagline;
   $("#logo-mark").textContent = (s.siteName.trim()[0] || "N").toUpperCase();
   $("#footer-text").textContent = s.footerText;
 }
+// *Wort* im Admin-Text wird in der Überschrift kursiv in Akzentfarbe gesetzt
+const heroTitle = (t) => esc(t).replace(/\*(.+?)\*/g, "<em>$1</em>");
 
-/* ---------- Navigation ---------- */
-const NAVS = {
-  customer: [["search", "Suchen"], ["credits", null], ["chat", "Nachrichten"], ["bookings", "Meine Buchungen"]],
-  provider: [["pdash", "Mein Bereich"], ["pchat", "Nachrichten"]],
-  admin: [["admin", "Admin-Bereich"], ["search", "Seite ansehen"]],
+/* ================= Navigation ================= */
+const TOPNAV = {
+  customer: [["home", "Entdecken"], ["credits", null], ["chat", "Nachrichten"], ["bookings", "Meine Buchungen"]],
+  provider: [["p-home", "Mein Bereich"], ["home", "Marktplatz ansehen"]],
+  admin: [["a-home", "Admin"], ["home", "Marktplatz ansehen"]],
 };
 function renderNav() {
-  $("#nav").innerHTML = NAVS[S.role].map(([v, label]) => {
-    const text = v === "credits" ? `<span class="pill">${fmt(S.credits)} Credits</span>` : label;
-    return `<button data-nav="${v}" ${S.view === v ? 'aria-current="page"' : ""}>${text}</button>`;
+  $("#nav").innerHTML = TOPNAV[S.role].map(([v, label]) => {
+    const text = v === "credits" ? `<span class="pill">${ic("wallet")}${fmt(S.credits)}</span>` : label;
+    const cur = S.view === v || (v === "p-home" && S.view.startsWith("p-")) || (v === "a-home" && S.view.startsWith("a-"));
+    return `<button data-nav="${v}" ${cur ? 'aria-current="page"' : ""}>${text}</button>`;
   }).join("");
   document.querySelectorAll("#roles button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.role === S.role)));
 }
-
+const VIEWS = {};
 function render() {
   applyBrand(); renderNav();
-  const views = { search: viewSearch, credits: viewCredits, chat: viewChat, bookings: viewBookings, pdash: viewProvider, pchat: viewProviderChat, admin: viewAdmin };
-  $("#app").innerHTML = (views[S.view] || viewSearch)();
+  $("#app").innerHTML = (VIEWS[S.view] || VIEWS.home)();
   S.flash = null;
   const m = $(".msgs"); if (m) m.scrollTop = m.scrollHeight;
 }
 function go(view) { S.view = view; render(); window.scrollTo({ top: 0 }); }
-function flashHtml() { return S.flash ? `<p class="note ${S.flash.kind}">${esc(S.flash.text)}</p>` : ""; }
 
-/* ---------- Kund:in: Suche ---------- */
+function dash(title, items, body, sideCard = "") {
+  return `<div class="dash">
+    <nav class="side" aria-label="${title}"><div class="side-title">${title}</div>
+      ${items.map(([v, label, icon, cnt]) => `<button data-nav="${v}" ${S.view === v || (v === "p-listings" && S.view === "p-edit") ? 'aria-current="page"' : ""}>${ic(icon)}<span>${label}</span>${cnt ? `<span class="cnt">${cnt}</span>` : ""}</button>`).join("")}
+      ${sideCard}
+    </nav>
+    <div class="content">${body}</div>
+  </div>`;
+}
+function ph(title, sub, action = "") { return `<div class="ph"><div><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${action}</div>`; }
+function statTile(icon, label, value, hint = "", acc = false) {
+  return `<div class="card stat"><span class="ico ${acc ? "acc" : ""}">${ic(icon)}</span><div><div class="lab">${label}</div><div class="val">${value}</div>${hint ? `<div class="hint">${hint}</div>` : ""}</div></div>`;
+}
+function chart(values, labels, unit) {
+  const max = Math.max(1, ...values);
+  const pow = 10 ** Math.floor(Math.log10(max));
+  const nice = ([1, 2, 2.5, 5, 10].find((s) => s * pow >= max) || 10) * pow;
+  return `<div class="chart" role="img" aria-label="Säulendiagramm: ${labels.map((l, i) => `${l} ${values[i]} ${unit}`).join(", ")}">
+    <div class="plot">
+      ${[0, nice / 2, nice].map((t) => `<div class="gl" style="bottom:${(t / nice) * 100}%"><span>${fmt(t)}</span><i></i></div>`).join("")}
+      ${values.map((v, i) => `<div class="bar" tabindex="0"><b style="height:${(v / nice) * 100}%"></b><span class="tip">${labels[i]}: <strong>${fmt(v)}</strong> ${unit}</span></div>`).join("")}
+    </div>
+    <div class="xl">${labels.map((l, i) => `<span>${i % 2 === 0 || i === labels.length - 1 ? l : ""}</span>`).join("")}</div>
+  </div>`;
+}
+
+/* ================= Kund:in ================= */
 function filtered() {
   const { q, place, cat, type } = S.filters;
-  return LISTINGS.filter((l) => {
-    const p = PROVIDERS[l.p];
-    if (q && !(l.title + " " + l.desc).toLowerCase().includes(q.toLowerCase())) return false;
+  return visible().filter((l) => {
+    const p = P(l.p);
+    if (q && !(l.title + " " + l.desc + " " + l.cat).toLowerCase().includes(q.toLowerCase())) return false;
     if (place) {
       if (/^\d+$/.test(place)) { if (!p.plz.startsWith(place)) return false; }
       else if (!p.city.toLowerCase().includes(place.toLowerCase())) return false;
@@ -343,113 +572,132 @@ function filtered() {
   });
 }
 function card(l) {
-  const p = PROVIDERS[l.p];
+  const p = P(l.p);
   return `<button class="listing" data-open="${l.id}">
-    <div class="thumb">${esc(l.cat[0])}${l.type === "GREETING_VIDEO" ? '<span class="kind badge b-accent">Grußvideo</span>' : ""}</div>
+    <div class="cover">
+      ${l.photos[0] ? `<img src="${l.photos[0]}" alt="">` : ""}
+      <span class="shade"></span>
+      <span class="price">${fmt(l.price)} Credits</span>
+      ${l.type === "GREETING_VIDEO" ? '<span class="tl tag-video">Grußvideo</span>' : ""}
+      ${l.photos.length > 1 ? `<span class="tr">${ic("image")}${l.photos.length}</span>` : ""}
+    </div>
     <div class="body">
-      <span><span class="badge b-brand">${esc(l.cat)}</span></span>
+      <span class="eyebrow">${esc(l.cat)}</span>
       <h3>${esc(l.title)}</h3>
-      <span class="small muted">${esc(p.name)} · ${p.plz} ${esc(p.city)} <span class="verified">✔ verifiziert</span></span>
-      <span class="price num">${fmt(l.price)} Credits</span>
+      <div class="foot">${avatar(l.p, 26)}<span>${esc(p.name)}</span><span class="verified" title="Verifiziert">${ic("shield")}</span><span class="where">${ic("pin")}${esc(p.city)}</span></div>
     </div>
   </button>`;
 }
-function viewSearch() {
+VIEWS.home = () => {
   const s = S.settings, f = S.filters, res = filtered();
-  return `<div class="stack" style="gap:28px">
+  return `<div class="stack" style="gap:40px">
     <section class="hero">
-      <h1>${esc(s.heroTitle)}</h1>
-      <p>${esc(s.heroText)}</p>
+      <span class="kicker">${ic("shield")} Alle Anbieterinnen persönlich verifiziert</span>
+      <h1>${heroTitle(s.heroTitle)}</h1>
+      <p class="lead">${esc(s.heroText)}</p>
       <form class="search" id="search-form">
-        <input class="input q" id="f-q" placeholder="Was suchst du? z. B. Gassi" value="${esc(f.q)}" aria-label="Suchbegriff">
+        <input class="input q" id="f-q" placeholder="Was suchst du? z. B. Gassi gehen" value="${esc(f.q)}" aria-label="Suchbegriff">
         <input class="input" id="f-place" placeholder="Ort oder PLZ" value="${esc(f.place)}" aria-label="Ort oder PLZ">
         <select class="input" id="f-cat" aria-label="Dienstleistung"><option value="">Alle Dienstleistungen</option>${CATS.map((c) => `<option ${f.cat === c ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
         <select class="input" id="f-type" aria-label="Art"><option value="">Alle Arten</option><option value="SERVICE" ${f.type === "SERVICE" ? "selected" : ""}>Dienstleistung</option><option value="GREETING_VIDEO" ${f.type === "GREETING_VIDEO" ? "selected" : ""}>Grußvideo</option></select>
         <button class="btn accent" type="submit">Suchen</button>
       </form>
-      <div class="chips" aria-label="Schnellfilter">
-        <button data-quick="place:Köln">Köln</button><button data-quick="place:Berlin">Berlin</button><button data-quick="place:20">PLZ 20… (Hamburg)</button><button data-quick="type:GREETING_VIDEO">Nur Grußvideos</button><button data-quick="clear">Alle Filter löschen</button>
+      <div class="chips" aria-label="Kategorien">
+        ${CATS.slice(0, 8).map((c) => `<button data-cat="${esc(c)}" aria-pressed="${f.cat === c}">${ic(CAT_META[c]?.icon || "sparkle")}${esc(c)}</button>`).join("")}
       </div>
     </section>
-    <section class="stack">
-      <h2 style="font-size:20px">${res.length} ${res.length === 1 ? "Angebot" : "Angebote"}${f.place ? ` in „${esc(f.place)}“` : ""}</h2>
-      ${res.length ? `<div class="grid">${res.map(card).join("")}</div>` : `<p class="card muted">Keine Angebote gefunden. Versuche einen anderen Ort oder eine andere Kategorie.</p>`}
+
+    <section class="trust">
+      <div class="card">${'<span class="ico">' + ic("shield") + "</span>"}<div><strong>Persönlich verifiziert</strong><p class="small muted">Jede Anbieterin weist Alter und Identität per Videocall nach.</p></div></div>
+      <div class="card">${'<span class="ico acc">' + ic("lock") + "</span>"}<div><strong>Sicher bezahlt</strong><p class="small muted">Deine Credits werden erst ausgezahlt, wenn die Leistung erledigt ist.</p></div></div>
+      <div class="card">${'<span class="ico">' + ic("pin") + "</span>"}<div><strong>Direkt um die Ecke</strong><p class="small muted">Filter nach Ort oder PLZ, zum Beispiel „50“ für den Raum Köln.</p></div></div>
+    </section>
+
+    <section class="stack" style="gap:18px">
+      <div class="row between">
+        <h2 style="font-size:28px">${res.length} ${res.length === 1 ? "Angebot" : "Angebote"}${f.place ? ` <span class="muted">in „${esc(f.place)}“</span>` : ""}</h2>
+        <div class="row">
+          ${["Köln", "Berlin", "Hamburg", "München"].map((c) => `<button class="btn ghost sm" data-place="${c}" ${f.place === c ? 'style="border-color:var(--brand);color:var(--brand)"' : ""}>${c}</button>`).join("")}
+          ${f.q || f.place || f.cat || f.type ? `<button class="btn ghost sm" data-clear>Filter löschen</button>` : ""}
+        </div>
+      </div>
+      ${res.length ? `<div class="grid">${res.map(card).join("")}</div>` : `<div class="card muted">Keine Angebote gefunden. Versuche einen anderen Ort oder eine andere Kategorie.</div>`}
     </section>
   </div>`;
-}
+};
 
-function openListing(id) {
-  const l = listingById(id), p = PROVIDERS[l.p], d = $("#dlg"), isVideo = l.type === "GREETING_VIDEO";
+function openListing(id, keepIdx) {
+  const l = L(id), p = P(l.p), d = $("#dlg"), isVideo = l.type === "GREETING_VIDEO";
+  if (!keepIdx) S.gallery = 0;
+  const i = Math.min(S.gallery, Math.max(0, l.photos.length - 1));
   const canOrder = S.role === "customer";
   d.innerHTML = `<button class="close" data-close aria-label="Schließen">×</button>
   <div class="dlg">
-    <div class="stack">
-      <div class="thumb" style="border-radius:var(--radius);aspect-ratio:16/7">${esc(l.cat[0])}</div>
-      <div class="row"><span class="badge b-brand">${esc(l.cat)}</span><span class="badge b-accent">${isVideo ? "Grußvideo" : "Dienstleistung"}</span></div>
-      <h2 style="font-size:24px">${esc(l.title)}</h2>
-      <p class="muted" style="margin:0">${p.plz} ${esc(p.city)}</p>
-      <p style="margin:0;max-width:62ch">${esc(l.desc)}</p>
-      <button class="btn ghost" data-report="${l.id}" style="align-self:flex-start">Anzeige melden</button>
+    <div class="stack" style="gap:16px">
+      <div class="gal">
+        ${l.photos.length ? `<img src="${l.photos[i]}" alt="Foto ${i + 1} von ${l.photos.length}">` : ""}
+        ${l.photos.length > 1 ? `<button class="nav prev" data-gal="-1" data-lid="${l.id}" aria-label="Vorheriges Foto">‹</button><button class="nav next" data-gal="1" data-lid="${l.id}" aria-label="Nächstes Foto">›</button><span class="count">${i + 1} / ${l.photos.length}</span>` : ""}
+      </div>
+      ${l.photos.length > 1 ? `<div class="thumbs">${l.photos.map((src, j) => `<button data-galto="${j}" data-lid="${l.id}" aria-current="${j === i}" aria-label="Foto ${j + 1}"><img src="${src}" alt=""></button>`).join("")}</div>` : ""}
+      <div class="row"><span class="eyebrow">${esc(l.cat)}</span>${isVideo ? '<span class="tag-video">Grußvideo</span>' : ""}</div>
+      <h2 style="font-size:30px;line-height:1.15">${esc(l.title)}</h2>
+      <p class="muted row" style="gap:4px">${ic("pin")} ${p.plz} ${esc(p.city)}</p>
+      <p style="max-width:62ch">${esc(l.desc)}</p>
+      <button class="btn ghost sm" data-report="${l.id}" style="align-self:flex-start">${ic("flag")} Anzeige melden</button>
     </div>
     <aside>
-      <p class="price num" style="font-size:30px;margin:0">${fmt(l.price)} Credits</p>
+      <div><span class="xs muted">Preis</span><p class="head num" style="font-size:38px;font-weight:700;line-height:1.1">${fmt(l.price)} <span style="font-size:18px">Credits</span></p><p class="small muted">entspricht ${euro(l.price / 10)}</p></div>
       ${canOrder ? `<form id="order-form" class="stack" data-id="${l.id}">
         <div><label class="lbl" for="o-note">${isVideo ? "Für wen ist das Video? Was soll gesagt werden?" : "Nachricht zur Buchung"}</label>
         <textarea class="input" id="o-note" rows="3">${isVideo ? "Für meine Schwester Julia zum 30. Geburtstag!" : ""}</textarea></div>
         <button class="btn block" type="submit">${isVideo ? "Grußvideo bestellen" : "Jetzt buchen"}</button>
-        <p class="small muted" style="margin:0">Deine Credits werden sicher verwahrt und erst nach Erledigung an ${esc(p.name)} ausgezahlt.</p>
+        <p class="xs muted row" style="gap:6px">${ic("lock")} Credits werden sicher verwahrt und erst nach Erledigung an ${esc(p.name)} ausgezahlt.</p>
         <div id="order-msg"></div>
-      </form>` : `<p class="note warn">In der Kund:innen-Ansicht kannst du hier buchen.</p>`}
-      <div class="card stack" style="gap:8px">
-        <div class="row"><span class="logo"><span class="mark">${esc(p.name[0])}</span></span><span><strong>${esc(p.name)}</strong><br><span class="verified">✔ Identität verifiziert</span></span></div>
-        <p class="small" style="margin:0">${esc(p.bio)}</p>
-        ${canOrder ? `<button class="btn ghost" data-chatwith="${l.p}">Chatten (${p.chat} Credits / Nachricht)</button>` : ""}
+      </form>` : `<p class="note warn">Wechsle oben zu „Kund:in“, um zu buchen.</p>`}
+      <div class="card stack" style="gap:10px;padding:16px">
+        <div class="row">${avatar(l.p, 52)}<div class="grow"><strong style="font-size:16px">${esc(p.name)}</strong><br><span class="verified">${ic("shield")} Identität verifiziert</span></div></div>
+        <div class="row small muted" style="gap:14px"><span>${ic("star")} ${p.rating.toLocaleString("de-DE")}</span><span>${p.jobs} Einsätze</span><span>seit ${p.since}</span></div>
+        <p class="small">${esc(p.bio)}</p>
+        ${canOrder ? `<button class="btn ghost" data-chatwith="${l.p}">${ic("chat")} Chatten · ${p.chat} Credits / Nachricht</button>` : ""}
       </div>
     </aside>
   </div>`;
-  d.showModal();
+  if (!d.open) d.showModal();
 }
-
 function placeOrder(id, note) {
-  const l = listingById(id), msg = $("#order-msg");
+  const l = L(id), msg = $("#order-msg");
   if (S.credits < l.price) {
-    msg.innerHTML = `<p class="note err">Nicht genügend Credits. Du hast ${fmt(S.credits)}, brauchst ${fmt(l.price)}. <button class="btn accent" data-nav="credits" style="margin-top:6px">Credits aufladen</button></p>`;
+    msg.innerHTML = `<div class="note err stack" style="gap:8px">Nicht genügend Credits. Du hast ${fmt(S.credits)}, brauchst ${fmt(l.price)}.<button class="btn accent sm" data-nav="credits" type="button">Credits aufladen</button></div>`;
     return;
   }
   S.credits -= l.price;
-  S.orders.unshift({ id: Date.now(), listing: id, buyer: "Du (Demo-Kundin)", note, status: "OPEN", price: l.price, fee: l.price - share(l.price), mine: true });
+  S.orders.unshift({ id: Date.now(), listing: id, buyer: "Demo-Kundin", note, status: "OPEN", price: l.price, fee: l.price - share(l.price), mine: true, date: "Heute" });
   $("#dlg").close();
-  S.flash = { kind: "ok", text: `Gebucht: „${l.title}“. ${fmt(l.price)} Credits sind reserviert, bis ${PROVIDERS[l.p].name} die Leistung erledigt hat.` };
+  S.flash = { kind: "ok", text: `Gebucht: „${l.title}“. ${fmt(l.price)} Credits sind reserviert, bis ${P(l.p).name} die Leistung erledigt hat.` };
   go("bookings");
 }
 
-/* ---------- Kund:in: Credits ---------- */
-function viewCredits() {
-  return `<div class="stack" style="gap:22px">
-    <div><h1 style="font-size:26px">Credits</h1>
-    <p class="muted" style="margin:6px 0 0">Dein Guthaben: <strong class="num" style="color:var(--brand)">${fmt(S.credits)} Credits</strong>. Damit buchst du Dienstleistungen, bestellst Grußvideos und chattest mit Anbieterinnen.</p></div>
-    ${flashHtml()}
-    <div class="packs">${PACKS.map((p) => `<div class="card pack">
-      <span class="badge b-accent">${p.label}</span>
-      <span class="big">${fmt(p.credits)}</span><span class="muted">Credits</span>
-      <strong style="font-size:20px">${euro(p.euro)}</strong>
-      <span class="small muted">${(p.euro * 100 / p.credits).toFixed(1).replace(".", ",")} Cent pro Credit</span>
-      <button class="btn block" data-buy="${p.id}">Kaufen</button>
-    </div>`).join("")}</div>
-    <p class="small muted">In der echten App läuft die Zahlung über Stripe (Karte, PayPal, Klarna, Apple Pay). In der Demo werden die Credits direkt gutgeschrieben.</p>
-  </div>`;
-}
+VIEWS.credits = () => `<div class="stack" style="gap:24px">
+  ${ph("Credits aufladen", `Dein Guthaben: <strong class="num" style="color:var(--brand)">${fmt(S.credits)} Credits</strong>. Damit buchst du Dienstleistungen, bestellst Grußvideos und chattest mit Anbieterinnen.`)}
+  ${flashHtml()}
+  <div class="packs">${PACKS.map((p) => `<div class="card pack ${p.best ? "best" : ""}">
+    <span class="badge ${p.best ? "b-warn" : "b-brand"}">${p.label}${p.best ? " · +10 % gratis" : ""}</span>
+    <span class="big">${fmt(p.credits)}</span><span class="muted">Credits</span>
+    <strong style="font-size:22px">${euro(p.euro)}</strong>
+    <span class="xs muted">${(p.euro * 100 / p.credits).toFixed(1).replace(".", ",")} Cent pro Credit</span>
+    <button class="btn block ${p.best ? "accent" : ""}" data-buy="${p.id}" style="margin-top:8px">Kaufen</button>
+  </div>`).join("")}</div>
+  <p class="small muted">In der echten App läuft die Zahlung über Stripe (Karte, PayPal, Klarna, Apple Pay). In der Demo werden die Credits direkt gutgeschrieben.</p>
+</div>`;
 
-/* ---------- Kund:in: Chat ---------- */
 function chatPanel(pid, asProvider) {
-  const p = PROVIDERS[pid], msgs = S.chats[pid] || [];
-  const other = asProvider ? "Du (Demo-Kundin)" : p.name;
+  const p = P(pid), msgs = S.chats[pid] || [];
   return `<div class="card stack">
-    <div class="row between"><h2 style="font-size:20px">Chat mit ${esc(other)}</h2>
-    ${asProvider ? `<span class="badge b-ok">Antworten sind für dich kostenlos</span>` : `<span class="badge b-brand">${p.chat} Credits / Nachricht</span>`}</div>
+    <div class="row between"><div class="row">${asProvider ? initials("Demo-Kundin", 40, "#5b5fc7") : avatar(pid, 40)}<div><strong>${asProvider ? "Demo-Kundin" : esc(p.name)}</strong><br><span class="xs muted">${asProvider ? "Kundin aus Köln" : `${esc(p.city)} · antwortet meist in 10 Min.`}</span></div></div>
+    ${asProvider ? `<span class="badge b-ok">Antworten sind kostenlos</span>` : `<span class="badge b-brand">${p.chat} Credits / Nachricht</span>`}</div>
     <div class="msgs" aria-live="polite">${msgs.length ? msgs.map((m) => {
       const mine = asProvider ? !m.me : m.me;
-      return `<div class="msg ${mine ? "me" : ""}">${esc(m.text)}<div class="meta">${m.t}${m.cost && !asProvider ? ` · ${m.cost} Credits` : ""}${m.cost && asProvider ? ` · +${share(m.cost)} Credits Verdienst` : ""}</div></div>`;
+      return `<div class="msg ${mine ? "me" : ""}">${esc(m.text)}<div class="meta">${m.t}${m.cost && !asProvider ? ` · ${m.cost} Credits` : ""}${m.cost && asProvider ? ` · +${share(m.cost)} Credits für dich` : ""}</div></div>`;
     }).join("") : `<p class="muted" style="margin:auto">Schreib die erste Nachricht.</p>`}
     ${S.typing === pid ? `<p class="typing">${esc(p.name)} schreibt …</p>` : ""}</div>
     <form id="chat-form" class="stack" data-pid="${pid}" data-asprovider="${asProvider ? 1 : 0}">
@@ -457,211 +705,408 @@ function chatPanel(pid, asProvider) {
       <div class="row between"><span class="small muted">${asProvider ? "Kund:innen zahlen pro Nachricht, du verdienst mit." : `Guthaben: <span class="num">${fmt(S.credits)}</span> Credits`}</span><button class="btn" type="submit">Senden</button></div>
       ${flashHtml()}
     </form>
-    <p class="small muted" style="margin:0">Zu deiner Sicherheit: Teile keine Bank- oder Ausweisdaten im Chat. Unzulässige Inhalte werden automatisch blockiert.</p>
+    <p class="xs muted">Zu deiner Sicherheit: Teile keine Bank- oder Ausweisdaten im Chat. Unzulässige Inhalte werden automatisch blockiert.</p>
   </div>`;
 }
-function viewChat() {
+VIEWS.chat = () => {
   const ids = Object.keys(S.chats);
-  if (!ids.length) return `<p class="card muted">Noch keine Chats. Öffne eine Anzeige und tippe auf „Chatten“.</p>`;
+  if (!ids.length) return `<div class="card muted">Noch keine Chats. Öffne eine Anzeige und tippe auf „Chatten“.</div>`;
   if (!S.chats[S.activeChat]) S.activeChat = ids[0];
-  return `<div class="stack"><h1 style="font-size:26px">Nachrichten</h1>
-    <div class="chat"><div class="convlist stack" style="gap:8px">${ids.map((id) => {
+  return `<div class="stack" style="gap:20px">${ph("Nachrichten")}
+    <div class="chat"><div class="stack" style="gap:8px">${ids.map((id) => {
       const last = S.chats[id].at(-1);
-      return `<button data-conv="${id}" aria-current="${id === S.activeChat}"><strong>${esc(PROVIDERS[id].name)}</strong><br><span class="small muted">${last ? esc(last.text.slice(0, 42)) : "Noch keine Nachrichten"}</span></button>`;
-    }).join("")}</div>
-    ${chatPanel(S.activeChat, false)}</div></div>`;
-}
+      return `<button class="conv" data-conv="${id}" aria-current="${id === S.activeChat}">${avatar(id, 40)}<span class="grow"><strong>${esc(P(id).name)}</strong><br><span class="small muted" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last ? esc(last.text) : "Noch keine Nachrichten"}</span></span></button>`;
+    }).join("")}</div>${chatPanel(S.activeChat, false)}</div></div>`;
+};
 function sendChat(pid, text, asProvider) {
   if (!text.trim()) { S.flash = { kind: "err", text: "Bitte schreibe eine Nachricht." }; return render(); }
-  const bad = blocked(text);
-  if (bad) { S.flash = { kind: "err", text: "Die Nachricht enthält unzulässige Inhalte und wurde nicht gesendet." }; return render(); }
-  const p = PROVIDERS[pid];
-  if (asProvider) {
-    (S.chats[pid] ||= []).push({ me: false, text, t: now() });
-    return render();
-  }
+  if (blocked(text)) { S.flash = { kind: "err", text: "Die Nachricht enthält unzulässige Inhalte und wurde nicht gesendet." }; return render(); }
+  const p = P(pid);
+  if (asProvider) { (S.chats[pid] ||= []).push({ me: false, text, t: now() }); return render(); }
   if (S.credits < p.chat) { S.flash = { kind: "err", text: "Nicht genügend Credits. Bitte lade dein Guthaben auf." }; return render(); }
-  S.credits -= p.chat;
-  S.earnings[pid] += share(p.chat);
-  S.stats.revenue += p.chat - share(p.chat);
+  S.credits -= p.chat; S.earnings[pid] += share(p.chat); S.stats.revenue += p.chat - share(p.chat);
   (S.chats[pid] ||= []).push({ me: true, text, cost: p.chat, t: now() });
   S.typing = pid; render();
   setTimeout(() => {
     S.typing = null;
     const replies = ["Hallo! Danke für deine Nachricht. Wann würde es dir passen?", "Das klingt gut, das bekomme ich hin.", "Gern! Buch mich einfach über die Anzeige, dann ist alles abgesichert.", "Am Wochenende hätte ich Zeit. Samstagvormittag?"];
     S.chats[pid].push({ me: false, text: replies[S.chats[pid].length % replies.length], t: now() });
-    if (S.view === "chat" || S.view === "pchat") render();
+    if (S.view === "chat" || S.view === "p-chat") render();
   }, 1400);
 }
-
-/* ---------- Kund:in: Buchungen ---------- */
-const STATUS = { OPEN: ["Offen", "b-warn"], DELIVERED: ["Erledigt", "b-ok"], CANCELLED: ["Storniert", "b-mute"] };
-function viewBookings() {
+VIEWS.bookings = () => {
   const mine = S.orders.filter((o) => o.mine);
-  return `<div class="stack" style="gap:18px"><h1 style="font-size:26px">Meine Buchungen</h1>${flashHtml()}
+  return `<div class="stack" style="gap:20px">${ph("Meine Buchungen", "Credits werden treuhänderisch gehalten, bis eine Buchung erledigt ist.")}${flashHtml()}
     <div class="card">${mine.length ? `<div class="list">${mine.map((o) => {
-      const l = listingById(o.listing), [txt, cls] = STATUS[o.status];
-      return `<div class="row between"><span><strong>${esc(l.title)}</strong><br><span class="small muted">bei ${esc(PROVIDERS[l.p].name)} · <span class="num">${fmt(o.price)}</span> Credits${o.status === "DELIVERED" && l.type === "GREETING_VIDEO" ? ' · <span style="color:var(--brand)">Video ist da</span>' : ""}</span></span>
-      <span class="row"><span class="badge ${cls}">${txt}</span>${o.status === "OPEN" ? `<button class="btn ghost" data-cancel="${o.id}">Stornieren</button>` : ""}</span></div>`;
-    }).join("")}</div>` : `<p class="muted" style="margin:0">Noch nichts gebucht. <button class="btn ghost" data-nav="search">Angebote entdecken</button></p>`}</div>
+      const l = L(o.listing);
+      return `<div class="row"><img class="thumb" src="${l.photos[0] || ""}" alt=""><div class="grow"><strong>${esc(l.title)}</strong><br><span class="small muted">bei ${esc(P(l.p).name)} · <span class="num">${fmt(o.price)}</span> Credits${o.status === "DELIVERED" && l.type === "GREETING_VIDEO" ? ' · <strong style="color:var(--brand)">Video ist da</strong>' : ""}</span></div>
+      ${status(o.status)}${o.status === "OPEN" ? `<button class="btn ghost sm" data-cancel="${o.id}">Stornieren</button>` : ""}</div>`;
+    }).join("")}</div>` : `<div class="stack" style="align-items:center;padding:30px;text-align:center"><span class="ico">${ic("calendar")}</span><strong>Noch nichts gebucht</strong><button class="btn" data-nav="home">Angebote entdecken</button></div>`}</div>
     <p class="small muted">Tipp für die Vorführung: Wechsle oben auf „Anbieterin“, wähle die passende Person und markiere die Buchung als erledigt.</p></div>`;
-}
+};
 
-/* ---------- Anbieterin ---------- */
-function viewProvider() {
-  const pid = S.providerAs, p = PROVIDERS[pid];
-  const mine = LISTINGS.filter((l) => l.p === pid);
-  const orders = S.orders.filter((o) => listingById(o.listing).p === pid);
-  return `<div class="stack" style="gap:22px">
-    <div class="row between">
-      <div><h1 style="font-size:26px">Hallo ${esc(p.name)}!</h1><p class="muted" style="margin:2px 0 0">${p.plz} ${esc(p.city)} · <span class="verified">✔ verifiziert</span></p></div>
-      <label class="row small">Angemeldet als
-        <select class="input" id="provider-as" style="width:auto">${Object.entries(PROVIDERS).map(([id, x]) => `<option value="${id}" ${id === pid ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
-      </label>
-    </div>
-    ${flashHtml()}
-    <div class="stats">
-      <div class="card stat"><span class="small muted">Verdient (auszahlbar)</span><div class="v">${fmt(S.earnings[pid])} Credits</div><span class="small muted">≈ ${euro(S.earnings[pid] / 10)}</span></div>
-      <div class="card stat"><span class="small muted">Offene Buchungen</span><div class="v">${orders.filter((o) => o.status === "OPEN").length}</div></div>
-      <div class="card stat"><span class="small muted">Chat-Preis</span><div class="v">${p.chat} Credits</div><span class="small muted">pro Nachricht, du erhältst ${share(p.chat)}</span></div>
-    </div>
-    <section class="card stack"><h2 style="font-size:18px">Eingegangene Buchungen</h2>
-      ${orders.length ? `<div class="list">${orders.map((o) => {
-        const l = listingById(o.listing), [txt, cls] = STATUS[o.status];
-        return `<div class="stack" style="gap:8px"><div class="row between"><span><strong>${esc(l.title)}</strong> von ${esc(o.buyer)}<br><span class="small muted"><span class="num">${fmt(o.price)}</span> Credits, du erhältst <span class="num">${fmt(o.price - o.fee)}</span> (Gebühr ${fmt(o.fee)})</span></span><span class="badge ${cls}">${txt}</span></div>
-        ${o.note ? `<p class="note" style="background:var(--soft);margin:0">„${esc(o.note)}“</p>` : ""}
-        ${o.status === "OPEN" ? `<div class="row"><button class="btn" data-deliver="${o.id}">${l.type === "GREETING_VIDEO" ? "Video hochladen und erledigen" : "Als erledigt markieren"}</button><button class="btn ghost" data-cancel="${o.id}">Ablehnen</button></div>` : ""}</div>`;
-      }).join("")}</div>` : `<p class="muted" style="margin:0">Noch keine Buchungen für ${esc(p.name)}.</p>`}
-    </section>
-    <div class="two">
-      <section class="card stack"><div class="row between"><h2 style="font-size:18px">Meine Anzeigen</h2><button class="btn" data-newlisting>+ Neue Anzeige</button></div>
-        <div class="list">${mine.map((l) => `<div class="row between"><span>${esc(l.title)}<br><span class="small muted">${l.type === "GREETING_VIDEO" ? "Grußvideo" : "Dienstleistung"} · ${fmt(l.price)} Credits</span></span><span class="badge b-ok">Aktiv</span></div>`).join("")}</div>
-      </section>
-      <section class="card stack"><h2 style="font-size:18px">Auszahlung</h2>
-        <p class="small muted" style="margin:0">Ab 200 Credits auszahlbar · 1 Credit = 0,10 €</p>
-        <form id="payout-form" class="stack"><div class="fields"><input class="input" id="po-credits" type="number" min="200" value="${Math.max(200, S.earnings[pid])}" aria-label="Credits"><input class="input" id="po-iban" value="DE89 3704 0044 0532 0130 00" aria-label="IBAN"></div>
-        <button class="btn accent" type="submit">Auszahlung beantragen</button></form>
-      </section>
-    </div>
-  </div>`;
-}
-function viewProviderChat() {
+/* ================= Anbieterin ================= */
+function providerDash(body) {
   const pid = S.providerAs;
-  if (!S.chats[pid]) return `<div class="stack"><h1 style="font-size:26px">Nachrichten</h1><p class="card muted">Noch keine Chats für ${esc(PROVIDERS[pid].name)}. Schreib ihr in der Kund:innen-Ansicht eine Nachricht.</p></div>`;
-  return `<div class="stack"><h1 style="font-size:26px">Nachrichten</h1>${chatPanel(pid, true)}</div>`;
+  const open = S.orders.filter((o) => L(o.listing)?.p === pid && o.status === "OPEN").length;
+  const switcher = `<div class="side-card"><strong>Demo-Konto</strong>Angemeldet als<select class="input" id="provider-as" style="margin-top:8px;background:#fff;color:#10201e">${Object.entries(S.providers).map(([id, x]) => `<option value="${id}" ${id === pid ? "selected" : ""}>${esc(x.name)} · ${esc(x.city)}</option>`).join("")}</select></div>`;
+  return dash("Anbieterin", [
+    ["p-home", "Übersicht", "home"], ["p-listings", "Meine Anzeigen", "grid"], ["p-bookings", "Buchungen", "calendar", open],
+    ["p-chat", "Nachrichten", "chat"], ["p-earn", "Verdienst & Auszahlung", "wallet"], ["p-profile", "Profil & Verifizierung", "user"],
+  ], body, switcher);
 }
-
-/* ---------- Admin ---------- */
-function viewAdmin() {
-  const tabs = [["design", "Design & Texte"], ["verify", "Verifizierung", S.verifications.length], ["reports", "Meldungen", S.reports.length], ["cats", "Kategorien"], ["users", "Nutzer:innen"]];
-  const body = { design: adminDesign, verify: adminVerify, reports: adminReports, cats: adminCats, users: adminUsers }[S.adminTab]();
-  return `<div class="stack" style="gap:20px">
-    <div class="row between"><h1 style="font-size:26px">Admin-Bereich</h1><span class="badge b-mute">Zahlen sind Beispieldaten</span></div>
-    <div class="stats">
-      <div class="card stat"><span class="small muted">Nutzer:innen</span><div class="v">${fmt(S.stats.users)}</div></div>
-      <div class="card stat"><span class="small muted">Aktive Anzeigen</span><div class="v">${LISTINGS.length}</div></div>
-      <div class="card stat"><span class="small muted">Verkaufte Credits</span><div class="v">${fmt(S.stats.soldCredits)}</div><span class="small muted">≈ ${euro(S.stats.soldCredits / 10)} Umsatz</span></div>
-      <div class="card stat"><span class="small muted">Plattform-Einnahmen (${S.settings.fee} %)</span><div class="v">${fmt(S.stats.revenue)} Credits</div><span class="small muted">≈ ${euro(S.stats.revenue / 10)}</span></div>
-    </div>
-    <div class="tabs" role="tablist">${tabs.map(([k, l, n]) => `<button role="tab" data-atab="${k}" aria-selected="${S.adminTab === k}">${l}${n ? ` <span class="pill">${n}</span>` : ""}</button>`).join("")}</div>
+VIEWS["p-home"] = () => {
+  const pid = S.providerAs, p = P(pid);
+  const mine = S.listings.filter((l) => l.p === pid);
+  const orders = S.orders.filter((o) => L(o.listing)?.p === pid);
+  const open = orders.filter((o) => o.status === "OPEN");
+  const weekly = S.weekly[pid] || [24, 40, 32, 56, 48, 64, 40, 72, 56, 80, 64, 48];
+  const month = weekly.slice(-3).reduce((a, b) => a + b, 0);
+  const photosDone = mine.length > 0 && mine.every((l) => l.photos.length >= 2);
+  const todo = [
+    ["Identität verifiziert", true],
+    ["Profilfoto hochgeladen", !!p.avatar],
+    ["Jede Anzeige hat mind. 2 Fotos", photosDone],
+    ["Beschreibung „Über mich“ ausgefüllt", p.bio.length > 40],
+  ];
+  const done = todo.filter((t) => t[1]).length;
+  return providerDash(`
+    ${ph(`Hallo ${esc(p.name)}!`, "Hier siehst du, wie dein Angebot läuft.", `<button class="btn" data-newlisting>${ic("plus")} Neue Anzeige</button>`)}
     ${flashHtml()}
-    <section class="card">${body}</section>
+    <div class="stats">
+      ${statTile("wallet", "Auszahlbar", `${euro(S.earnings[pid] / 10)}`, `${fmt(S.earnings[pid])} Credits`)}
+      ${statTile("chart", "Verdient in 3 Wochen", `${fmt(month)} Cr.`, `<span class="up">+12 %</span> zum Vormonat`, true)}
+      ${statTile("calendar", "Offene Buchungen", open.length)}
+      ${statTile("star", "Bewertung", p.rating.toLocaleString("de-DE"), `${p.jobs} Einsätze`)}
+    </div>
+    <div class="cols">
+      <section class="card"><div class="panel-h"><h2>Verdienst pro Woche</h2><span class="xs muted">Credits nach Gebühr</span></div>${chart(weekly, WEEKS, "Credits")}</section>
+      <section class="card"><div class="panel-h"><h2>Profil vervollständigen</h2><span class="badge b-brand">${done} / ${todo.length}</span></div>
+        <div class="meter" style="margin-bottom:10px"><i style="width:${(done / todo.length) * 100}%"></i></div>
+        <ul class="checklist" style="list-style:none;padding:0;margin:0">${todo.map(([t, ok]) => `<li><span class="dot ${ok ? "done" : ""}">${ok ? ic("check") : ""}</span>${t}</li>`).join("")}</ul>
+        <p class="xs muted" style="margin-top:10px">Anzeigen mit mehreren Fotos werden deutlich häufiger gebucht.</p>
+      </section>
+    </div>
+    <section class="card"><div class="panel-h"><h2>Offene Buchungen</h2><button class="btn ghost sm" data-nav="p-bookings">Alle ansehen</button></div>
+      ${open.length ? `<div class="list">${open.map((o) => { const l = L(o.listing); return `<div class="row"><img class="thumb" src="${l.photos[0] || ""}" alt=""><div class="grow"><strong>${esc(l.title)}</strong><br><span class="small muted">von ${esc(o.buyer)} · ${o.date} · du erhältst ${fmt(o.price - o.fee)} Cr.</span></div><button class="btn sm" data-deliver="${o.id}">Erledigt</button></div>`; }).join("")}</div>` : `<p class="muted">Keine offenen Buchungen.</p>`}
+    </section>`);
+};
+VIEWS["p-listings"] = () => {
+  const pid = S.providerAs, mine = S.listings.filter((l) => l.p === pid);
+  return providerDash(`
+    ${ph("Meine Anzeigen", `${mine.length} ${mine.length === 1 ? "Anzeige" : "Anzeigen"} · bis zu 8 Fotos pro Anzeige`, `<button class="btn" data-newlisting>${ic("plus")} Neue Anzeige</button>`)}
+    ${flashHtml()}
+    <div class="grid">${mine.map((l) => `<article class="card flush" style="display:flex;flex-direction:column">
+      <button class="cover" data-edit="${l.id}" style="border:0;padding:0;cursor:pointer" aria-label="Fotos bearbeiten">
+        ${l.photos[0] ? `<img src="${l.photos[0]}" alt="">` : `<span style="display:grid;place-items:center;height:100%;color:var(--brand);gap:4px">${ic("image")}<span class="small">Fotos hinzufügen</span></span>`}
+        <span class="tr">${ic("image")}${l.photos.length}</span>
+      </button>
+      <div class="stack" style="padding:16px;gap:8px;flex:1">
+        <div class="row" style="gap:6px">${status(l.active ? "ACTIVE" : "PAUSED")}<span class="xs muted">${esc(l.cat)}</span></div>
+        <h3 style="font-size:18px">${esc(l.title)}</h3>
+        <p class="small muted">${fmt(l.price)} Credits · ${S.orders.filter((o) => o.listing === l.id && o.status === "DELIVERED").length + 3}× erledigt</p>
+        <div class="row" style="margin-top:auto"><button class="btn grow" data-edit="${l.id}">Bearbeiten</button><button class="btn ghost" data-toggle="${l.id}">${l.active ? "Pausieren" : "Aktivieren"}</button></div>
+      </div>
+    </article>`).join("")}</div>`);
+};
+VIEWS["p-edit"] = () => {
+  const l = L(S.editId);
+  if (!l) return VIEWS["p-listings"]();
+  const max = 8;
+  return providerDash(`
+    ${ph("Anzeige bearbeiten", `${esc(l.title)} ${status(l.active ? "ACTIVE" : "PAUSED")}`, `<div class="row"><button class="btn ghost" data-open="${l.id}">${ic("eye")} Vorschau</button><button class="btn ghost" data-nav="p-listings">Zurück</button></div>`)}
+    ${flashHtml()}
+    <section class="card stack" style="gap:16px">
+      <div class="panel-h" style="margin:0"><h2>Fotos <span class="muted" style="font-family:var(--font-body);font-size:15px">(${l.photos.length} von ${max})</span></h2><span class="xs muted">Das erste Foto ist das Titelbild</span></div>
+      ${l.photos.length ? `<div class="photos">${l.photos.map((src, i) => `<div class="photo">
+        <img src="${src}" alt="Foto ${i + 1}">
+        ${i === 0 ? '<span class="cov">Titelbild</span>' : ""}
+        <button class="del" data-pdel="${i}" aria-label="Foto löschen">×</button>
+        <div class="bar2"><button data-pmove="${i}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="Nach links">‹</button><button data-pmove="${i}" data-dir="1" ${i === l.photos.length - 1 ? "disabled" : ""} aria-label="Nach rechts">›</button>${i > 0 ? `<button class="mk" data-pcover="${i}" aria-label="Als Titelbild verwenden">Titelbild</button>` : ""}</div>
+      </div>`).join("")}</div>` : ""}
+      ${l.photos.length < max ? `<div class="drop" id="drop" role="button" tabindex="0">${ic("image")}<strong>Fotos hierher ziehen oder <span style="color:var(--brand);text-decoration:underline">auswählen</span></strong><span class="xs muted">JPG, PNG, WebP oder HEIC · noch ${max - l.photos.length} frei · Standortdaten werden automatisch entfernt</span></div>` : `<p class="note warn">Maximal ${max} Fotos erreicht. Lösche ein Foto, um ein neues hinzuzufügen.</p>`}
+    </section>
+    <section class="card"><div class="panel-h"><h2>Angebot</h2></div>
+      <form id="edit-form" class="fields">
+        <div class="full"><label class="lbl" for="e-title">Titel</label><input class="input" id="e-title" value="${esc(l.title)}"></div>
+        <div><label class="lbl" for="e-cat">Kategorie</label><select class="input" id="e-cat">${CATS.map((c) => `<option ${c === l.cat ? "selected" : ""}>${esc(c)}</option>`).join("")}</select></div>
+        <div><label class="lbl" for="e-type">Art</label><select class="input" id="e-type"><option value="SERVICE" ${l.type === "SERVICE" ? "selected" : ""}>Dienstleistung</option><option value="GREETING_VIDEO" ${l.type === "GREETING_VIDEO" ? "selected" : ""}>Grußvideo</option></select></div>
+        <div class="full"><label class="lbl" for="e-desc">Beschreibung</label><textarea class="input" id="e-desc" rows="5">${esc(l.desc)}</textarea></div>
+        <div><label class="lbl" for="e-price">Preis (Credits)</label><input class="input" id="e-price" type="number" min="1" value="${l.price}"><span class="xs muted">100 Credits = 10 € · du erhältst ${100 - S.settings.fee} %</span></div>
+        <div class="full"><button class="btn" type="submit">Änderungen speichern</button></div>
+      </form>
+    </section>`);
+};
+VIEWS["p-bookings"] = () => {
+  const pid = S.providerAs;
+  const orders = S.orders.filter((o) => L(o.listing)?.p === pid);
+  return providerDash(`
+    ${ph("Buchungen", "Credits werden treuhänderisch gehalten, bis du die Leistung als erledigt markierst.")}
+    ${flashHtml()}
+    <section class="card">${orders.length ? `<div class="list">${orders.map((o) => {
+      const l = L(o.listing);
+      return `<div class="stack" style="gap:10px"><div class="row" style="align-items:flex-start"><img class="thumb" src="${l.photos[0] || ""}" alt=""><div class="grow"><div class="row" style="gap:8px"><strong>${esc(l.title)}</strong>${status(o.status)}</div><span class="small muted">von ${esc(o.buyer)} · ${o.date} · <span class="num">${fmt(o.price)}</span> Cr., du erhältst <strong style="color:var(--ink)">${fmt(o.price - o.fee)} Cr.</strong></span></div></div>
+      ${o.note ? `<p class="note" style="background:var(--soft)">„${esc(o.note)}“</p>` : ""}
+      ${o.status === "OPEN" ? `<div class="row"><button class="btn" data-deliver="${o.id}">${l.type === "GREETING_VIDEO" ? "Video hochladen & erledigen" : "Als erledigt markieren"}</button><button class="btn ghost" data-cancel="${o.id}">Ablehnen</button></div>` : ""}</div>`;
+    }).join("")}</div>` : `<p class="muted">Noch keine Buchungen für ${esc(P(pid).name)}. Buche in der Kund:innen-Ansicht eine ihrer Anzeigen.</p>`}</section>`);
+};
+VIEWS["p-chat"] = () => {
+  const pid = S.providerAs;
+  return providerDash(`${ph("Nachrichten")}${S.chats[pid] ? chatPanel(pid, true) : `<div class="card muted">Noch keine Chats für ${esc(P(pid).name)}. Schreib ihr in der Kund:innen-Ansicht eine Nachricht.</div>`}`);
+};
+VIEWS["p-earn"] = () => {
+  const pid = S.providerAs, hist = S.payouts[pid] || [];
+  const paid = hist.filter((h) => h.status === "PAID").reduce((a, h) => a + h.amount, 0);
+  return providerDash(`
+    ${ph("Verdienst & Auszahlung", `1 Credit = 0,10 € · Servicegebühr ${S.settings.fee} % ist bereits abgezogen`)}
+    ${flashHtml()}
+    <div class="stats">
+      ${statTile("wallet", "Auszahlbar", euro(S.earnings[pid] / 10), `${fmt(S.earnings[pid])} Credits`)}
+      ${statTile("check", "Bereits überwiesen", euro(paid / 10), "", true)}
+    </div>
+    <div class="cols even">
+      <section class="card"><div class="panel-h"><h2>Auszahlung beantragen</h2></div>
+        <form id="payout-form" class="stack">
+          <div><label class="lbl" for="po-credits">Credits</label><input class="input" id="po-credits" type="number" min="200" value="${Math.max(200, S.earnings[pid])}"></div>
+          <div><label class="lbl" for="po-iban">IBAN</label><input class="input" id="po-iban" value="DE89 3704 0044 0532 0130 00" style="font-family:ui-monospace,monospace"></div>
+          <p class="xs muted">Mindestens 200 Credits. Überweisung meist innerhalb von 5 Werktagen.</p>
+          <button class="btn accent block" type="submit">Auszahlung beantragen</button>
+        </form>
+      </section>
+      <section class="card flush"><div class="panel-h" style="padding:20px 20px 0"><h2>Verlauf</h2></div>
+        <div class="tablewrap"><table><thead><tr><th>Datum</th><th>Betrag</th><th>Status</th></tr></thead><tbody>
+          ${hist.length ? hist.map((h) => `<tr><td>${h.date}</td><td class="num"><strong>${euro(h.amount / 10)}</strong></td><td>${status(h.status)}</td></tr>`).join("") : `<tr><td colspan="3" class="muted">Noch keine Auszahlungen</td></tr>`}
+        </tbody></table></div>
+      </section>
+    </div>`);
+};
+VIEWS["p-profile"] = () => {
+  const pid = S.providerAs, p = P(pid);
+  return providerDash(`
+    ${ph("Profil & Verifizierung", `${esc(p.name.toLowerCase())}@beispiel.de`)}
+    ${flashHtml()}
+    <div class="cols" style="grid-template-columns:1fr 1.4fr">
+      <div class="stack" style="gap:22px">
+        <section class="card"><div class="panel-h"><h2>Profilfoto</h2></div>
+          <div class="row" style="gap:18px">${avatar(pid, 92)}<div class="stack" style="gap:8px"><button class="btn ghost" data-avatar>${ic("image")} Foto hochladen</button>${p.avatar ? `<button class="btn ghost sm" data-avatar-del>Entfernen</button>` : ""}</div></div>
+          <p class="xs muted" style="margin-top:12px">Ein freundliches Porträtfoto schafft Vertrauen. Standortdaten werden automatisch entfernt.</p>
+        </section>
+        <section class="card"><div class="panel-h"><h2>Verifizierung</h2><span class="badge b-ok">${ic("shield")} Verifiziert</span></div>
+          <p class="small muted">Alter und Identität wurden per Videocall mit Ausweis geprüft. Deine Anzeigen tragen das Verifiziert-Abzeichen.</p>
+        </section>
+      </div>
+      <section class="card"><div class="panel-h"><h2>Angaben</h2></div>
+        <form id="profile-form" class="fields">
+          <div><label class="lbl" for="pr-name">Name</label><input class="input" id="pr-name" value="${esc(p.name)}"></div>
+          <div><label class="lbl" for="pr-city">Ort</label><input class="input" id="pr-city" value="${esc(p.plz)} ${esc(p.city)}"></div>
+          <div class="full"><label class="lbl" for="pr-bio">Über mich</label><textarea class="input" id="pr-bio" rows="5">${esc(p.bio)}</textarea></div>
+          <div><label class="lbl" for="pr-chat">Chat-Preis (Credits pro Nachricht)</label><input class="input" id="pr-chat" type="number" min="2" max="50" value="${p.chat}"><span class="xs muted">Du erhältst ${100 - S.settings.fee} % davon.</span></div>
+          <div class="full"><button class="btn" type="submit">Speichern</button></div>
+        </form>
+      </section>
+    </div>`);
+};
+
+/* ================= Admin ================= */
+function adminDash(body) {
+  return dash("Admin", [
+    ["a-home", "Übersicht", "chart"], ["a-listings", "Anzeigen", "grid"], ["a-users", "Nutzer:innen", "users"],
+    ["a-verify", "Verifizierung", "shield", S.verifications.length], ["a-reports", "Meldungen", "flag", S.reports.length],
+    ["a-payouts", "Auszahlungen", "wallet", S.payoutQueue.length], ["a-cats", "Kategorien", "tag"], ["a-design", "Design & Texte", "palette"],
+  ], body, `<div class="side-card"><strong>${fmt(S.stats.users)}</strong>Nutzer:innen · <span style="color:var(--accent)">+${S.stats.growth} %</span> in 30 Tagen</div>`);
+}
+VIEWS["a-home"] = () => {
+  const catCounts = CATS.map((c) => [c, visible().filter((l) => l.cat === c).length * 9 + (c.length % 5) * 4]).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const maxC = Math.max(...catCounts.map((c) => c[1]));
+  const feed = [
+    ["Neue Buchung", "Wocheneinkauf für Senior:innen · Herr Krämer → Anna", "vor 4 Min.", "calendar"],
+    ["Credits gekauft", "550 Credits · Kundin aus Hamburg", "vor 11 Min.", "wallet"],
+    ["Verifizierung angefragt", "Ayşe aus Dortmund", "vor 25 Min.", "shield"],
+    ["Neue Anzeige", "Türkisches Buffet für 10 Personen · Fatma", "vor 1 Std.", "grid"],
+    ["Wortfilter", "Nachricht mit unzulässigem Begriff blockiert", "vor 2 Std.", "flag"],
+  ];
+  return adminDash(`
+    ${ph("Übersicht", "So läuft deine Plattform. Zahlen sind Beispieldaten.", `<span class="badge b-mute">Letzte 12 Wochen</span>`)}
+    ${flashHtml()}
+    <div class="stats">
+      ${statTile("wallet", `Plattform-Einnahmen (${S.settings.fee} %)`, euro(S.stats.revenue / 10), `${fmt(S.stats.revenue)} Credits`)}
+      ${statTile("receipt", "Verkaufte Credits", fmt(S.stats.soldCredits), `≈ ${euro(S.stats.soldCredits / 10)} Umsatz`, true)}
+      ${statTile("users", "Nutzer:innen", fmt(S.stats.users), `<span class="up">+${S.stats.growth} %</span> in 30 Tagen`)}
+      ${statTile("grid", "Aktive Anzeigen", visible().length, `${Object.keys(S.providers).length} verifizierte Anbieterinnen`)}
+    </div>
+    <div class="cols">
+      <section class="card"><div class="panel-h"><h2>Einnahmen pro Woche</h2><span class="xs muted">Credits</span></div>${chart(S.revenueWeekly, WEEKS, "Credits")}</section>
+      <section class="card"><div class="panel-h"><h2>Beliebteste Kategorien</h2></div>
+        <div class="stack" style="gap:12px">${catCounts.map(([c, n]) => `<div><div class="row between small" style="margin-bottom:5px"><span class="row" style="gap:6px">${ic(CAT_META[c]?.icon || "sparkle")}${esc(c)}</span><span class="num muted">${n} Buchungen</span></div><div class="meter"><i style="width:${(n / maxC) * 100}%"></i></div></div>`).join("")}</div>
+      </section>
+    </div>
+    <div class="cols even">
+      <section class="card"><div class="panel-h"><h2>Live-Aktivität</h2><span class="badge b-ok">● live</span></div>
+        <div class="list">${feed.map(([t, d, w, i]) => `<div class="row"><span class="ico">${ic(i)}</span><div class="grow"><strong>${t}</strong><br><span class="small muted">${d}</span></div><span class="xs muted">${w}</span></div>`).join("")}</div>
+      </section>
+      <section class="card"><div class="panel-h"><h2>Top-Orte</h2></div>
+        <div class="list">${[["Köln", 412, 38], ["Berlin", 365, 31], ["Hamburg", 248, 22], ["München", 187, 17], ["Leipzig", 72, 6]].map(([c, u, a], i) => `<div class="row"><span class="num muted" style="width:18px">${i + 1}</span><span class="grow"><strong>${c}</strong></span><span class="small muted num">${u} Nutzer:innen · ${a} Anzeigen</span></div>`).join("")}</div>
+      </section>
+    </div>`);
+};
+VIEWS["a-listings"] = () => {
+  const q = S.adminFilter.toLowerCase();
+  const rows = S.listings.filter((l) => !q || (l.title + P(l.p).name + P(l.p).city).toLowerCase().includes(q));
+  return adminDash(`
+    ${ph("Anzeigen", `${rows.length} von ${S.listings.length} Anzeigen`)}
+    ${flashHtml()}
+    <form id="admin-filter" class="row"><input class="input" id="af-q" value="${esc(S.adminFilter)}" placeholder="Titel, Anbieterin oder Ort" style="max-width:300px"><button class="btn" type="submit">Filtern</button></form>
+    <section class="card flush"><div class="tablewrap"><table style="min-width:780px"><thead><tr><th>Anzeige</th><th>Anbieterin</th><th>Fotos</th><th>Preis</th><th>Status</th><th></th></tr></thead><tbody>
+      ${rows.map((l) => `<tr>
+        <td><div class="row" style="flex-wrap:nowrap"><img class="thumb" src="${l.photos[0] || ""}" alt=""><div><strong>${esc(l.title)}</strong><br><span class="xs muted">${esc(l.cat)} · ${esc(P(l.p).city)}</span></div></div></td>
+        <td><span class="row" style="flex-wrap:nowrap;gap:8px">${avatar(l.p, 28)}${esc(P(l.p).name)}</span></td>
+        <td><span class="stackimgs">${l.photos.slice(0, 4).map((s) => `<img src="${s}" alt="">`).join("") || '<span class="muted">–</span>'}</span></td>
+        <td class="num">${fmt(l.price)} Cr.</td>
+        <td>${status(l.active ? "ACTIVE" : "PAUSED")}${S.reports.some((r) => r.listing === l.id) ? ' <span class="badge b-err">Gemeldet</span>' : ""}</td>
+        <td><div class="row" style="flex-wrap:nowrap;justify-content:flex-end"><button class="btn ghost sm" data-open="${l.id}">Ansehen</button><button class="btn sm ${l.active ? "danger" : ""}" data-toggle="${l.id}">${l.active ? "Deaktivieren" : "Aktivieren"}</button></div></td>
+      </tr>`).join("")}
+    </tbody></table></div></section>`);
+};
+VIEWS["a-users"] = () => adminDash(`
+  ${ph("Nutzer:innen", `${fmt(S.stats.users)} insgesamt · Ausschnitt`)}
+  <section class="card flush"><div class="tablewrap"><table style="min-width:720px"><thead><tr><th>Person</th><th>Rolle</th><th>Ort</th><th>Verdienst</th><th>Status</th><th></th></tr></thead><tbody>
+    ${Object.entries(S.providers).map(([id, p]) => `<tr><td><span class="row" style="flex-wrap:nowrap">${avatar(id, 34)}<span><strong>${esc(p.name)}</strong><br><span class="xs muted">${esc(p.name.toLowerCase())}@beispiel.de</span></span></span></td><td>Anbieterin</td><td>${esc(p.city)}</td><td class="num">${fmt(S.earnings[id])} Cr.</td><td><span class="badge b-ok">${ic("shield")} Verifiziert</span></td><td><button class="btn ghost sm" data-ban="${esc(p.name)}">Sperren</button></td></tr>`).join("")}
+    <tr><td><span class="row" style="flex-wrap:nowrap">${initials("Demo-Kundin", 34, "#5b5fc7")}<span><strong>Demo-Kundin</strong><br><span class="xs muted">kundin@beispiel.de</span></span></span></td><td>Kund:in</td><td>Köln</td><td class="num">–</td><td><span class="badge b-mute">Aktiv</span></td><td><button class="btn ghost sm" data-ban="Demo-Kundin">Sperren</button></td></tr>
+  </tbody></table></div></section>`);
+VIEWS["a-verify"] = () => adminDash(`
+  ${ph("Verifizierung", "Prüfe Alter (mind. 18) und Identität jeder Anbieterin, zum Beispiel per Videocall mit Ausweis.")}
+  ${flashHtml()}
+  <section class="card">${S.verifications.length ? `<div class="list">${S.verifications.map((v) => `<div class="row">${initials(v.name, 50, "#a3497f")}<div class="grow"><strong>${esc(v.name)}</strong> <span class="muted">· ${esc(v.city)} · seit ${v.date}</span><br><span class="small muted">Hinweis: ${esc(v.note)}</span></div><button class="btn" data-verify="${v.id}">Freischalten</button><button class="btn ghost" data-reject="${v.id}">Ablehnen</button></div>`).join("")}</div>` : `<div class="stack" style="align-items:center;text-align:center;padding:28px"><span class="ico">${ic("shield")}</span><strong>Keine offenen Anfragen</strong></div>`}</section>`);
+VIEWS["a-reports"] = () => adminDash(`
+  ${ph("Meldungen", "Von Nutzer:innen gemeldete Anzeigen")}
+  ${flashHtml()}
+  <section class="card">${S.reports.length ? `<div class="list">${S.reports.map((r) => { const l = L(r.listing); return `<div class="row" style="align-items:flex-start"><img class="thumb" src="${l.photos[0] || ""}" alt="" style="width:96px;height:72px"><div class="grow stack" style="gap:8px"><span><strong>${esc(l.title)}</strong> <span class="small muted">von ${esc(P(l.p).name)} · gemeldet von ${esc(r.by)} am ${r.date}</span></span><p class="note err">${esc(r.reason)}</p><div class="row"><button class="btn danger sm" data-resolve="${r.id}" data-deact="1">Anzeige deaktivieren</button><button class="btn ghost sm" data-resolve="${r.id}">Verwerfen</button></div></div></div>`; }).join("")}</div>` : `<div class="stack" style="align-items:center;text-align:center;padding:28px"><span class="ico">${ic("flag")}</span><strong>Keine offenen Meldungen</strong></div>`}</section>`);
+VIEWS["a-payouts"] = () => adminDash(`
+  ${ph("Auszahlungen", `Offen: ${euro(S.payoutQueue.reduce((a, p) => a + p.amount, 0) / 10)}`)}
+  ${flashHtml()}
+  <section class="card flush"><div class="tablewrap"><table style="min-width:680px"><thead><tr><th>Datum</th><th>Anbieterin</th><th>IBAN</th><th>Betrag</th><th></th></tr></thead><tbody>
+    ${S.payoutQueue.length ? S.payoutQueue.map((p) => `<tr><td>${p.date}</td><td><span class="row" style="flex-wrap:nowrap;gap:8px">${avatar(p.p, 28)}${esc(P(p.p).name)}</span></td><td style="font-family:ui-monospace,monospace">${p.iban}</td><td class="num"><strong>${euro(p.amount / 10)}</strong></td><td><div class="row" style="flex-wrap:nowrap;justify-content:flex-end"><button class="btn sm" data-paid="${p.id}">Überwiesen</button><button class="btn ghost sm" data-paid="${p.id}" data-rej="1">Ablehnen</button></div></td></tr>`).join("") : `<tr><td colspan="5" class="muted">Keine offenen Auszahlungen</td></tr>`}
+  </tbody></table></div></section>`);
+VIEWS["a-cats"] = () => adminDash(`
+  ${ph("Kategorien", "Nach diesen Dienstleistungen kann auf der Startseite gefiltert werden.")}
+  ${flashHtml()}
+  <section class="card"><form id="cat-form" class="row" style="margin-bottom:14px"><input class="input" id="cat-name" placeholder="Neue Kategorie, z. B. Umzugshilfe" style="max-width:320px"><button class="btn" type="submit">${ic("plus")} Hinzufügen</button></form>
+  <div class="list">${CATS.map((c) => `<div class="row"><span class="ico">${ic(CAT_META[c]?.icon || "sparkle")}</span><span class="grow"><strong>${esc(c)}</strong></span><span class="small muted num">${S.listings.filter((l) => l.cat === c).length} Anzeigen</span></div>`).join("")}</div></section>`);
+
+function field(id, label, html, full) { return `<div class="${full ? "full" : ""}"><label class="lbl" for="${id}">${label}</label>${html}</div>`; }
+function adminPreview() {
+  const s = S.settings;
+  return `<div style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg);box-shadow:var(--shadow)">
+    <div class="row" style="background:var(--surface);padding:10px 14px;border-bottom:1px solid var(--line)"><span class="mark" style="width:30px;height:30px;font-size:15px;border-radius:9px">${esc((s.siteName.trim()[0] || "N").toUpperCase())}</span><span><span class="head" style="display:block;font-weight:700;font-size:16px">${esc(s.siteName)}</span><span class="xs muted">${esc(s.tagline)}</span></span></div>
+    <div style="margin:12px;padding:18px;background:var(--brand);color:#fff;border-radius:calc(var(--radius) * 1.4)"><div class="head" style="font-weight:700;font-size:22px;line-height:1.1">${heroTitle(s.heroTitle).replace("<em>", '<em style="color:' + s.accent + '">')}</div><span class="btn accent sm" style="margin-top:12px">Suchen</span></div>
+    <div style="margin:12px;display:grid">${card(S.listings[6])}</div>
   </div>`;
 }
-function field(id, label, html, full) { return `<div class="${full ? "full" : ""}"><label class="lbl" for="${id}">${label}</label>${html}</div>`; }
-function adminDesign() {
+VIEWS["a-design"] = () => {
   const s = S.settings;
   const txt = (k, l, full) => field("s-" + k, l, `<input class="input" id="s-${k}" data-set="${k}" value="${esc(s[k])}">`, full);
   const font = (k, l) => field("s-" + k, l, `<select class="input" id="s-${k}" data-set="${k}">${FONTS.map((f) => `<option ${s[k] === f ? "selected" : ""}>${f}</option>`).join("")}</select>`);
   const col = (k, l) => field("s-" + k, l, `<div class="colorrow"><input type="color" data-set="${k}" value="${s[k]}" aria-label="${l} wählen"><input class="input" id="s-${k}" data-set="${k}" value="${s[k]}" style="font-family:ui-monospace,monospace"></div>`);
-  const presets = [["Petrol (Standard)", "#0f766e", "#f59e0b", "#f8fafc"], ["Beere", "#9d174d", "#0ea5e9", "#fdf8fa"], ["Waldgrün", "#3f6212", "#ea580c", "#f9faf5"], ["Nachtblau", "#1e3a8a", "#facc15", "#f7f8fc"]];
-  return `<div class="editor">
-    <div class="stack" style="gap:22px">
-      <p class="small muted" style="margin:0">Jede Änderung gilt sofort für die ganze Seite. Wechsle danach auf „Seite ansehen“.</p>
-      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Name & Texte</legend>
-        ${txt("siteName", "Name der Plattform")}${txt("tagline", "Slogan")}${txt("heroTitle", "Überschrift Startseite", true)}
-        ${field("s-heroText", "Text Startseite", `<textarea class="input" id="s-heroText" data-set="heroText" rows="3">${esc(s.heroText)}</textarea>`, true)}
-        ${txt("footerText", "Footer-Text", true)}
-      </fieldset>
-      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Schriften</legend>${font("headingFont", "Überschriften")}${font("bodyFont", "Fließtext")}</fieldset>
-      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Farben & Form</legend>
-        <div class="full row">${presets.map(([n, b, a, bg]) => `<button class="btn ghost small" data-preset="${b},${a},${bg}"><span style="width:14px;height:14px;border-radius:50%;background:${b};display:inline-block"></span>${n}</button>`).join("")}</div>
-        ${col("brand", "Hauptfarbe")}${col("accent", "Akzentfarbe")}${col("bg", "Hintergrund")}${col("ink", "Textfarbe")}
-        ${field("s-radius", `Eckenradius: <span class="num" id="radius-val">${s.radius}</span> px`, `<input type="range" id="s-radius" data-set="radius" min="0" max="28" value="${s.radius}" style="width:100%">`)}
-      </fieldset>
-      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Geschäftsmodell</legend>
-        ${field("s-fee", "Plattformgebühr in %", `<input class="input" type="number" id="s-fee" data-set="fee" min="0" max="50" value="${s.fee}">`)}
-        <p class="small muted full" style="margin:0" id="fee-note">Gilt für Buchungen, Grußvideos und Chat-Nachrichten. Bei ${s.fee} % bleiben von 100 Credits ${100 - s.fee} bei der Anbieterin.</p>
-      </fieldset>
-      <div class="row"><button class="btn" data-nav="search">Seite ansehen</button><button class="btn ghost" data-resetdesign>Auf Standard zurücksetzen</button></div>
-    </div>
-    <div class="stack" style="position:sticky;top:64px"><span class="small muted">Vorschau</span><div id="preview">${adminPreview()}</div></div>
-  </div>`;
+  const presets = [["Petrol & Koralle", "#0d5c56", "#ff6b4a", "#f5f7f6"], ["Aubergine & Gold", "#4a1d3f", "#e0a526", "#f8f5f7"], ["Waldgrün & Orange", "#2f5d2a", "#ef7d22", "#f6f8f4"], ["Nachtblau & Gelb", "#1b2f6b", "#f4c430", "#f5f6fa"]];
+  return adminDash(`
+    ${ph("Design & Texte", "Jede Änderung gilt sofort für die ganze Seite.", `<button class="btn" data-nav="home">${ic("eye")} Seite ansehen</button>`)}
+    <section class="card"><div style="display:grid;gap:26px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)" class="design-grid">
+      <div class="stack" style="gap:24px">
+        <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;font-size:18px;margin-bottom:10px">Name & Texte</legend>
+          ${txt("siteName", "Name der Plattform")}${txt("tagline", "Slogan")}${txt("heroTitle", "Überschrift Startseite (*Wort* = hervorgehoben)", true)}
+          ${field("s-heroText", "Text Startseite", `<textarea class="input" id="s-heroText" data-set="heroText" rows="3">${esc(s.heroText)}</textarea>`, true)}
+          ${txt("footerText", "Footer-Text", true)}
+        </fieldset>
+        <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;font-size:18px;margin-bottom:10px">Schriften</legend>${font("headingFont", "Überschriften")}${font("bodyFont", "Fließtext")}</fieldset>
+        <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;font-size:18px;margin-bottom:10px">Farben & Form</legend>
+          <div class="full row">${presets.map(([n, b, a, bg]) => `<button type="button" class="btn ghost sm" data-preset="${b},${a},${bg}"><span style="display:inline-flex"><span style="width:14px;height:14px;border-radius:50%;background:${b}"></span><span style="width:14px;height:14px;border-radius:50%;background:${a};margin-left:-4px"></span></span>${n}</button>`).join("")}</div>
+          ${col("brand", "Hauptfarbe")}${col("accent", "Akzentfarbe")}${col("bg", "Hintergrund")}${col("ink", "Textfarbe")}
+          ${field("s-radius", `Eckenradius: <span class="num" id="radius-val">${s.radius}</span> px`, `<input type="range" id="s-radius" data-set="radius" min="0" max="28" value="${s.radius}" style="width:100%">`)}
+        </fieldset>
+        <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;font-size:18px;margin-bottom:10px">Geschäftsmodell</legend>
+          ${field("s-fee", "Plattformgebühr in %", `<input class="input" type="number" id="s-fee" data-set="fee" min="0" max="50" value="${s.fee}">`)}
+          <p class="small muted full" id="fee-note">Gilt für Buchungen, Grußvideos und Chat-Nachrichten. Bei ${s.fee} % bleiben von 100 Credits ${100 - s.fee} bei der Anbieterin.</p>
+        </fieldset>
+        <div class="row"><button class="btn ghost" data-resetdesign>Auf Standard zurücksetzen</button></div>
+      </div>
+      <div class="stack" style="position:sticky;top:132px;align-self:start"><span class="eyebrow">Live-Vorschau</span><div id="preview">${adminPreview()}</div></div>
+    </div></section>
+    <style>@media (max-width: 900px) { .design-grid { grid-template-columns: 1fr !important; } .design-grid > .stack:last-child { position: static !important; } }</style>`);
+};
+
+/* ================= Fotos ================= */
+// Verkleinert ein hochgeladenes Bild per Canvas. Das Neuzeichnen entfernt nebenbei alle Metadaten (z. B. GPS).
+function readImage(file, max = 1400) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const k = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL("image/jpeg", 0.85));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
-function adminPreview() {
-  const s = S.settings;
-  return `<div style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg)">
-    <div class="row" style="background:var(--surface);padding:10px 14px"><span class="logo"><span class="mark" style="width:30px;height:30px;font-size:14px">${esc((s.siteName.trim()[0] || "N").toUpperCase())}</span><span><span class="name" style="font-size:16px">${esc(s.siteName)}</span><span class="tagline">${esc(s.tagline)}</span></span></span></div>
-    <div style="margin:12px;padding:16px;background:var(--brand);color:#fff;border-radius:var(--radius)"><div class="head" style="font-weight:700;font-size:18px">${esc(s.heroTitle)}</div><span class="btn accent" style="margin-top:10px;padding:5px 12px;font-size:13px">Suchen</span></div>
-    <div style="margin:12px;display:grid">${card(LISTINGS[6])}</div>
-  </div>`;
-}
-function adminVerify() {
-  return `<p class="small muted" style="margin-top:0">Prüfe Alter (mind. 18) und Identität jeder Anbieterin, zum Beispiel per Videocall mit Ausweis, bevor ihre Anzeigen sichtbar werden.</p>
-  ${S.verifications.length ? `<div class="list">${S.verifications.map((v) => `<div class="row between"><span><strong>${esc(v.name)}</strong> · ${esc(v.city)}<br><span class="small muted">Hinweis: ${esc(v.note)}</span></span><span class="row"><button class="btn" data-verify="${v.id}">Freischalten</button><button class="btn danger" data-reject="${v.id}">Ablehnen</button></span></div>`).join("")}</div>` : `<p class="muted" style="margin:0">Keine offenen Anfragen.</p>`}`;
-}
-function adminReports() {
-  return S.reports.length ? `<div class="list">${S.reports.map((r) => { const l = listingById(r.listing); return `<div class="stack" style="gap:8px"><span><strong>${esc(l.title)}</strong> <span class="small muted">von ${esc(PROVIDERS[l.p].name)}</span></span><p class="note err" style="margin:0">${esc(r.reason)}</p><div class="row"><button class="btn danger" data-resolve="${r.id}">Anzeige deaktivieren</button><button class="btn ghost" data-resolve="${r.id}">Verwerfen</button></div></div>`; }).join("")}</div>` : `<p class="muted" style="margin:0">Keine offenen Meldungen.</p>`;
-}
-function adminCats() {
-  return `<form id="cat-form" class="row" style="margin-bottom:12px"><input class="input" id="cat-name" placeholder="Neue Kategorie, z. B. Umzugshilfe" style="max-width:320px"><button class="btn" type="submit">Hinzufügen</button></form>
-  <div class="list">${CATS.map((c) => `<div class="row between"><span>${esc(c)}</span><span class="small muted num">${LISTINGS.filter((l) => l.cat === c).length} Anzeigen</span></div>`).join("")}</div>`;
-}
-function adminUsers() {
-  return `<div class="tablewrap"><table><thead><tr><th>Name</th><th>Rolle</th><th>Ort</th><th>Verdienst</th><th>Status</th></tr></thead><tbody>
-  ${Object.entries(PROVIDERS).map(([id, p]) => `<tr><td>${esc(p.name)}</td><td>Anbieterin</td><td>${esc(p.city)}</td><td class="num">${fmt(S.earnings[id])}</td><td><span class="badge b-ok">verifiziert</span></td></tr>`).join("")}
-  <tr><td>Demo-Kundin</td><td>Kund:in</td><td>Köln</td><td class="num">–</td><td><span class="badge b-mute">aktiv</span></td></tr>
-  </tbody></table></div>`;
+async function addPhotos(files) {
+  const l = L(S.editId); if (!l) return;
+  const list = Array.from(files).filter((f) => f.type.startsWith("image/")).slice(0, 8 - l.photos.length);
+  if (!list.length) { toast("Bitte wähle Bilddateien aus (JPG, PNG, WebP)."); return; }
+  try {
+    for (const f of list) l.photos.push(await readImage(f));
+    S.flash = { kind: "ok", text: list.length === 1 ? "Foto hochgeladen." : `${list.length} Fotos hochgeladen.` };
+  } catch { S.flash = { kind: "err", text: "Ein Foto konnte nicht gelesen werden." }; }
+  render();
 }
 
-/* ---------- Events ---------- */
+/* ================= Events ================= */
 document.addEventListener("click", (e) => {
   if (e.target.id === "dlg") { e.target.close(); return; }
+  if (e.target.closest("#drop")) { $("#file-photos").click(); return; }
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
-  if (d.role) { S.role = d.role; S.view = { customer: "search", provider: "pdash", admin: "admin" }[d.role]; render(); return; }
-  if (t.id === "reset") { S = initialState(); render(); toast("Demo zurückgesetzt"); return; }
-  if (t.id === "logo") { go(S.role === "provider" ? "pdash" : "search"); return; }
+  if (d.role) { S.role = d.role; S.view = { customer: "home", provider: "p-home", admin: "a-home" }[d.role]; render(); window.scrollTo({ top: 0 }); return; }
+  if (t.id === "reset") { S = initialState(); CATS = Object.keys(CAT_META); render(); toast("Demo zurückgesetzt"); return; }
+  if (t.id === "logo") { go({ customer: "home", provider: "p-home", admin: "a-home" }[S.role]); return; }
   if (d.nav) { if ($("#dlg").open) $("#dlg").close(); go(d.nav); return; }
   if (d.open) { openListing(+d.open); return; }
   if ("close" in d) { $("#dlg").close(); return; }
-  if (d.quick) {
-    if (d.quick === "clear") S.filters = { q: "", place: "", cat: "", type: "" };
-    else { const [k, v] = d.quick.split(":"); S.filters = { q: "", place: "", cat: "", type: "", [k]: v }; }
-    render(); return;
-  }
+  if (d.gal) { const l = L(+d.lid); S.gallery = (S.gallery + +d.gal + l.photos.length) % l.photos.length; openListing(l.id, true); return; }
+  if (d.galto) { S.gallery = +d.galto; openListing(+d.lid, true); return; }
+  if (d.cat) { S.filters = { ...S.filters, cat: S.filters.cat === d.cat ? "" : d.cat }; render(); return; }
+  if (d.place) { S.filters = { ...S.filters, place: S.filters.place === d.place ? "" : d.place }; render(); return; }
+  if ("clear" in d) { S.filters = { q: "", place: "", cat: "", type: "" }; render(); return; }
   if (d.chatwith) { $("#dlg").close(); S.chats[d.chatwith] ||= []; S.activeChat = d.chatwith; go("chat"); return; }
-  if (d.report) { $("#dlg").close(); S.reports.push({ id: Date.now(), listing: +d.report, reason: "In der Demo gemeldet: bitte prüfen." }); toast("Danke! Die Meldung liegt jetzt im Admin-Bereich."); return; }
+  if (d.report) { $("#dlg").close(); S.reports.push({ id: Date.now(), listing: +d.report, reason: "In der Demo gemeldet: bitte prüfen.", by: "Demo-Kundin", date: "Heute" }); toast("Danke! Die Meldung liegt jetzt im Admin-Bereich."); return; }
   if (d.conv) { S.activeChat = d.conv; render(); return; }
-  if (d.buy) {
-    const p = PACKS.find((x) => x.id === d.buy);
-    S.credits += p.credits; S.stats.soldCredits += p.credits;
-    S.flash = { kind: "ok", text: `${fmt(p.credits)} Credits für ${euro(p.euro)} gutgeschrieben (Demo, keine echte Zahlung).` };
-    render(); return;
-  }
-  if (d.cancel) {
-    const o = S.orders.find((x) => x.id === +d.cancel);
-    if (o && o.status === "OPEN") { o.status = "CANCELLED"; if (o.mine) S.credits += o.price; S.flash = { kind: "ok", text: `Storniert. ${fmt(o.price)} Credits gehen zurück an die Kundin.` }; }
-    render(); return;
-  }
+  if (d.buy) { const p = PACKS.find((x) => x.id === d.buy); S.credits += p.credits; S.stats.soldCredits += p.credits; S.flash = { kind: "ok", text: `${fmt(p.credits)} Credits für ${euro(p.euro)} gutgeschrieben (Demo, keine echte Zahlung).` }; render(); return; }
+  if (d.cancel) { const o = S.orders.find((x) => x.id === +d.cancel); if (o && o.status === "OPEN") { o.status = "CANCELLED"; if (o.mine) S.credits += o.price; S.flash = { kind: "ok", text: `Storniert. ${fmt(o.price)} Credits gehen zurück an die Kundin.` }; } render(); return; }
   if (d.deliver) {
-    const o = S.orders.find((x) => x.id === +d.deliver), l = listingById(o.listing);
+    const o = S.orders.find((x) => x.id === +d.deliver), l = L(o.listing);
     o.status = "DELIVERED"; S.earnings[l.p] += o.price - o.fee; S.stats.revenue += o.fee;
-    S.flash = { kind: "ok", text: `Erledigt! ${fmt(o.price - o.fee)} Credits für ${PROVIDERS[l.p].name}, ${fmt(o.fee)} Credits Gebühr für die Plattform.` };
+    S.flash = { kind: "ok", text: `Erledigt! ${fmt(o.price - o.fee)} Credits für ${P(l.p).name}, ${fmt(o.fee)} Credits Gebühr für die Plattform.` };
     render(); return;
   }
-  if ("newlisting" in d) { toast("In der echten App öffnet sich hier das Anzeigen-Formular."); return; }
-  if (d.atab) { S.adminTab = d.atab; render(); return; }
+  if ("newlisting" in d) {
+    const pid = S.providerAs, id = ++S.nextId;
+    S.listings.unshift({ id, p: pid, cat: CATS[0], type: "SERVICE", title: "Meine neue Anzeige", price: 100, desc: "Beschreibe hier dein Angebot: Was machst du, wann hast du Zeit, was bringst du mit?", active: false, photos: [] });
+    S.editId = id; S.flash = { kind: "ok", text: "Entwurf angelegt. Füge Fotos hinzu, passe die Texte an und aktiviere die Anzeige." };
+    go("p-edit"); return;
+  }
+  if (d.edit) { S.editId = +d.edit; go("p-edit"); return; }
+  if (d.toggle) { const l = L(+d.toggle); l.active = !l.active; toast(l.active ? "Anzeige ist jetzt sichtbar" : "Anzeige ist pausiert"); render(); return; }
+  if (d.pdel) { L(S.editId).photos.splice(+d.pdel, 1); render(); return; }
+  if (d.pmove) { const ph = L(S.editId).photos, i = +d.pmove, j = i + +d.dir; [ph[i], ph[j]] = [ph[j], ph[i]]; render(); return; }
+  if (d.pcover) { const ph = L(S.editId).photos; ph.unshift(ph.splice(+d.pcover, 1)[0]); toast("Titelbild geändert"); render(); return; }
+  if ("avatar" in d) { $("#file-avatar").click(); return; }
+  if ("avatarDel" in d) { P(S.providerAs).avatar = null; render(); return; }
   if (d.preset) { const [b, a, bg] = d.preset.split(","); Object.assign(S.settings, { brand: b, accent: a, bg }); render(); return; }
   if ("resetdesign" in d) { S.settings = { ...DEFAULT_SETTINGS }; render(); toast("Design zurückgesetzt"); return; }
   if (d.verify || d.reject) {
@@ -670,29 +1115,42 @@ document.addEventListener("click", (e) => {
     S.flash = { kind: "ok", text: d.verify ? `${v.name} ist freigeschaltet. Ihre Anzeigen sind jetzt sichtbar.` : `Anfrage von ${v.name} abgelehnt.` };
     render(); return;
   }
-  if (d.resolve) { S.reports = S.reports.filter((x) => x.id !== +d.resolve); S.flash = { kind: "ok", text: "Meldung bearbeitet." }; render(); return; }
+  if (d.resolve) { const r = S.reports.find((x) => x.id === +d.resolve); if (d.deact && r) L(r.listing).active = false; S.reports = S.reports.filter((x) => x.id !== +d.resolve); S.flash = { kind: "ok", text: d.deact ? "Anzeige deaktiviert, Meldung erledigt." : "Meldung verworfen." }; render(); return; }
+  if (d.paid) { const p = S.payoutQueue.find((x) => x.id === +d.paid); S.payoutQueue = S.payoutQueue.filter((x) => x.id !== +d.paid); S.flash = { kind: "ok", text: d.rej ? `Auszahlung an ${P(p.p).name} abgelehnt, Betrag zurückgebucht.` : `${euro(p.amount / 10)} an ${P(p.p).name} als überwiesen markiert.` }; render(); return; }
+  if (d.ban) { toast(`${d.ban} würde jetzt gesperrt (in der Demo ohne Wirkung).`); return; }
 });
 
 document.addEventListener("submit", (e) => {
   e.preventDefault();
   const f = e.target;
-  if (f.id === "search-form") {
-    S.filters = { q: $("#f-q").value.trim(), place: $("#f-place").value.trim(), cat: $("#f-cat").value, type: $("#f-type").value };
-    render(); return;
-  }
+  if (f.id === "search-form") { S.filters = { q: $("#f-q").value.trim(), place: $("#f-place").value.trim(), cat: $("#f-cat").value, type: $("#f-type").value }; render(); return; }
   if (f.id === "order-form") { placeOrder(+f.dataset.id, $("#o-note").value.trim()); return; }
   if (f.id === "chat-form") { sendChat(f.dataset.pid, $("#chat-text").value, f.dataset.asprovider === "1"); return; }
   if (f.id === "payout-form") {
     const n = +$("#po-credits").value, pid = S.providerAs;
-    if (n < 200) { S.flash = { kind: "err", text: "Mindestens 200 Credits pro Auszahlung." }; }
-    else if (n > S.earnings[pid]) { S.flash = { kind: "err", text: `Dein Verdienst reicht nicht aus. Verfügbar: ${fmt(S.earnings[pid])} Credits.` }; }
-    else { S.earnings[pid] -= n; S.flash = { kind: "ok", text: `Auszahlung über ${euro(n / 10)} beantragt. Überweisung in der Regel innerhalb von 5 Werktagen.` }; }
+    if (n < 200) S.flash = { kind: "err", text: "Mindestens 200 Credits pro Auszahlung." };
+    else if (n > S.earnings[pid]) S.flash = { kind: "err", text: `Dein Verdienst reicht nicht aus. Verfügbar: ${fmt(S.earnings[pid])} Credits.` };
+    else { S.earnings[pid] -= n; (S.payouts[pid] ||= []).unshift({ date: "Heute", amount: n, status: "REQUESTED" }); S.payoutQueue.unshift({ id: Date.now(), p: pid, amount: n, iban: $("#po-iban").value, date: "Heute" }); S.flash = { kind: "ok", text: `Auszahlung über ${euro(n / 10)} beantragt. Sie erscheint jetzt auch im Admin-Bereich.` }; }
     render(); return;
   }
+  if (f.id === "edit-form") {
+    const l = L(S.editId), title = $("#e-title").value.trim(), desc = $("#e-desc").value.trim();
+    if (blocked(title + " " + desc)) { S.flash = { kind: "err", text: "Deine Anzeige enthält unzulässige Begriffe. Erotische oder sexuelle Angebote sind verboten." }; return render(); }
+    if (title.length < 5) { S.flash = { kind: "err", text: "Der Titel ist zu kurz (mindestens 5 Zeichen)." }; return render(); }
+    Object.assign(l, { title, desc, cat: $("#e-cat").value, type: $("#e-type").value, price: Math.max(1, +$("#e-price").value || 1) });
+    S.flash = { kind: "ok", text: l.active ? "Anzeige gespeichert." : "Gespeichert. Aktiviere die Anzeige unter „Meine Anzeigen“, damit sie sichtbar wird." };
+    render(); return;
+  }
+  if (f.id === "profile-form") {
+    const p = P(S.providerAs);
+    p.name = $("#pr-name").value.trim() || p.name; p.bio = $("#pr-bio").value.trim(); p.chat = Math.min(50, Math.max(2, +$("#pr-chat").value || 2));
+    S.flash = { kind: "ok", text: "Profil gespeichert." }; render(); return;
+  }
+  if (f.id === "admin-filter") { S.adminFilter = $("#af-q").value.trim(); render(); return; }
   if (f.id === "cat-form") {
     const n = $("#cat-name").value.trim();
-    if (n.length < 2) { S.flash = { kind: "err", text: "Bitte gib einen Namen mit mindestens 2 Zeichen an." }; }
-    else if (CATS.includes(n)) { S.flash = { kind: "err", text: "Diese Kategorie gibt es schon." }; }
+    if (n.length < 2) S.flash = { kind: "err", text: "Bitte gib einen Namen mit mindestens 2 Zeichen an." };
+    else if (CATS.includes(n)) S.flash = { kind: "err", text: "Diese Kategorie gibt es schon." };
     else { CATS.push(n); S.flash = { kind: "ok", text: `Kategorie „${n}“ angelegt.` }; }
     render(); return;
   }
@@ -711,9 +1169,21 @@ document.addEventListener("input", (e) => {
   if (k === "radius") $("#radius-val").textContent = v;
   if (k === "fee") $("#fee-note").textContent = `Gilt für Buchungen, Grußvideos und Chat-Nachrichten. Bei ${v} % bleiben von 100 Credits ${100 - v} bei der Anbieterin.`;
 });
-document.addEventListener("change", (e) => {
-  if (e.target.id === "provider-as") { S.providerAs = e.target.value; render(); }
+document.addEventListener("change", async (e) => {
+  if (e.target.id === "provider-as") { S.providerAs = e.target.value; if (S.view === "p-edit") S.view = "p-listings"; render(); }
+  if (e.target.id === "file-photos") { await addPhotos(e.target.files); e.target.value = ""; }
+  if (e.target.id === "file-avatar" && e.target.files[0]) {
+    try { P(S.providerAs).avatar = await readImage(e.target.files[0], 400); toast("Profilfoto gespeichert"); } catch { toast("Das Foto konnte nicht gelesen werden."); }
+    e.target.value = ""; render();
+  }
 });
+document.addEventListener("keydown", (e) => { if (e.target.id === "drop" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); $("#file-photos").click(); } });
+["dragover", "dragleave", "drop"].forEach((type) => document.addEventListener(type, (e) => {
+  const zone = e.target.closest?.("#drop"); if (!zone) return;
+  e.preventDefault();
+  zone.classList.toggle("over", type === "dragover");
+  if (type === "drop") addPhotos(e.dataTransfer.files);
+}));
 
 render();
 </script>
