@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  PROVIDER
+  ADMIN
+}
+
+enum VerificationStatus {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ListingType {
+  SERVICE
+  GREETING_VIDEO
+}
+
+enum OrderStatus {
+  OPEN
+  DELIVERED
+  CANCELLED
+}
+
+enum TransactionType {
+  PURCHASE
+  SPEND
+  EARN
+  REFUND
+  PAYOUT
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+enum PayoutStatus {
+  REQUESTED
+  PAID
+  REJECTED
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  passwordHash       String
+  name               String
+  role               Role               @default(USER)
+  bio                String?
+  city               String?
+  postalCode         String?
+  // Guthaben zum Ausgeben (gekaufte Credits)
+  credits            Int                @default(0)
+  // Verdiente Credits (Anbieterinnen), auszahlbar
+  earnings           Int                @default(0)
+  // Credits pro Chat-Nachricht, die Kund:innen an diese Anbieterin zahlen
+  chatPrice          Int                @default(5)
+  verification       VerificationStatus @default(NONE)
+  verificationNote   String?
+  banned             Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+
+  sessions           Session[]
+  listings           Listing[]
+  ordersAsBuyer      Order[]            @relation("BuyerOrders")
+  ordersAsProvider   Order[]            @relation("ProviderOrders")
+  transactions       CreditTransaction[]
+  conversationsAsBuyer    Conversation[] @relation("ConvBuyer")
+  conversationsAsProvider Conversation[] @relation("ConvProvider")
+  messages           Message[]
+  reports            Report[]
+  payouts            PayoutRequest[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  listings Listing[]
+}
+
+model Listing {
+  id           String      @id @default(cuid())
+  providerId   String
+  provider     User        @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id])
+  type         ListingType @default(SERVICE)
+  title        String
+  description  String
+  priceCredits Int
+  city         String
+  postalCode   String
+  imageUrl     String?
+  active       Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+
+  orders       Order[]
+  reports      Report[]
+
+  @@index([city])
+  @@index([postalCode])
+  @@index([categoryId])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  listingId    String
+  listing      Listing     @relation(fields: [listingId], references: [id])
+  buyerId      String
+  buyer        User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  providerId   String
+  provider     User        @relation("ProviderOrders", fields: [providerId], references: [id])
+  priceCredits Int
+  platformFee  Int
+  note         String?
+  deliveryUrl  String?
+  status       OrderStatus @default(OPEN)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model CreditTransaction {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      TransactionType
+  amount    Int
+  reference String?
+  createdAt DateTime        @default(now())
+
+  @@unique([type, reference])
+}
+
+model Conversation {
+  id         String    @id @default(cuid())
+  buyerId    String
+  buyer      User      @relation("ConvBuyer", fields: [buyerId], references: [id])
+  providerId String
+  provider   User      @relation("ConvProvider", fields: [providerId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  messages   Message[]
+
+  @@unique([buyerId, providerId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  body           String
+  cost           Int          @default(0)
+  createdAt      DateTime     @default(now())
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  listingId  String
+  listing    Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   User         @relation(fields: [reporterId], references: [id])
+  reason     String
+  status     ReportStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+}
+
+model PayoutRequest {
+  id         String       @id @default(cuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id])
+  credits    Int
+  iban       String
+  status     PayoutStatus @default(REQUESTED)
+  createdAt  DateTime     @default(now())
+}
+
+/// Einzelner Datensatz (id = "site") mit allen im Admin-Bereich anpassbaren Einstellungen.
+model SiteSettings {
+  id                 String   @id @default("site")
+  siteName           String   @default("Neighbours.com")
+  tagline            String   @default("Hilfe aus deiner Nachbarschaft")
+  logoUrl            String?
+  heroTitle          String   @default("Finde Hilfe direkt um die Ecke")
+  heroText           String   @default("Frauen aus deiner Nachbarschaft bieten ihre Dienstleistungen an – vom Einkaufsservice bis zur Nachhilfe. Bezahlt wird einfach mit Credits.")
+  footerText         String   @default("Neighbours.com – Nachbarschaftshilfe, fair und sicher.")
+  headingFont        String   @default("Poppins")
+  bodyFont           String   @default("Inter")
+  primaryColor       String   @default("#0f766e")
+  accentColor        String   @default("#f59e0b")
+  backgroundColor    String   @default("#f8fafc")
+  textColor          String   @default("#0f172a")
+  borderRadius       Int      @default(12)
+  platformFeePercent Int      @default(20)
+  updatedAt          DateTime @updatedAt
+}

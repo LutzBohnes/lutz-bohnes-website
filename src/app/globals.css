@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: var(--brand-primary);
+  --color-accent: var(--brand-accent);
+  --color-bg: var(--brand-bg);
+  --color-fg: var(--brand-text);
+  --font-heading: var(--brand-heading-font), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--brand-body-font), ui-sans-serif, system-ui, sans-serif;
+  --radius-brand: var(--brand-radius);
+}
+
+body {
+  background: var(--brand-bg);
+  color: var(--brand-text);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-slate-200 p-5 shadow-sm;
+    border-radius: var(--brand-radius);
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 font-medium text-white transition hover:opacity-90 disabled:opacity-50 cursor-pointer;
+    background: var(--brand-primary);
+    border-radius: var(--brand-radius);
+  }
+  .btn-accent {
+    background: var(--brand-accent);
+  }
+  .btn-ghost {
+    @apply bg-transparent text-slate-700 border border-slate-300 hover:bg-slate-100;
+  }
+  .btn-danger {
+    background: #dc2626;
+  }
+  .input {
+    @apply w-full border border-slate-300 bg-white px-3 py-2 outline-none focus:ring-2;
+    border-radius: calc(var(--brand-radius) * 0.6);
+    --tw-ring-color: var(--brand-primary);
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-slate-700;
+  }
+  .badge {
+    @apply inline-block rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
