@@ -4,6 +4,8 @@ import { startConversation } from "@/app/actions/chat";
 import { reportListing } from "@/app/actions/listings";
 import { orderListing } from "@/app/actions/orders";
 import { ActionForm, SubmitButton } from "@/components/action-form";
+import { Avatar } from "@/components/avatar";
+import { Gallery } from "@/components/gallery";
 import { getCurrentUser } from "@/lib/auth";
 import { LISTING_TYPE_LABEL } from "@/lib/config";
 import { db } from "@/lib/db";
@@ -12,7 +14,10 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const [user, listing] = await Promise.all([
     getCurrentUser(),
-    db.listing.findUnique({ where: { id }, include: { category: true, provider: true } }),
+    db.listing.findUnique({
+      where: { id },
+      include: { category: true, provider: true, images: { orderBy: { position: "asc" } } },
+    }),
   ]);
   if (!listing) notFound();
   const isOwner = user?.id === listing.providerId;
@@ -29,24 +34,28 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             {provider.verification !== "VERIFIED" ? " – dein Konto muss erst verifiziert werden." : " (deaktiviert)."}
           </p>
         )}
-        {listing.imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={listing.imageUrl} alt="" className="max-h-96 w-full rounded-[var(--brand-radius)] object-cover" />
-        )}
+        <Gallery
+          images={listing.images}
+          fallback={
+            <div className="grid aspect-[16/7] place-items-center bg-primary/10 font-heading text-6xl font-bold text-primary/70" style={{ borderRadius: "var(--brand-radius)" }}>
+              {listing.category.name.charAt(0)}
+            </div>
+          }
+        />
         <div className="flex flex-wrap gap-2">
           <span className="badge bg-primary/10 text-primary">{listing.category.name}</span>
           <span className="badge bg-accent/15 text-accent">{LISTING_TYPE_LABEL[listing.type]}</span>
         </div>
-        <h1 className="text-2xl font-bold">{listing.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{listing.title}</h1>
         <p className="text-slate-500">📍 {listing.postalCode} {listing.city}</p>
         <p className="whitespace-pre-line leading-relaxed">{listing.description}</p>
       </article>
 
-      <aside className="space-y-4">
+      <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
         <div className="card space-y-3">
           <p className="font-heading text-3xl font-bold text-primary">{listing.priceCredits} Credits</p>
           {isOwner ? (
-            <Link href="/konto" className="btn btn-ghost w-full">Anzeige im Konto verwalten</Link>
+            <Link href={`/konto/anzeige/${listing.id}`} className="btn btn-ghost w-full">Anzeige & Fotos bearbeiten</Link>
           ) : user ? (
             <ActionForm action={orderListing} className="space-y-2">
               <input type="hidden" name="listingId" value={listing.id} />
@@ -68,9 +77,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
 
         <div className="card space-y-3">
           <Link href={`/anbieterin/${provider.id}`} className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 font-heading text-xl font-bold text-primary">
-              {provider.name.charAt(0)}
-            </span>
+            <Avatar name={provider.name} url={provider.avatarUrl} size={52} />
             <span>
               <span className="block font-semibold">{provider.name}</span>
               {provider.verification === "VERIFIED" && <span className="text-xs text-emerald-700">✔ Verifiziert</span>}

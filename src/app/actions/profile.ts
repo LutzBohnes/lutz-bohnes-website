@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { MAX_CHAT_PRICE, MIN_CHAT_PRICE } from "@/lib/config";
 import { db } from "@/lib/db";
 import { findBlockedTerm } from "@/lib/moderation";
+import { deleteImage, saveImage, UploadError } from "@/lib/storage";
 import type { ActionState } from "@/lib/action-state";
 
 const profileSchema = z.object({
@@ -28,14 +29,14 @@ export async function updateProfile(_: ActionState, formData: FormData): Promise
     where: { id: user.id },
     data: { ...data, ...(user.role !== "USER" && chatPrice ? { chatPrice } : {}) },
   });
-  revalidatePath("/konto");
+  revalidatePath("/konto", "layout");
   return { ok: "Profil gespeichert." };
 }
 
 export async function becomeProvider() {
   const user = await requireUser();
   if (user.role === "USER") await db.user.update({ where: { id: user.id }, data: { role: "PROVIDER" } });
-  revalidatePath("/konto");
+  revalidatePath("/konto", "layout");
 }
 
 export async function requestVerification(_: ActionState, formData: FormData): Promise<ActionState> {
@@ -48,6 +49,22 @@ export async function requestVerification(_: ActionState, formData: FormData): P
     where: { id: user.id },
     data: { verification: "PENDING", verificationNote: note || null },
   });
-  revalidatePath("/konto");
+  revalidatePath("/konto", "layout");
   return { ok: "Danke! Wir melden uns zur Identitätsprüfung bei dir." };
+}
+
+export async function uploadAvatar(_: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  const file = formData.get("avatar");
+  if (!(file instanceof File) || file.size === 0) return { error: "Bitte wähle ein Foto aus." };
+  try {
+    const url = await saveImage(file, 600);
+    if (user.avatarUrl) await deleteImage(user.avatarUrl);
+    await db.user.update({ where: { id: user.id }, data: { avatarUrl: url } });
+  } catch (e) {
+    if (e instanceof UploadError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath("/", "layout");
+  return { ok: "Profilfoto gespeichert." };
 }

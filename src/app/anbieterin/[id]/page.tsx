@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { startConversation } from "@/app/actions/chat";
+import { Avatar } from "@/components/avatar";
 import { ListingCard } from "@/components/listing-card";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -10,7 +11,13 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
     getCurrentUser(),
     db.user.findUnique({
       where: { id },
-      include: { listings: { where: { active: true }, include: { category: true }, orderBy: { createdAt: "desc" } } },
+      include: {
+        listings: {
+          where: { active: true },
+          include: { category: true, images: { orderBy: { position: "asc" }, select: { url: true } } },
+          orderBy: { createdAt: "desc" },
+        },
+      },
     }),
   ]);
   if (!provider || provider.role === "USER" || provider.banned) notFound();
@@ -19,9 +26,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
   return (
     <div className="space-y-6">
       <section className="card flex flex-wrap items-center gap-5">
-        <span className="grid h-20 w-20 place-items-center rounded-full bg-primary/10 font-heading text-3xl font-bold text-primary">
-          {provider.name.charAt(0)}
-        </span>
+        <Avatar name={provider.name} url={provider.avatarUrl} size={96} className="ring-4 ring-primary/15" />
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{provider.name}</h1>
           <p className="text-slate-500">
@@ -40,7 +45,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
       <h2 className="text-xl font-semibold">Angebote</h2>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {provider.listings.map((l) => (
-          <ListingCard key={l.id} listing={{ ...l, provider: { name: provider.name } }} />
+          <ListingCard key={l.id} listing={{ ...l, provider: { name: provider.name, avatarUrl: provider.avatarUrl } }} />
         ))}
       </div>
     </div>

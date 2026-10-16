@@ -68,6 +68,6 @@ export async function requestPayout(_: ActionState, formData: FormData): Promise
     return true;
   });
   if (!ok) return { error: "Dein Verdienst reicht für diese Auszahlung nicht aus." };
-  revalidatePath("/konto");
+  revalidatePath("/konto", "layout");
   return { ok: "Auszahlung beantragt. Sie wird in der Regel innerhalb von 5 Werktagen überwiesen." };
 }

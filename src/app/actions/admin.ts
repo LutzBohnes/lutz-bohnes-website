@@ -86,7 +86,7 @@ export async function setVerification(formData: FormData) {
   await requireAdmin();
   const status = z.enum(["VERIFIED", "REJECTED", "NONE"]).parse(formData.get("status"));
   await db.user.update({ where: { id: String(formData.get("userId")) }, data: { verification: status } });
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
 }
 
 export async function setBanned(formData: FormData) {
@@ -99,7 +99,7 @@ export async function setBanned(formData: FormData) {
     await db.session.deleteMany({ where: { userId } });
     await db.listing.updateMany({ where: { providerId: userId }, data: { active: false } });
   }
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
 }
 
 export async function resolveReport(formData: FormData) {
@@ -113,7 +113,7 @@ export async function resolveReport(formData: FormData) {
   if (action === "deactivate") {
     await db.listing.update({ where: { id: report.listingId }, data: { active: false } });
   }
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
 }
 
 export async function setPayoutStatus(formData: FormData) {
@@ -130,5 +130,5 @@ export async function setPayoutStatus(formData: FormData) {
       data: { userId: payout.userId, type: "REFUND", amount: payout.credits, reference: `payout:${id}` },
     });
   });
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
 }

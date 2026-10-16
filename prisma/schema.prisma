@@ -60,6 +60,7 @@ model User {
   bio                String?
   city               String?
   postalCode         String?
+  avatarUrl          String?
   // Guthaben zum Ausgeben (gekaufte Credits)
   credits            Int                @default(0)
   // Verdiente Credits (Anbieterinnen), auszahlbar
@@ -109,16 +110,28 @@ model Listing {
   priceCredits Int
   city         String
   postalCode   String
-  imageUrl     String?
   active       Boolean     @default(true)
   createdAt    DateTime    @default(now())
 
   orders       Order[]
   reports      Report[]
+  images       ListingImage[]
 
   @@index([city])
   @@index([postalCode])
   @@index([categoryId])
+}
+
+/// Fotos einer Anzeige; position 0 ist das Titelbild.
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([listingId, position])
 }
 
 model Order {
@@ -204,12 +217,12 @@ model SiteSettings {
   heroTitle          String   @default("Finde Hilfe direkt um die Ecke")
   heroText           String   @default("Frauen aus deiner Nachbarschaft bieten ihre Dienstleistungen an – vom Einkaufsservice bis zur Nachhilfe. Bezahlt wird einfach mit Credits.")
   footerText         String   @default("Neighbours.com – Nachbarschaftshilfe, fair und sicher.")
-  headingFont        String   @default("Poppins")
-  bodyFont           String   @default("Inter")
-  primaryColor       String   @default("#0f766e")
-  accentColor        String   @default("#f59e0b")
-  backgroundColor    String   @default("#f8fafc")
-  textColor          String   @default("#0f172a")
+  headingFont        String   @default("Playfair Display")
+  bodyFont           String   @default("DM Sans")
+  primaryColor       String   @default("#0d5c56")
+  accentColor        String   @default("#ff6b4a")
+  backgroundColor    String   @default("#f5f7f6")
+  textColor          String   @default("#10201e")
   borderRadius       Int      @default(12)
   platformFeePercent Int      @default(20)
   updatedAt          DateTime @updatedAt

@@ -42,7 +42,7 @@ export async function orderListing(_: ActionState, formData: FormData): Promise<
     if (e instanceof InsufficientCreditsError) return { error: e.message };
     throw e;
   }
-  revalidatePath("/konto");
+  revalidatePath("/konto", "layout");
   return { ok: "Gebucht! Die Anbieterin wurde benachrichtigt. Du findest die Buchung in deinem Konto." };
 }
 
@@ -63,7 +63,7 @@ export async function deliverOrder(_: ActionState, formData: FormData): Promise<
     return true;
   });
   if (!done) return { error: "Buchung nicht gefunden oder bereits abgeschlossen." };
-  revalidatePath("/konto");
+  revalidatePath("/konto", "layout");
   return { ok: "Als erledigt markiert. Dein Verdienst wurde gutgeschrieben." };
 }
 
@@ -79,5 +79,5 @@ export async function cancelOrder(formData: FormData) {
     const order = await tx.order.findUniqueOrThrow({ where: { id } });
     await refundCredits(tx, order.buyerId, order.priceCredits, `order:${id}`);
   });
-  revalidatePath("/konto");
+  revalidatePath("/konto", "layout");
 }

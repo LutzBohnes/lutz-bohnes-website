@@ -6,13 +6,15 @@ Bezahlt wird mit **Credits**, an denen die Plattform über eine Gebühr mitverdi
 
 ## Funktionen
 
+- **Fotos pro Anzeige**: bis zu 8 Fotos per Drag & Drop, Titelbild wählen, Reihenfolge ändern, löschen; Galerie auf der Anzeigenseite. Fotos werden serverseitig neu kodiert (WebP, max. 1600 px) – dabei werden alle Metadaten inkl. GPS-Standort entfernt. Dazu Profilfotos für alle Nutzer:innen
+- **Anbieterinnen-Bereich** (`/konto`): Übersicht mit Verdienst-Diagramm, Anzeigen mit Foto-Verwaltung, Buchungen, Verdienst & Auszahlungsverlauf, Profil & Verifizierung
 - **Suche & Filter** nach Stichwort, Ort bzw. PLZ (Präfix, z. B. `50` = Raum Köln), Kategorie und Art (Dienstleistung / Grußvideo)
 - **Credits**: Pakete kaufen per Stripe Checkout (ohne Stripe-Key: Demo-Modus mit direkter Gutschrift)
 - **Buchungen & Grußvideos**: Credits werden treuhänderisch gehalten und erst bei Erledigung an die Anbieterin gutgeschrieben; Stornierung = volle Rückerstattung
 - **Bezahlter Chat**: Kund:innen zahlen pro Nachricht den Chat-Preis der Anbieterin, Antworten sind kostenlos
 - **Einnahmen**: Plattformgebühr (Standard 20 %) auf Buchungen, Grußvideos und Chat-Nachrichten; Anbieterinnen beantragen Auszahlungen per IBAN
 - **Sicherheit**: Anbieterinnen müssen verifiziert sein (18+, Identität), bevor ihre Anzeigen sichtbar sind; Wortfilter gegen erotische Angebote in Anzeigen, Profilen und Chats; Meldefunktion; Sperren von Konten
-- **Admin-Bereich** (`/admin`):
+- **Admin-Bereich** (`/admin`): Übersicht mit Einnahmen pro Woche, beliebtesten Kategorien und Orten; Anzeigen (mit Fotos, Filter, deaktivieren), Buchungen, Nutzer:innen (Suche, sperren) sowie:
   - **Design & Texte**: Name, Slogan, Logo, Startseiten-Texte, Footer, Schriften (Google Fonts), Farben, Eckenradius – mit Live-Vorschau
   - Plattformgebühr, Kategorien, Verifizierungen, Meldungen, Auszahlungen, Nutzer:innen, Umsatzübersicht
 
@@ -45,4 +47,4 @@ Das **erste registrierte Konto wird automatisch Admin**. Demo-Logins:
 - Nutzungsbedingungen, Datenschutzerklärung und Impressum rechtlich prüfen lassen
 - Identitätsprüfung professionalisieren (z. B. IDnow, Veriff) statt manueller Prüfung
 - Auszahlungen an Anbieterinnen über einen Zahlungsdienst mit KYC abwickeln (z. B. Stripe Connect) – das Halten fremder Gelder kann sonst eine Erlaubnis nach ZAG erfordern
-- Bilder-Upload (aktuell Bild-URL), E-Mail-Benachrichtigungen und Passwort-Zurücksetzen ergänzen
+- Fotos in einem Objektspeicher ablegen (z. B. S3/R2) statt im lokalen Ordner `UPLOAD_DIR`; E-Mail-Benachrichtigungen und Passwort-Zurücksetzen ergänzen

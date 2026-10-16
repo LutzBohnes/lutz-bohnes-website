@@ -6,7 +6,7 @@ import { getSettings } from "@/lib/settings";
 export async function Header() {
   const [user, settings] = await Promise.all([getCurrentUser(), getSettings()]);
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
           {settings.logoUrl ? (
