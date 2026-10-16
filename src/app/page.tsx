@@ -14,12 +14,16 @@ type SearchParams = Promise<{
   erfahrung?: string;
   sprache?: string;
   fotos?: string;
+  social?: string;
 }>;
 
 export default async function Home({ searchParams }: { searchParams: SearchParams }) {
-  const { q = "", ort = "", kategorie = "", typ = "", preis = "", erfahrung = "", sprache = "", fotos = "" } = await searchParams;
+  const { q = "", ort = "", kategorie = "", typ = "", preis = "", erfahrung = "", sprache = "", fotos = "", social = "" } = await searchParams;
   const settings = await getSettings();
-  const categories = await db.category.findMany({ orderBy: { name: "asc" } });
+  const [categories, platforms] = await Promise.all([
+    db.category.findMany({ orderBy: { name: "asc" } }),
+    settings.filterSocial ? db.socialPlatform.findMany({ where: { active: true }, orderBy: { position: "asc" } }) : [],
+  ]);
 
   const where: Prisma.ListingWhereInput = {
     active: true,
@@ -45,14 +49,20 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   }
   if (kategorie) and.push({ category: { slug: kategorie } });
   if (typ === "SERVICE" || typ === "GREETING_VIDEO") and.push({ type: typ });
-  const maxPrice = Number(preis);
+  // Zusatzfilter wirken nur, wenn sie im Admin-Bereich eingeschaltet sind
+  const maxPrice = settings.filterPrice ? Number(preis) : 0;
   if (maxPrice > 0) and.push({ priceCredits: { lte: maxPrice } });
-  const minExperience = Number(erfahrung);
+  const minExperience = settings.filterExperience ? Number(erfahrung) : 0;
   if (minExperience > 0) and.push({ provider: { experienceYears: { gte: minExperience } } });
-  if ((LANGUAGE_CHOICES as readonly string[]).includes(sprache)) and.push({ provider: { languages: { has: sprache } } });
-  if (fotos === "1") and.push({ images: { some: {} } });
+  const language = settings.filterLanguage && (LANGUAGE_CHOICES as readonly string[]).includes(sprache) ? sprache : "";
+  if (language) and.push({ provider: { languages: { has: language } } });
+  const photosOnly = settings.filterPhotos && fotos === "1";
+  if (photosOnly) and.push({ images: { some: {} } });
+  const platform = platforms.find((p) => p.id === social);
+  if (platform) and.push({ provider: { socialLinks: { some: { platformId: platform.id } } } });
   if (and.length) where.AND = and;
-  const extraFilters = [preis, erfahrung, sprache, fotos].filter(Boolean).length;
+  const extraFilters = [maxPrice, minExperience, language, photosOnly, platform].filter(Boolean).length;
+  const anyExtra = settings.filterPrice || settings.filterExperience || settings.filterLanguage || settings.filterPhotos || platforms.length > 0;
 
   const listings = await db.listing.findMany({
     where,
@@ -89,28 +99,34 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
               <option value="GREETING_VIDEO">Grußvideo</option>
             </select>
             <button className="btn btn-accent px-6">Suchen</button>
-            <details className="sm:col-span-5" open={extraFilters > 0}>
+            {anyExtra && <details className="sm:col-span-5" open={extraFilters > 0}>
               <summary className="cursor-pointer select-none px-2 py-1.5 text-sm font-medium text-slate-600">
                 Weitere Filter{extraFilters > 0 && <span className="ml-1.5 rounded-full bg-primary px-2 py-0.5 text-xs text-white">{extraFilters}</span>}
               </summary>
-              <div className="grid gap-2 px-1 pb-1 pt-2 sm:grid-cols-4">
-                <select name="preis" defaultValue={preis} className="input border-0 bg-slate-50" aria-label="Preis bis">
+              <div className="grid gap-2 px-1 pb-1 pt-2 sm:grid-cols-[repeat(auto-fit,minmax(170px,1fr))]">
+                {platforms.length > 0 && (
+                  <select name="social" defaultValue={platform?.id ?? ""} className="input border-0 bg-slate-50" aria-label="Social Media">
+                    <option value="">Social Media: egal</option>
+                    {platforms.map((p) => <option key={p.id} value={p.id}>mit {p.name}</option>)}
+                  </select>
+                )}
+                {settings.filterPrice && <select name="preis" defaultValue={preis} className="input border-0 bg-slate-50" aria-label="Preis bis">
                   <option value="">Preis: egal</option>
                   {[50, 100, 200, 500].map((p) => <option key={p} value={p}>bis {p} Credits ({p / 10} €)</option>)}
-                </select>
-                <select name="erfahrung" defaultValue={erfahrung} className="input border-0 bg-slate-50" aria-label="Erfahrung">
+                </select>}
+                {settings.filterExperience && <select name="erfahrung" defaultValue={erfahrung} className="input border-0 bg-slate-50" aria-label="Erfahrung">
                   <option value="">Erfahrung: egal</option>
                   {[1, 3, 5, 10].map((y) => <option key={y} value={y}>mind. {y} {y === 1 ? "Jahr" : "Jahre"}</option>)}
-                </select>
-                <select name="sprache" defaultValue={sprache} className="input border-0 bg-slate-50" aria-label="Sprache">
+                </select>}
+                {settings.filterLanguage && <select name="sprache" defaultValue={sprache} className="input border-0 bg-slate-50" aria-label="Sprache">
                   <option value="">Sprache: egal</option>
                   {LANGUAGE_CHOICES.map((l) => <option key={l}>{l}</option>)}
-                </select>
-                <label className="flex items-center gap-2 rounded-[calc(var(--brand-radius)*0.6)] bg-slate-50 px-3 text-sm">
+                </select>}
+                {settings.filterPhotos && <label className="flex items-center gap-2 rounded-[calc(var(--brand-radius)*0.6)] bg-slate-50 px-3 text-sm">
                   <input type="checkbox" name="fotos" value="1" defaultChecked={fotos === "1"} /> Nur mit Fotos
-                </label>
+                </label>}
               </div>
-            </details>
+            </details>}
           </form>
           <div className="mt-6 flex flex-wrap gap-2">
             {categories.slice(0, 8).map((c) => (

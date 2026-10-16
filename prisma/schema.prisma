@@ -86,6 +86,7 @@ model User {
   messages           Message[]
   reports            Report[]
   payouts            PayoutRequest[]
+  socialLinks        SocialLink[]
 }
 
 model Session {
@@ -229,5 +230,33 @@ model SiteSettings {
   textColor          String   @default("#10201e")
   borderRadius       Int      @default(12)
   platformFeePercent Int      @default(20)
+  // Welche Zusatzfilter auf der Startseite angezeigt werden
+  filterPrice        Boolean  @default(false)
+  filterExperience   Boolean  @default(false)
+  filterLanguage     Boolean  @default(false)
+  filterPhotos       Boolean  @default(false)
+  filterSocial       Boolean  @default(true)
   updatedAt          DateTime @updatedAt
+}
+
+/// Im Admin-Bereich angelegte Social-Media-Plattform, z. B. Instagram.
+model SocialPlatform {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  /// Erlaubte Domains, kommagetrennt, z. B. "instagram.com"
+  domains   String
+  active    Boolean      @default(true)
+  position  Int          @default(0)
+  links     SocialLink[]
+}
+
+model SocialLink {
+  id         String         @id @default(cuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platformId String
+  platform   SocialPlatform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  url        String
+
+  @@unique([userId, platformId])
 }

@@ -22,6 +22,15 @@ async function main() {
     await db.category.upsert({ where: { slug }, update: {}, create: { slug, name } });
   }
   await db.siteSettings.upsert({ where: { id: "site" }, update: {}, create: { id: "site" } });
+  const PLATFORMS = [
+    ["Instagram", "instagram.com"],
+    ["TikTok", "tiktok.com"],
+    ["YouTube", "youtube.com, youtu.be"],
+    ["Facebook", "facebook.com, fb.com"],
+  ];
+  for (const [i, [name, domains]] of PLATFORMS.entries()) {
+    await db.socialPlatform.upsert({ where: { name }, update: {}, create: { name, domains, position: i } });
+  }
 
   if (process.env.SEED_DEMO !== "1") return;
 

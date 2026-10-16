@@ -21,6 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/meldungen", label: "Meldungen", icon: "flag", badge: reports },
     { href: "/admin/auszahlungen", label: "Auszahlungen", icon: "wallet", badge: payouts },
     { href: "/admin/kategorien", label: "Kategorien", icon: "tag" },
+    { href: "/admin/social-media", label: "Social Media", icon: "share" },
     { href: "/admin/design", label: "Design & Texte", icon: "palette" },
   ];
   return <DashboardShell nav={nav} title="Admin">{children}</DashboardShell>;

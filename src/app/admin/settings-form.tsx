@@ -13,6 +13,14 @@ const COLORS = [
   ["textColor", "Textfarbe"],
 ] as const;
 
+const FILTERS = [
+  ["filterSocial", "Social Media (Plattformen unter „Social Media“ verwalten)"],
+  ["filterPrice", "Preis bis"],
+  ["filterExperience", "Erfahrung ab"],
+  ["filterLanguage", "Sprache"],
+  ["filterPhotos", "Nur mit Fotos"],
+] as const;
+
 /** Branding-Editor mit Live-Vorschau. Gespeicherte Werte gelten sofort für die ganze Seite. */
 export function SettingsForm({ settings }: { settings: SiteSettings }) {
   const [s, setS] = useState(settings);
@@ -75,6 +83,17 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <Field label={`Eckenradius: ${s.borderRadius}px`}>
             <input name="borderRadius" type="range" min={0} max={32} value={s.borderRadius} onChange={set("borderRadius")} className="w-full" />
           </Field>
+        </fieldset>
+
+        <fieldset className="space-y-2">
+          <legend className="mb-2 font-semibold">Suche & Filter</legend>
+          <p className="text-sm text-slate-500">Welche Zusatzfilter sollen auf der Startseite unter „Weitere Filter“ erscheinen?</p>
+          {FILTERS.map(([key, label]) => (
+            <label key={key} className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name={key} checked={Boolean(s[key])} onChange={(e) => setS({ ...s, [key]: e.target.checked })} />
+              {label}
+            </label>
+          ))}
         </fieldset>
 
         <fieldset>

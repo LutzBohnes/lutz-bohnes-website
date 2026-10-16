@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { becomeProvider, requestVerification, updateProfile, uploadAvatar } from "@/app/actions/profile";
+import { becomeProvider, requestVerification, updateProfile, updateSocialLinks, uploadAvatar } from "@/app/actions/profile";
+import { db } from "@/lib/db";
 import { ActionForm, SubmitButton } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { PageHeader, Panel, StatusBadge } from "@/components/dashboard";
@@ -12,7 +13,11 @@ export const metadata = { title: "Profil" };
 export default async function ProfilePage() {
   const user = await requireUser();
   const isProvider = user.role !== "USER";
-  const { platformFeePercent } = await getSettings();
+  const [{ platformFeePercent }, platforms, links] = await Promise.all([
+    getSettings(),
+    db.socialPlatform.findMany({ where: { active: true }, orderBy: { position: "asc" } }),
+    db.socialLink.findMany({ where: { userId: user.id } }),
+  ]);
   return (
     <>
       <PageHeader
@@ -59,6 +64,7 @@ export default async function ProfilePage() {
           )}
         </div>
 
+        <div className="space-y-6">
         <Panel title="Angaben">
           <ActionForm action={updateProfile} className="space-y-4">
             <div>
@@ -107,6 +113,27 @@ export default async function ProfilePage() {
             <SubmitButton>Speichern</SubmitButton>
           </ActionForm>
         </Panel>
+        {isProvider && platforms.length > 0 && (
+          <Panel title="Social Media">
+            <ActionForm action={updateSocialLinks} className="space-y-3">
+              {platforms.map((pl) => (
+                <div key={pl.id}>
+                  <label className="label" htmlFor={`social_${pl.id}`}>{pl.name}</label>
+                  <input
+                    id={`social_${pl.id}`}
+                    name={`social_${pl.id}`}
+                    defaultValue={links.find((l) => l.platformId === pl.id)?.url ?? ""}
+                    placeholder={`https://${pl.domains.split(",")[0].trim()}/…`}
+                    className="input"
+                  />
+                </div>
+              ))}
+              <p className="text-xs text-slate-500">Die Links erscheinen auf deinem Profil. Leer lassen, um einen Link zu entfernen.</p>
+              <SubmitButton>Links speichern</SubmitButton>
+            </ActionForm>
+          </Panel>
+        )}
+        </div>
       </div>
     </>
   );

@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { LANGUAGE_CHOICES, MAX_CHAT_PRICE, MIN_CHAT_PRICE } from "@/lib/config";
 import { db } from "@/lib/db";
 import { findBlockedTerm } from "@/lib/moderation";
+import { validateSocialUrl } from "@/lib/social";
 import { deleteImage, saveImage, UploadError } from "@/lib/storage";
 import type { ActionState } from "@/lib/action-state";
 
@@ -88,4 +89,35 @@ export async function uploadAvatar(_: ActionState, formData: FormData): Promise<
   }
   revalidatePath("/", "layout");
   return { ok: "Profilfoto gespeichert." };
+}
+
+/** Speichert die Social-Media-Links (ein Feld social_<plattformId> je aktiver Plattform). */
+export async function updateSocialLinks(_: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  if (user.role === "USER") return { error: "Nur Anbieterinnen können Social-Media-Links hinterlegen." };
+  const platforms = await db.socialPlatform.findMany({ where: { active: true } });
+  const upserts: { platformId: string; url: string }[] = [];
+  const removals: string[] = [];
+  for (const platform of platforms) {
+    const raw = String(formData.get(`social_${platform.id}`) ?? "").trim();
+    if (!raw) {
+      removals.push(platform.id);
+      continue;
+    }
+    const res = validateSocialUrl(raw, platform);
+    if ("error" in res) return { error: res.error };
+    upserts.push({ platformId: platform.id, url: res.url });
+  }
+  await db.$transaction([
+    db.socialLink.deleteMany({ where: { userId: user.id, platformId: { in: removals } } }),
+    ...upserts.map((u) =>
+      db.socialLink.upsert({
+        where: { userId_platformId: { userId: user.id, platformId: u.platformId } },
+        update: { url: u.url },
+        create: { userId: user.id, ...u },
+      }),
+    ),
+  ]);
+  revalidatePath("/", "layout");
+  return { ok: "Social-Media-Links gespeichert." };
 }

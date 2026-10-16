@@ -26,6 +26,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
           orderBy: { createdAt: "desc" },
         },
         _count: { select: { ordersAsProvider: { where: { status: "DELIVERED" } } } },
+        socialLinks: { where: { platform: { active: true } }, include: { platform: true }, orderBy: { platform: { position: "asc" } } },
       },
     }),
   ]);
@@ -70,11 +71,22 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
             <h2 className="mb-2 text-lg font-semibold">Über mich</h2>
             <p className="whitespace-pre-line leading-relaxed text-slate-700">{provider.bio || "Diese Anbieterin hat noch keine Beschreibung hinterlegt."}</p>
           </div>
+          <div className="space-y-4">
           <ul className="space-y-2.5 text-sm">
             {facts.map((f) => (
               <li key={f.text} className="flex items-center gap-2.5"><span className="grid h-8 w-8 flex-none place-items-center rounded-lg bg-primary/10 text-primary"><Icon name={f.icon} size={16} /></span>{f.text}</li>
             ))}
           </ul>
+          {provider.socialLinks.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {provider.socialLinks.map((l) => (
+                <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer nofollow ugc" className="btn btn-ghost px-3 py-1.5 text-sm">
+                  <Icon name="link" size={16} /> {l.platform.name}
+                </a>
+              ))}
+            </div>
+          )}
+          </div>
         </div>
       </section>
 
