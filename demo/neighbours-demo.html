@@ -113,6 +113,22 @@ label.lbl { display: block; font-size: 13px; font-weight: 600; color: #34433f; m
 .search .input { border: 0; background: var(--soft); }
 @media (max-width: 900px) { .search { grid-template-columns: 1fr 1fr; } .search .q { grid-column: 1 / -1; } }
 @media (max-width: 480px) { .search { grid-template-columns: 1fr; } }
+.search .more { grid-column: 1 / -1; }
+.search .more summary { cursor: pointer; padding: 6px 8px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.more-grid { display: grid; gap: 6px; padding: 4px 0 2px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 900px) { .more-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .more-grid { grid-template-columns: 1fr; } }
+.svc { display: flex; gap: 18px; text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); transition: box-shadow .2s, transform .2s; }
+.svc:hover { box-shadow: var(--shadow-lift); transform: translateY(-2px); }
+.svc .cover { width: 220px; flex: none; border-radius: calc(var(--radius) * .8); }
+@media (max-width: 640px) { .svc { flex-direction: column; } .svc .cover { width: 100%; } }
+.pgrid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.pgrid button { border: 0; padding: 0; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--soft); }
+.pgrid img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.pgrid button:hover img { transform: scale(1.06); }
+.facts li { display: flex; align-items: center; gap: 10px; padding-block: 5px; font-size: 14px; }
+.facts .ico { width: 32px; height: 32px; border-radius: 9px; }
+.facts .ico svg.i { width: 16px; height: 16px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .chips button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,.28); background: transparent; color: #fff; border-radius: 999px; padding: 6px 14px; font-size: 13px; }
 .chips button:hover, .chips button[aria-pressed="true"] { background: #fff; color: var(--ink); border-color: #fff; }
@@ -371,13 +387,13 @@ function coverArt(cat, v = 0) {
 
 const AV_COLORS = ["#0d5c56", "#b4553a", "#5b5fc7", "#a3497f", "#3f7d3a", "#8a6a1f", "#2f6f8f"];
 const PROVIDERS = {
-  anna:  { name: "Anna",  city: "Köln",    plz: "50667", chat: 3, rating: 4.9, jobs: 87, since: "2024", bio: "Rentnerin mit viel Zeit und Herz. Ich helfe beim Einkaufen, im Garten und bei Behördengängen." },
-  lena:  { name: "Lena",  city: "Berlin",  plz: "10115", chat: 4, rating: 5.0, jobs: 42, since: "2025", bio: "Lehramtsstudentin für Mathe und Englisch. Ich nehme auch persönliche Grußvideos auf." },
-  sevgi: { name: "Sevgi", city: "Köln",    plz: "50823", chat: 3, rating: 4.8, jobs: 133, since: "2023", bio: "Gelernte Friseurin. Ich komme mit Schere und Föhn zu dir nach Hause." },
-  marie: { name: "Marie", city: "Hamburg", plz: "20095", chat: 5, rating: 4.9, jobs: 64, since: "2024", bio: "Erzieherin in Elternzeit. Ich passe abends und am Wochenende auf Kinder auf." },
-  jana:  { name: "Jana",  city: "München", plz: "80331", chat: 4, rating: 5.0, jobs: 58, since: "2025", bio: "Tiermedizinische Fachangestellte. Gassi gehen, Katzen füttern, Urlaubsbetreuung." },
-  fatma: { name: "Fatma", city: "Berlin",  plz: "12043", chat: 3, rating: 4.9, jobs: 101, since: "2023", bio: "Ich nähe, ändere und repariere Kleidung. Und ich koche für eure Feier." },
-  clara: { name: "Clara", city: "Hamburg", plz: "22765", chat: 6, rating: 4.7, jobs: 29, since: "2025", bio: "Schauspielerin. Ich nehme Grußvideos für Geburtstage, Hochzeiten und Prüfungen auf." },
+  anna:  { name: "Anna",  city: "Köln",    plz: "50667", chat: 3, rating: 4.9, jobs: 87, since: "2024", langs: ["Deutsch"], exp: 12, bio: "Rentnerin mit viel Zeit und Herz. Ich helfe beim Einkaufen, im Garten und bei Behördengängen." },
+  lena:  { name: "Lena",  city: "Berlin",  plz: "10115", chat: 4, rating: 5.0, jobs: 42, since: "2025", langs: ["Deutsch", "Englisch"], exp: 3, bio: "Lehramtsstudentin für Mathe und Englisch. Ich nehme auch persönliche Grußvideos auf." },
+  sevgi: { name: "Sevgi", city: "Köln",    plz: "50823", chat: 3, rating: 4.8, jobs: 133, since: "2023", langs: ["Deutsch", "Türkisch"], exp: 15, bio: "Gelernte Friseurin. Ich komme mit Schere und Föhn zu dir nach Hause." },
+  marie: { name: "Marie", city: "Hamburg", plz: "20095", chat: 5, rating: 4.9, jobs: 64, since: "2024", langs: ["Deutsch", "Englisch", "Französisch"], exp: 8, bio: "Erzieherin in Elternzeit. Ich passe abends und am Wochenende auf Kinder auf." },
+  jana:  { name: "Jana",  city: "München", plz: "80331", chat: 4, rating: 5.0, jobs: 58, since: "2025", langs: ["Deutsch", "Englisch"], exp: 6, bio: "Tiermedizinische Fachangestellte. Gassi gehen, Katzen füttern, Urlaubsbetreuung." },
+  fatma: { name: "Fatma", city: "Berlin",  plz: "12043", chat: 3, rating: 4.9, jobs: 101, since: "2023", langs: ["Deutsch", "Türkisch", "Arabisch"], exp: 20, bio: "Ich nähe, ändere und repariere Kleidung. Und ich koche für eure Feier." },
+  clara: { name: "Clara", city: "Hamburg", plz: "22765", chat: 6, rating: 4.7, jobs: 29, since: "2025", langs: ["Deutsch", "Englisch", "Italienisch"], exp: 4, bio: "Schauspielerin. Ich nehme Grußvideos für Geburtstage, Hochzeiten und Prüfungen auf." },
 };
 const SEED_LISTINGS = [
   { id: 1, p: "anna", cat: "Einkaufshilfe", type: "SERVICE", title: "Wocheneinkauf für Senior:innen", price: 80, n: 2, desc: "Ich erledige Ihren Wocheneinkauf im Veedel und bringe alles bis an die Haustür. Eine Einkaufsliste genügt, gern auch Apotheke und Post." },
@@ -393,6 +409,8 @@ const SEED_LISTINGS = [
   { id: 11, p: "marie", cat: "Haushalt & Putzen", type: "SERVICE", title: "Fensterputzen für die ganze Wohnung", price: 220, n: 2, desc: "Innen und außen, inklusive Rahmen. Putzmittel bringe ich mit. Bis 4 Zimmer in Hamburg-Altona." },
   { id: 12, p: "anna", cat: "Seniorenhilfe", type: "SERVICE", title: "Begleitung zu Arzt und Behörden", price: 90, n: 1, desc: "Ich begleite Sie zu Terminen, helfe beim Ausfüllen von Formularen und behalte den Überblick." },
 ];
+const LANGS = ["Deutsch", "Englisch", "Türkisch", "Arabisch", "Russisch", "Polnisch", "Ukrainisch", "Italienisch", "Spanisch", "Französisch"];
+const EMPTY_FILTERS = { q: "", place: "", cat: "", type: "", maxPrice: "", minExp: "", lang: "", minRating: "", photosOnly: false };
 const PACKS = [
   { id: "s", credits: 100, euro: 10, label: "Starter" },
   { id: "m", credits: 550, euro: 50, label: "Beliebt", best: true },
@@ -416,7 +434,7 @@ function initialState() {
   Object.values(providers).forEach((p) => (p.avatar = null));
   return {
     role: "customer", view: "home",
-    filters: { q: "", place: "", cat: "", type: "" },
+    filters: { ...EMPTY_FILTERS }, profileId: null,
     credits: 250, settings: { ...DEFAULT_SETTINGS },
     listings, providers, nextId: 100,
     earnings: { anna: 412, lena: 238, sevgi: 960, marie: 540, jana: 188, fatma: 705, clara: 120 },
@@ -570,6 +588,12 @@ function filtered() {
     }
     if (cat && l.cat !== cat) return false;
     if (type && l.type !== type) return false;
+    const f = S.filters;
+    if (f.maxPrice && l.price > +f.maxPrice) return false;
+    if (f.minExp && p.exp < +f.minExp) return false;
+    if (f.lang && !p.langs.includes(f.lang)) return false;
+    if (f.minRating && p.rating < +f.minRating) return false;
+    if (f.photosOnly && l.photos.length === 0) return false;
     return true;
   });
 }
@@ -592,6 +616,7 @@ function card(l) {
 }
 VIEWS.home = () => {
   const s = S.settings, f = S.filters, res = filtered();
+  const extra = [f.maxPrice, f.minExp, f.lang, f.minRating, f.photosOnly].filter(Boolean).length;
   return `<div class="stack" style="gap:40px">
     <section class="hero">
       <span class="kicker">${ic("shield")} Alle Anbieterinnen persönlich verifiziert</span>
@@ -603,6 +628,16 @@ VIEWS.home = () => {
         <select class="input" id="f-cat" aria-label="Dienstleistung"><option value="">Alle Dienstleistungen</option>${CATS.map((c) => `<option ${f.cat === c ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
         <select class="input" id="f-type" aria-label="Art"><option value="">Alle Arten</option><option value="SERVICE" ${f.type === "SERVICE" ? "selected" : ""}>Dienstleistung</option><option value="GREETING_VIDEO" ${f.type === "GREETING_VIDEO" ? "selected" : ""}>Grußvideo</option></select>
         <button class="btn accent" type="submit">Suchen</button>
+        <details class="more" ${extra ? "open" : ""}>
+          <summary>Weitere Filter${extra ? ` <span class="pill" style="font-size:11px;padding:1px 8px">${extra}</span>` : ""}</summary>
+          <div class="more-grid">
+            <select class="input" id="f-price" aria-label="Preis bis"><option value="">Preis: egal</option>${[50, 100, 200, 500].map((v) => `<option value="${v}" ${f.maxPrice == v ? "selected" : ""}>bis ${v} Credits (${v / 10} €)</option>`).join("")}</select>
+            <select class="input" id="f-exp" aria-label="Erfahrung"><option value="">Erfahrung: egal</option>${[1, 3, 5, 10].map((v) => `<option value="${v}" ${f.minExp == v ? "selected" : ""}>mind. ${v} ${v === 1 ? "Jahr" : "Jahre"}</option>`).join("")}</select>
+            <select class="input" id="f-lang" aria-label="Sprache"><option value="">Sprache: egal</option>${LANGS.map((v) => `<option ${f.lang === v ? "selected" : ""}>${v}</option>`).join("")}</select>
+            <select class="input" id="f-rating" aria-label="Bewertung"><option value="">Bewertung: egal</option>${["4.5", "4.8", "5"].map((v) => `<option value="${v}" ${f.minRating === v ? "selected" : ""}>ab ${v.replace(".", ",")} ★</option>`).join("")}</select>
+            <label class="input" style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="f-photos" ${f.photosOnly ? "checked" : ""}> Nur mit Fotos</label>
+          </div>
+        </details>
       </form>
       <div class="chips" aria-label="Kategorien">
         ${CATS.slice(0, 8).map((c) => `<button data-cat="${esc(c)}" aria-pressed="${f.cat === c}">${ic(CAT_META[c]?.icon || "sparkle")}${esc(c)}</button>`).join("")}
@@ -615,16 +650,62 @@ VIEWS.home = () => {
       <div class="card">${'<span class="ico">' + ic("pin") + "</span>"}<div><strong>Direkt um die Ecke</strong><p class="small muted">Filter nach Ort oder PLZ, zum Beispiel „50“ für den Raum Köln.</p></div></div>
     </section>
 
+    <section class="stack" style="gap:14px">
+      <h2 style="font-size:24px">Anbieterinnen in deiner Nähe</h2>
+      <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:6px">${Object.entries(S.providers).map(([id, p]) => `<button class="card" data-profile="${id}" style="flex:none;width:200px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:8px">
+        <div class="row" style="flex-wrap:nowrap">${avatar(id, 44)}<div style="min-width:0"><strong>${esc(p.name)}</strong><br><span class="xs muted">${esc(p.city)}</span></div></div>
+        <span class="xs muted">${S.listings.filter((l) => l.p === id && l.active).length} Angebote · ${p.rating.toLocaleString("de-DE")} ★ · ${p.exp} J. Erfahrung</span>
+      </button>`).join("")}</div>
+    </section>
+
     <section class="stack" style="gap:18px">
       <div class="row between">
         <h2 style="font-size:28px">${res.length} ${res.length === 1 ? "Angebot" : "Angebote"}${f.place ? ` <span class="muted">in „${esc(f.place)}“</span>` : ""}</h2>
         <div class="row">
           ${["Köln", "Berlin", "Hamburg", "München"].map((c) => `<button class="btn ghost sm" data-place="${c}" ${f.place === c ? 'style="border-color:var(--brand);color:var(--brand)"' : ""}>${c}</button>`).join("")}
-          ${f.q || f.place || f.cat || f.type ? `<button class="btn ghost sm" data-clear>Filter löschen</button>` : ""}
+          ${f.q || f.place || f.cat || f.type || extra ? `<button class="btn ghost sm" data-clear>Filter löschen</button>` : ""}
         </div>
       </div>
       ${res.length ? `<div class="grid">${res.map(card).join("")}</div>` : `<div class="card muted">Keine Angebote gefunden. Versuche einen anderen Ort oder eine andere Kategorie.</div>`}
     </section>
+  </div>`;
+};
+
+VIEWS.profile = () => {
+  const pid = S.profileId, p = P(pid);
+  if (!p) return VIEWS.home();
+  const items = S.listings.filter((l) => l.p === pid && l.active);
+  const photos = items.flatMap((l) => l.photos.map((src) => ({ src, id: l.id, title: l.title })));
+  const cats = [...new Set(items.map((l) => l.cat))];
+  const facts = [["shield", "Identität verifiziert"], ["pin", `${p.plz} ${p.city}`], ["star", `${p.rating.toLocaleString("de-DE")} ★ · ${p.jobs} erledigte Aufträge`], ["sparkle", `${p.exp} Jahre Erfahrung`], ["chat", p.langs.join(", ")], ["calendar", `Dabei seit ${p.since}`]];
+  return `<div class="stack" style="gap:36px">
+    <section class="card flush">
+      <div style="height:130px;background:var(--brand);position:relative;overflow:hidden"><span style="position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.12)"></span><span style="position:absolute;left:40%;bottom:-120px;width:240px;height:240px;border-radius:50%;background:color-mix(in srgb, var(--accent) 45%, transparent);filter:blur(30px)"></span></div>
+      <div class="row" style="padding:0 24px 22px;align-items:flex-end;gap:18px">
+        <span style="margin-top:-56px;border-radius:50%;box-shadow:0 0 0 5px var(--surface)">${avatar(pid, 116)}</span>
+        <div class="grow" style="padding-top:10px"><h1 style="font-size:34px">${esc(p.name)}</h1><p class="muted">${cats.map(esc).join(" · ")}</p></div>
+        ${S.role === "customer" ? `<button class="btn" data-chatwith="${pid}">${ic("chat")} Chatten · ${p.chat} Credits / Nachricht</button>` : ""}
+      </div>
+      <div class="cols" style="border-top:1px solid var(--line);padding:22px 24px;grid-template-columns:1.6fr 1fr">
+        <div class="stack" style="gap:8px"><h2 style="font-size:19px">Über mich</h2><p style="max-width:62ch;color:#34433f">${esc(p.bio)}</p></div>
+        <ul class="facts" style="list-style:none;padding:0;margin:0">${facts.map(([i, t]) => `<li><span class="ico">${ic(i)}</span>${esc(t)}</li>`).join("")}</ul>
+      </div>
+    </section>
+    <section class="stack" style="gap:16px">
+      <div class="row between"><h2 style="font-size:28px">Alle Dienstleistungen <span class="muted">(${items.length})</span></h2>${items.length ? `<span class="small muted">ab ${fmt(Math.min(...items.map((l) => l.price)))} Credits</span>` : ""}</div>
+      ${items.map((l) => `<button class="svc" data-open="${l.id}">
+        <div class="cover">${l.photos[0] ? `<img src="${l.photos[0]}" alt="">` : ""}${l.photos.length > 1 ? `<span class="tr">${ic("image")}${l.photos.length}</span>` : ""}</div>
+        <div class="stack grow" style="gap:6px">
+          <div class="row" style="gap:8px"><span class="eyebrow">${esc(l.cat)}</span>${l.type === "GREETING_VIDEO" ? '<span class="tag-video">Grußvideo</span>' : ""}</div>
+          <h3 style="font-size:21px;line-height:1.2">${esc(l.title)}</h3>
+          <p class="small muted" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(l.desc)}</p>
+          <div class="row" style="margin-top:auto;padding-top:6px"><span class="head num" style="font-size:20px;font-weight:700">${fmt(l.price)} Credits</span><span class="small muted">${euro(l.price / 10)}</span><span style="margin-left:auto;color:var(--brand);font-weight:600;font-size:14px">Ansehen & buchen →</span></div>
+        </div>
+      </button>`).join("") || `<div class="card muted">Gerade keine aktiven Angebote.</div>`}
+    </section>
+    ${photos.length ? `<section class="stack" style="gap:16px"><h2 style="font-size:28px">Fotos <span class="muted">(${photos.length})</span></h2>
+      <div class="pgrid">${photos.map((ph) => `<button data-open="${ph.id}" title="${esc(ph.title)}"><img src="${ph.src}" alt="${esc(ph.title)}"></button>`).join("")}</div></section>` : ""}
+    <div><button class="btn ghost" data-nav="home">← Zurück zur Suche</button></div>
   </div>`;
 };
 
@@ -660,7 +741,10 @@ function openListing(id, keepIdx) {
         <div class="row">${avatar(l.p, 52)}<div class="grow"><strong style="font-size:16px">${esc(p.name)}</strong><br><span class="verified">${ic("shield")} Identität verifiziert</span></div></div>
         <div class="row small muted" style="gap:14px"><span>${ic("star")} ${p.rating.toLocaleString("de-DE")}</span><span>${p.jobs} Einsätze</span><span>seit ${p.since}</span></div>
         <p class="small">${esc(p.bio)}</p>
-        ${canOrder ? `<button class="btn ghost" data-chatwith="${l.p}">${ic("chat")} Chatten · ${p.chat} Credits / Nachricht</button>` : ""}
+        <div class="row" style="gap:8px">
+          <button class="btn ghost grow" data-profile="${l.p}">${ic("user")} Profil & alle ${S.listings.filter((x) => x.p === l.p && x.active).length} Angebote</button>
+          ${canOrder ? `<button class="btn ghost grow" data-chatwith="${l.p}">${ic("chat")} Chatten · ${p.chat} Cr.</button>` : ""}
+        </div>
       </div>
     </aside>
   </div>`;
@@ -885,7 +969,7 @@ VIEWS["p-earn"] = () => {
 VIEWS["p-profile"] = () => {
   const pid = S.providerAs, p = P(pid);
   return providerDash(`
-    ${ph("Profil & Verifizierung", `${esc(p.name.toLowerCase())}@beispiel.de`)}
+    ${ph("Profil & Verifizierung", `${esc(p.name.toLowerCase())}@beispiel.de`, `<button class="btn ghost" data-profile="${pid}">${ic("eye")} Öffentliches Profil ansehen</button>`)}
     ${flashHtml()}
     <div class="cols" style="grid-template-columns:1fr 1.4fr">
       <div class="stack" style="gap:22px">
@@ -902,6 +986,8 @@ VIEWS["p-profile"] = () => {
           <div><label class="lbl" for="pr-name">Name</label><input class="input" id="pr-name" value="${esc(p.name)}"></div>
           <div><label class="lbl" for="pr-city">Ort</label><input class="input" id="pr-city" value="${esc(p.plz)} ${esc(p.city)}"></div>
           <div class="full"><label class="lbl" for="pr-bio">Über mich</label><textarea class="input" id="pr-bio" rows="5">${esc(p.bio)}</textarea></div>
+          <div><label class="lbl" for="pr-exp">Erfahrung (Jahre)</label><input class="input" id="pr-exp" type="number" min="0" max="60" value="${p.exp}"></div>
+          <fieldset class="full" style="border:0;padding:0;margin:0"><legend class="lbl">Sprachen</legend><div class="row" style="gap:6px">${LANGS.map((l) => `<label class="badge ${p.langs.includes(l) ? "b-brand" : "b-mute"}" style="cursor:pointer;padding:5px 12px;font-size:13px"><input type="checkbox" name="pr-lang" value="${l}" ${p.langs.includes(l) ? "checked" : ""} style="margin:0 4px 0 0">${l}</label>`).join("")}</div></fieldset>
           <div><label class="lbl" for="pr-chat">Chat-Preis (Credits pro Nachricht)</label><input class="input" id="pr-chat" type="number" min="2" max="50" value="${p.chat}"><span class="xs muted">Du erhältst ${100 - S.settings.fee} % davon.</span></div>
           <div class="full"><button class="btn" type="submit">Speichern</button></div>
         </form>
@@ -1084,8 +1170,9 @@ document.addEventListener("click", (e) => {
   if (d.galto) { S.gallery = +d.galto; openListing(+d.lid, true); return; }
   if (d.cat) { S.filters = { ...S.filters, cat: S.filters.cat === d.cat ? "" : d.cat }; render(); return; }
   if (d.place) { S.filters = { ...S.filters, place: S.filters.place === d.place ? "" : d.place }; render(); return; }
-  if ("clear" in d) { S.filters = { q: "", place: "", cat: "", type: "" }; render(); return; }
-  if (d.chatwith) { $("#dlg").close(); S.chats[d.chatwith] ||= []; S.activeChat = d.chatwith; go("chat"); return; }
+  if ("clear" in d) { S.filters = { ...EMPTY_FILTERS }; render(); return; }
+  if (d.profile) { if ($("#dlg").open) $("#dlg").close(); S.profileId = d.profile; go("profile"); return; }
+  if (d.chatwith) { if ($("#dlg").open) $("#dlg").close(); S.chats[d.chatwith] ||= []; S.activeChat = d.chatwith; go("chat"); return; }
   if (d.report) { $("#dlg").close(); S.reports.push({ id: Date.now(), listing: +d.report, reason: "In der Demo gemeldet: bitte prüfen.", by: "Demo-Kundin", date: "Heute" }); toast("Danke! Die Meldung liegt jetzt im Admin-Bereich."); return; }
   if (d.conv) { S.activeChat = d.conv; render(); return; }
   if (d.buy) { const p = PACKS.find((x) => x.id === d.buy); S.credits += p.credits; S.stats.soldCredits += p.credits; S.flash = { kind: "ok", text: `${fmt(p.credits)} Credits für ${euro(p.euro)} gutgeschrieben (Demo, keine echte Zahlung).` }; render(); return; }
@@ -1125,7 +1212,13 @@ document.addEventListener("click", (e) => {
 document.addEventListener("submit", (e) => {
   e.preventDefault();
   const f = e.target;
-  if (f.id === "search-form") { S.filters = { q: $("#f-q").value.trim(), place: $("#f-place").value.trim(), cat: $("#f-cat").value, type: $("#f-type").value }; render(); return; }
+  if (f.id === "search-form") {
+    S.filters = {
+      q: $("#f-q").value.trim(), place: $("#f-place").value.trim(), cat: $("#f-cat").value, type: $("#f-type").value,
+      maxPrice: $("#f-price").value, minExp: $("#f-exp").value, lang: $("#f-lang").value, minRating: $("#f-rating").value, photosOnly: $("#f-photos").checked,
+    };
+    render(); return;
+  }
   if (f.id === "order-form") { placeOrder(+f.dataset.id, $("#o-note").value.trim()); return; }
   if (f.id === "chat-form") { sendChat(f.dataset.pid, $("#chat-text").value, f.dataset.asprovider === "1"); return; }
   if (f.id === "payout-form") {
@@ -1146,6 +1239,8 @@ document.addEventListener("submit", (e) => {
   if (f.id === "profile-form") {
     const p = P(S.providerAs);
     p.name = $("#pr-name").value.trim() || p.name; p.bio = $("#pr-bio").value.trim(); p.chat = Math.min(50, Math.max(2, +$("#pr-chat").value || 2));
+    p.exp = Math.min(60, Math.max(0, +$("#pr-exp").value || 0));
+    p.langs = [...document.querySelectorAll("input[name=pr-lang]:checked")].map((el) => el.value);
     S.flash = { kind: "ok", text: "Profil gespeichert." }; render(); return;
   }
   if (f.id === "admin-filter") { S.adminFilter = $("#af-q").value.trim(); render(); return; }
