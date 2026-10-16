@@ -1,0 +1,719 @@
+<title>Neighbours.com Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: Demo-Leiste oben (Rollenwechsel), darunter die App im Produkt-Branding; eine Spalte auf dem Handy, Raster ab Tablet.
+   Bewusst nur helles Theme: die Demo zeigt das Produkt so, wie es live aussieht. Alle Farben sind explizit gesetzt. */
+:root {
+  color-scheme: light;
+  --brand: #0f766e;
+  --accent: #f59e0b;
+  --bg: #f8fafc;
+  --ink: #0f172a;
+  --muted: #5b6b7f;
+  --line: #e2e8f0;
+  --surface: #ffffff;
+  --soft: #f1f5f9;
+  --demo-bar: #132a2e;
+  --demo-ink: #e6f1ef;
+  --ok-bg: #ecfdf5; --ok-ink: #047857;
+  --err-bg: #fef2f2; --err-ink: #b91c1c;
+  --warn-bg: #fffbeb; --warn-ink: #92400e;
+  --radius: 12px;
+  --font-head: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--demo-bar); }
+h1, h2, h3, .head { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Demo-Leiste */
+.demobar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--demo-bar); color: var(--demo-ink); font-size: 13px; }
+.demobar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding-block: 8px; }
+.demobar .tag { letter-spacing: .08em; text-transform: uppercase; font-weight: 600; font-size: 11px; opacity: .75; }
+.seg { display: inline-flex; background: rgba(255,255,255,.08); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; color: var(--demo-ink); padding: 5px 12px; border-radius: 999px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--demo-ink); color: var(--demo-bar); }
+.demobar .reset { margin-left: auto; background: transparent; border: 1px solid rgba(255,255,255,.25); color: var(--demo-ink); border-radius: 999px; padding: 4px 12px; }
+
+/* App-Header */
+.apphead { background: var(--surface); border-bottom: 1px solid var(--line); }
+.apphead .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-block: 12px; }
+.logo { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; text-align: left; }
+.logo .mark { width: 38px; height: 38px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-family: var(--font-head); font-weight: 700; font-size: 18px; flex: none; }
+.logo .name { display: block; font-family: var(--font-head); font-weight: 700; font-size: 20px; color: var(--brand); line-height: 1.1; }
+.logo .tagline { display: block; font-size: 12px; color: var(--muted); }
+nav.main { display: flex; flex-wrap: wrap; gap: 2px; align-items: center; }
+nav.main button { border: 0; background: none; padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+nav.main button:hover { background: var(--soft); }
+nav.main button[aria-current="page"] { color: var(--brand); font-weight: 600; }
+.pill { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; background: var(--accent); color: #fff; font-variant-numeric: tabular-nums; }
+
+main { padding-block: 28px 48px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: var(--brand); color: #fff; padding: 9px 16px; border-radius: var(--radius); font-weight: 500; transition: opacity .15s; }
+.btn:hover { opacity: .9; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.accent { background: var(--accent); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.danger { background: #dc2626; }
+.btn.block { width: 100%; }
+.input { width: 100%; border: 1px solid #cbd5e1; background: var(--surface); padding: 9px 12px; border-radius: calc(var(--radius) * .6); }
+.input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+label.lbl { display: block; font-size: 13px; font-weight: 500; color: #334155; margin-bottom: 4px; }
+.badge { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; }
+.b-brand { background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand); }
+.b-accent { background: color-mix(in srgb, var(--accent) 18%, transparent); color: color-mix(in srgb, var(--accent) 70%, #000); }
+.b-ok { background: var(--ok-bg); color: var(--ok-ink); }
+.b-warn { background: var(--warn-bg); color: var(--warn-ink); }
+.b-mute { background: var(--soft); color: var(--muted); }
+.note { border-radius: 8px; padding: 9px 12px; font-size: 14px; }
+.note.ok { background: var(--ok-bg); color: var(--ok-ink); }
+.note.err { background: var(--err-bg); color: var(--err-ink); }
+.note.warn { background: var(--warn-bg); color: var(--warn-ink); }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.num { font-variant-numeric: tabular-nums; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.between { justify-content: space-between; }
+
+/* Hero + Suche */
+.hero { background: var(--brand); color: #fff; border-radius: var(--radius); padding: 36px clamp(20px, 4vw, 44px); }
+.hero h1 { font-size: clamp(26px, 4vw, 38px); line-height: 1.15; max-width: 22ch; }
+.hero p { max-width: 60ch; opacity: .88; margin: 10px 0 0; }
+.search { margin-top: 22px; background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: 10px; display: grid; gap: 8px; grid-template-columns: 2fr 1.3fr 1.4fr 1fr auto; }
+@media (max-width: 860px) { .search { grid-template-columns: 1fr 1fr; } .search .q { grid-column: 1 / -1; } }
+@media (max-width: 460px) { .search { grid-template-columns: 1fr; } }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.chips button { border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; border-radius: 999px; padding: 4px 12px; font-size: 13px; }
+.chips button:hover { background: rgba(255,255,255,.12); }
+
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.listing { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); transition: box-shadow .15s, transform .15s; }
+.listing:hover { box-shadow: 0 6px 22px rgba(15,23,42,.08); transform: translateY(-1px); }
+.thumb { aspect-ratio: 4 / 3; max-width: 100%; display: grid; place-items: center; font-family: var(--font-head); font-size: 40px; font-weight: 700; color: var(--brand); background: color-mix(in srgb, var(--brand) 9%, var(--surface)); position: relative; }
+.thumb .kind { position: absolute; top: 10px; left: 10px; font-family: var(--font-body); font-size: 11px; font-weight: 600; }
+.listing .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.listing h3 { font-size: 16px; line-height: 1.3; }
+.price { font-family: var(--font-head); font-weight: 700; color: var(--brand); font-size: 18px; margin-top: auto; }
+.verified { color: var(--ok-ink); font-size: 12px; font-weight: 500; }
+
+/* Dialog */
+dialog { border: 0; padding: 0; border-radius: var(--radius); width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 48px); background: var(--surface); color: var(--ink); }
+dialog::backdrop { background: rgba(15,23,42,.45); }
+.dlg { display: grid; grid-template-columns: 1.6fr 1fr; }
+@media (max-width: 720px) { .dlg { grid-template-columns: 1fr; } }
+.dlg > div { padding: 22px; min-width: 0; }
+.dlg aside { background: var(--soft); display: flex; flex-direction: column; gap: 14px; }
+.close { position: absolute; right: 10px; top: 10px; border: 0; background: var(--surface); width: 34px; height: 34px; border-radius: 50%; font-size: 18px; }
+
+/* Chat */
+.chat { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
+@media (max-width: 760px) { .chat { grid-template-columns: 1fr; } }
+.convlist button { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px; }
+.convlist button[aria-current="true"] { border-color: var(--brand); box-shadow: inset 3px 0 0 var(--brand); }
+.msgs { display: flex; flex-direction: column; gap: 10px; min-height: 280px; max-height: 420px; overflow-y: auto; padding: 4px; }
+.msg { max-width: 80%; padding: 9px 14px; border-radius: 18px; background: var(--soft); align-self: flex-start; }
+.msg.me { align-self: flex-end; background: var(--brand); color: #fff; }
+.msg .meta { font-size: 11px; opacity: .7; margin-top: 2px; }
+.typing { font-size: 13px; color: var(--muted); font-style: italic; }
+
+/* Konto / Admin */
+.stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.stat .v { font-family: var(--font-head); font-weight: 700; font-size: 26px; color: var(--brand); font-variant-numeric: tabular-nums; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.tabs button { border: 0; background: none; padding: 7px 12px; border-radius: 8px; font-size: 14px; }
+.tabs button[aria-selected="true"] { background: var(--brand); color: #fff; }
+.list > * + * { border-top: 1px solid var(--line); }
+.list > * { padding-block: 12px; }
+.two { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+.editor { display: grid; gap: 22px; grid-template-columns: 1.5fr 1fr; align-items: start; }
+@media (max-width: 860px) { .editor { grid-template-columns: 1fr; } }
+.fields { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.fields .full { grid-column: 1 / -1; }
+@media (max-width: 460px) { .fields { grid-template-columns: 1fr; } }
+.colorrow { display: flex; gap: 8px; }
+.colorrow input[type=color] { width: 44px; height: 40px; padding: 2px; border: 1px solid #cbd5e1; border-radius: 8px; background: var(--surface); flex: none; }
+.packs { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.pack { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pack .big { font-family: var(--font-head); font-size: 40px; font-weight: 700; color: var(--brand); line-height: 1; font-variant-numeric: tabular-nums; }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; color: var(--muted); font-weight: 500; padding: 8px 6px; }
+td { padding: 10px 6px; border-top: 1px solid var(--line); }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 50; max-width: calc(100vw - 32px); }
+footer.app { border-top: 1px solid var(--line); background: var(--surface); }
+footer.app .wrap { padding-block: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="demobar" role="region" aria-label="Demo-Steuerung">
+  <div class="wrap">
+    <span class="tag">Demo</span>
+    <span>Ansicht:</span>
+    <div class="seg" id="roles">
+      <button data-role="customer" aria-pressed="true">Kund:in</button>
+      <button data-role="provider" aria-pressed="false">Anbieterin</button>
+      <button data-role="admin" aria-pressed="false">Admin</button>
+    </div>
+    <button class="reset" id="reset">Demo zurücksetzen</button>
+  </div>
+</div>
+
+<header class="apphead">
+  <div class="wrap">
+    <button class="logo" id="logo" aria-label="Zur Startseite">
+      <span class="mark" id="logo-mark">N</span>
+      <span><span class="name" id="site-name">Neighbours.com</span><span class="tagline" id="site-tagline"></span></span>
+    </button>
+    <nav class="main" id="nav" aria-label="Hauptnavigation"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<footer class="app">
+  <div class="wrap"><span id="footer-text"></span><span>Klick-Demo mit Beispieldaten · keine echten Zahlungen</span></div>
+</footer>
+
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const FONTS = ["Inter","Poppins","Roboto","Open Sans","Lato","Montserrat","Nunito","Raleway","Playfair Display","Merriweather","DM Sans","Quicksand","Work Sans","Lora"];
+const CATS = ["Einkaufshilfe","Haushalt & Putzen","Kinderbetreuung","Seniorenhilfe","Nachhilfe","Tierbetreuung","Garten","Beauty & Friseur","Nähen & Reparaturen","Kochen & Backen","Grußvideos"];
+const PACKS = [
+  { id: "s", credits: 100, euro: 10, label: "Starter" },
+  { id: "m", credits: 550, euro: 50, label: "Beliebt" },
+  { id: "l", credits: 1200, euro: 100, label: "Vorteil" },
+];
+const BLOCKED = ["escort","erotik","erotisch","sex","nackt","nude","happy end","taschengeld","sugar daddy","intim","fetisch","domina","bdsm","dessous","onlyfans","date gegen","begleitung gegen"];
+const DEFAULT_SETTINGS = {
+  siteName: "Neighbours.com", tagline: "Hilfe aus deiner Nachbarschaft",
+  heroTitle: "Finde Hilfe direkt um die Ecke",
+  heroText: "Frauen aus deiner Nachbarschaft bieten ihre Dienstleistungen an, vom Einkaufsservice bis zur Nachhilfe. Bezahlt wird einfach mit Credits.",
+  footerText: "Neighbours.com · Nachbarschaftshilfe, fair und sicher.",
+  headingFont: "Poppins", bodyFont: "Inter",
+  brand: "#0f766e", accent: "#f59e0b", bg: "#f8fafc", ink: "#0f172a", radius: 12, fee: 20,
+};
+
+const PROVIDERS = {
+  anna:  { name: "Anna",  city: "Köln",    plz: "50667", chat: 3, bio: "Rentnerin mit viel Zeit. Ich helfe gern beim Einkaufen, im Garten und bei Behördengängen." },
+  lena:  { name: "Lena",  city: "Berlin",  plz: "10115", chat: 4, bio: "Lehramtsstudentin für Mathe und Englisch. Ich nehme auch persönliche Grußvideos auf." },
+  sevgi: { name: "Sevgi", city: "Köln",    plz: "50823", chat: 3, bio: "Gelernte Friseurin. Ich komme mit Schere und Föhn zu dir nach Hause." },
+  marie: { name: "Marie", city: "Hamburg", plz: "20095", chat: 5, bio: "Erzieherin in Elternzeit. Ich passe abends und am Wochenende auf Kinder auf." },
+  jana:  { name: "Jana",  city: "München", plz: "80331", chat: 4, bio: "Tierärztliche Fachangestellte. Gassi gehen, Katzen füttern, Urlaubsbetreuung." },
+  fatma: { name: "Fatma", city: "Berlin",  plz: "12043", chat: 3, bio: "Ich nähe, ändere und repariere Kleidung. Und ich koche für eure Feier." },
+  clara: { name: "Clara", city: "Hamburg", plz: "22765", chat: 6, bio: "Schauspielerin. Ich nehme Grußvideos für Geburtstage, Hochzeiten und Prüfungen auf." },
+};
+
+const LISTINGS = [
+  { id: 1, p: "anna", cat: "Einkaufshilfe", type: "SERVICE", title: "Wocheneinkauf für Senior:innen", price: 80, desc: "Ich erledige Ihren Wocheneinkauf im Veedel und bringe alles bis an die Haustür. Eine Einkaufsliste genügt, gern auch Apotheke und Post." },
+  { id: 2, p: "anna", cat: "Garten", type: "SERVICE", title: "Rasen mähen und Hecke schneiden", price: 150, desc: "Kleinere Gartenarbeiten in der Kölner Innenstadt. Werkzeug bringe ich mit, den Grünschnitt nehme ich mit." },
+  { id: 3, p: "lena", cat: "Nachhilfe", type: "SERVICE", title: "Mathe-Nachhilfe 5. bis 10. Klasse (60 Min.)", price: 200, desc: "Geduldige Nachhilfe für die Mittelstufe, bei euch zu Hause in Berlin-Mitte oder online. Vor Klassenarbeiten auch kurzfristig." },
+  { id: 4, p: "lena", cat: "Grußvideos", type: "GREETING_VIDEO", title: "Geburtstagsgruß auf Englisch", price: 90, desc: "Ein persönliches Video von etwa einer Minute, auf Englisch oder Deutsch, mit Namen und euren Wünschen. Lieferung innerhalb von 3 Tagen." },
+  { id: 5, p: "sevgi", cat: "Beauty & Friseur", type: "SERVICE", title: "Haare schneiden bei dir zu Hause", price: 180, desc: "Waschen, Schneiden, Föhnen in deiner Wohnung in Köln-Ehrenfeld und Umgebung. Für Damen, Herren und Kinder." },
+  { id: 6, p: "marie", cat: "Kinderbetreuung", type: "SERVICE", title: "Babysitting am Abend (bis 4 Std.)", price: 320, desc: "Erfahrene Erzieherin mit Erste-Hilfe-Kurs am Kind. Ich bringe die Kleinen ins Bett, damit ihr einen freien Abend habt." },
+  { id: 7, p: "jana", cat: "Tierbetreuung", type: "SERVICE", title: "Gassi-Service, 45 Minuten", price: 60, desc: "Ich gehe mit deinem Hund in der Münchner Altstadt und an der Isar spazieren. Auch für ängstliche oder ältere Hunde." },
+  { id: 8, p: "jana", cat: "Tierbetreuung", type: "SERVICE", title: "Katzenbetreuung im Urlaub (pro Besuch)", price: 70, desc: "Füttern, Katzenklo, Streicheleinheiten und ein kurzes Foto-Update per Chat bei jedem Besuch." },
+  { id: 9, p: "fatma", cat: "Nähen & Reparaturen", type: "SERVICE", title: "Hosen kürzen und Reißverschluss tauschen", price: 50, desc: "Änderungen aller Art in Berlin-Neukölln. Abholung und Rückgabe im Kiez sind möglich." },
+  { id: 10, p: "fatma", cat: "Kochen & Backen", type: "SERVICE", title: "Türkisches Buffet für 10 Personen", price: 600, desc: "Börek, Linsensuppe, Sarma und Baklava, frisch gekocht für eure Feier. Lieferung im Umkreis von 5 km." },
+  { id: 11, p: "clara", cat: "Grußvideos", type: "GREETING_VIDEO", title: "Hochzeitsgruß mit kleinem Gedicht", price: 150, desc: "Ich schreibe ein kurzes Gedicht über das Brautpaar und trage es im Video vor. Ihr erzählt mir vorher ein paar Anekdoten." },
+  { id: 12, p: "marie", cat: "Haushalt & Putzen", type: "SERVICE", title: "Fensterputzen für die ganze Wohnung", price: 220, desc: "Innen und außen, inklusive Rahmen. Putzmittel bringe ich mit. Bis 4 Zimmer in Hamburg-Altona." },
+  { id: 13, p: "anna", cat: "Seniorenhilfe", type: "SERVICE", title: "Begleitung zum Arzt und zu Behörden", price: 90, desc: "Ich begleite Sie zu Terminen, helfe beim Ausfüllen von Formularen und behalte den Überblick." },
+];
+
+function initialState() {
+  return {
+    role: "customer", view: "search",
+    filters: { q: "", place: "", cat: "", type: "" },
+    credits: 250,
+    settings: { ...DEFAULT_SETTINGS },
+    earnings: { anna: 412, lena: 238, sevgi: 96, marie: 540, jana: 188, fatma: 305, clara: 120 },
+    providerAs: "lena",
+    orders: [
+      { id: 101, listing: 3, buyer: "Familie Weber", note: "Paul, 8. Klasse, Klassenarbeit über lineare Funktionen am Freitag.", status: "OPEN", price: 200, fee: 40, mine: false },
+      { id: 102, listing: 6, buyer: "Tom K.", note: "Samstag ab 19 Uhr, zwei Kinder (3 und 6).", status: "OPEN", price: 320, fee: 64, mine: false },
+    ],
+    chats: {
+      jana: [
+        { me: true, text: "Hallo Jana, geht nächste Woche jeden Morgen Gassi?", cost: 4, t: "09:12" },
+        { me: false, text: "Hallo! Ja, Montag bis Freitag um 8 Uhr passt gut. Wie heißt dein Hund?", t: "09:20" },
+      ],
+    },
+    activeChat: "jana",
+    stats: { users: 1284, soldCredits: 48200, revenue: 6910 },
+    verifications: [
+      { id: 1, name: "Sophie", city: "Leipzig", note: "Videocall gern abends, Tel. hinterlegt" },
+      { id: 2, name: "Ayşe", city: "Dortmund", note: "Ausweis liegt bereit" },
+    ],
+    reports: [
+      { id: 1, listing: 10, reason: "Preis wirkt sehr niedrig für 10 Personen, bitte prüfen." },
+    ],
+    adminTab: "design",
+    flash: null,
+  };
+}
+
+let S = initialState();
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => n.toLocaleString("de-DE");
+const euro = (n) => n.toLocaleString("de-DE", { style: "currency", currency: "EUR" });
+const share = (price) => Math.floor(price * (100 - S.settings.fee) / 100);
+const now = () => new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+const listingById = (id) => LISTINGS.find((l) => l.id === id);
+const blocked = (txt) => { const t = txt.toLowerCase(); return BLOCKED.find((w) => new RegExp("(^|[^a-zäöüß])" + w.replace(/ /g, "\\s+")).test(t)); };
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => (t.hidden = true), 2600);
+}
+
+/* ---------- Branding ---------- */
+const loadedFonts = new Set(["Poppins", "Inter"]);
+function ensureFont(f) {
+  if (loadedFonts.has(f)) return;
+  loadedFonts.add(f);
+  const l = document.createElement("link");
+  l.rel = "stylesheet";
+  l.href = `https://fonts.googleapis.com/css2?family=${f.replace(/ /g, "+")}:wght@400;500;600;700&display=swap`;
+  document.head.appendChild(l);
+}
+function applyBrand() {
+  const s = S.settings, r = document.documentElement.style;
+  ensureFont(s.headingFont); ensureFont(s.bodyFont);
+  r.setProperty("--brand", s.brand); r.setProperty("--accent", s.accent);
+  r.setProperty("--bg", s.bg); r.setProperty("--ink", s.ink);
+  r.setProperty("--radius", s.radius + "px");
+  r.setProperty("--font-head", `"${s.headingFont}", ui-sans-serif, system-ui, sans-serif`);
+  r.setProperty("--font-body", `"${s.bodyFont}", ui-sans-serif, system-ui, sans-serif`);
+  $("#site-name").textContent = s.siteName;
+  $("#site-tagline").textContent = s.tagline;
+  $("#logo-mark").textContent = (s.siteName.trim()[0] || "N").toUpperCase();
+  $("#footer-text").textContent = s.footerText;
+}
+
+/* ---------- Navigation ---------- */
+const NAVS = {
+  customer: [["search", "Suchen"], ["credits", null], ["chat", "Nachrichten"], ["bookings", "Meine Buchungen"]],
+  provider: [["pdash", "Mein Bereich"], ["pchat", "Nachrichten"]],
+  admin: [["admin", "Admin-Bereich"], ["search", "Seite ansehen"]],
+};
+function renderNav() {
+  $("#nav").innerHTML = NAVS[S.role].map(([v, label]) => {
+    const text = v === "credits" ? `<span class="pill">${fmt(S.credits)} Credits</span>` : label;
+    return `<button data-nav="${v}" ${S.view === v ? 'aria-current="page"' : ""}>${text}</button>`;
+  }).join("");
+  document.querySelectorAll("#roles button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.role === S.role)));
+}
+
+function render() {
+  applyBrand(); renderNav();
+  const views = { search: viewSearch, credits: viewCredits, chat: viewChat, bookings: viewBookings, pdash: viewProvider, pchat: viewProviderChat, admin: viewAdmin };
+  $("#app").innerHTML = (views[S.view] || viewSearch)();
+  S.flash = null;
+  const m = $(".msgs"); if (m) m.scrollTop = m.scrollHeight;
+}
+function go(view) { S.view = view; render(); window.scrollTo({ top: 0 }); }
+function flashHtml() { return S.flash ? `<p class="note ${S.flash.kind}">${esc(S.flash.text)}</p>` : ""; }
+
+/* ---------- Kund:in: Suche ---------- */
+function filtered() {
+  const { q, place, cat, type } = S.filters;
+  return LISTINGS.filter((l) => {
+    const p = PROVIDERS[l.p];
+    if (q && !(l.title + " " + l.desc).toLowerCase().includes(q.toLowerCase())) return false;
+    if (place) {
+      if (/^\d+$/.test(place)) { if (!p.plz.startsWith(place)) return false; }
+      else if (!p.city.toLowerCase().includes(place.toLowerCase())) return false;
+    }
+    if (cat && l.cat !== cat) return false;
+    if (type && l.type !== type) return false;
+    return true;
+  });
+}
+function card(l) {
+  const p = PROVIDERS[l.p];
+  return `<button class="listing" data-open="${l.id}">
+    <div class="thumb">${esc(l.cat[0])}${l.type === "GREETING_VIDEO" ? '<span class="kind badge b-accent">Grußvideo</span>' : ""}</div>
+    <div class="body">
+      <span><span class="badge b-brand">${esc(l.cat)}</span></span>
+      <h3>${esc(l.title)}</h3>
+      <span class="small muted">${esc(p.name)} · ${p.plz} ${esc(p.city)} <span class="verified">✔ verifiziert</span></span>
+      <span class="price num">${fmt(l.price)} Credits</span>
+    </div>
+  </button>`;
+}
+function viewSearch() {
+  const s = S.settings, f = S.filters, res = filtered();
+  return `<div class="stack" style="gap:28px">
+    <section class="hero">
+      <h1>${esc(s.heroTitle)}</h1>
+      <p>${esc(s.heroText)}</p>
+      <form class="search" id="search-form">
+        <input class="input q" id="f-q" placeholder="Was suchst du? z. B. Gassi" value="${esc(f.q)}" aria-label="Suchbegriff">
+        <input class="input" id="f-place" placeholder="Ort oder PLZ" value="${esc(f.place)}" aria-label="Ort oder PLZ">
+        <select class="input" id="f-cat" aria-label="Dienstleistung"><option value="">Alle Dienstleistungen</option>${CATS.map((c) => `<option ${f.cat === c ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
+        <select class="input" id="f-type" aria-label="Art"><option value="">Alle Arten</option><option value="SERVICE" ${f.type === "SERVICE" ? "selected" : ""}>Dienstleistung</option><option value="GREETING_VIDEO" ${f.type === "GREETING_VIDEO" ? "selected" : ""}>Grußvideo</option></select>
+        <button class="btn accent" type="submit">Suchen</button>
+      </form>
+      <div class="chips" aria-label="Schnellfilter">
+        <button data-quick="place:Köln">Köln</button><button data-quick="place:Berlin">Berlin</button><button data-quick="place:20">PLZ 20… (Hamburg)</button><button data-quick="type:GREETING_VIDEO">Nur Grußvideos</button><button data-quick="clear">Alle Filter löschen</button>
+      </div>
+    </section>
+    <section class="stack">
+      <h2 style="font-size:20px">${res.length} ${res.length === 1 ? "Angebot" : "Angebote"}${f.place ? ` in „${esc(f.place)}“` : ""}</h2>
+      ${res.length ? `<div class="grid">${res.map(card).join("")}</div>` : `<p class="card muted">Keine Angebote gefunden. Versuche einen anderen Ort oder eine andere Kategorie.</p>`}
+    </section>
+  </div>`;
+}
+
+function openListing(id) {
+  const l = listingById(id), p = PROVIDERS[l.p], d = $("#dlg"), isVideo = l.type === "GREETING_VIDEO";
+  const canOrder = S.role === "customer";
+  d.innerHTML = `<button class="close" data-close aria-label="Schließen">×</button>
+  <div class="dlg">
+    <div class="stack">
+      <div class="thumb" style="border-radius:var(--radius);aspect-ratio:16/7">${esc(l.cat[0])}</div>
+      <div class="row"><span class="badge b-brand">${esc(l.cat)}</span><span class="badge b-accent">${isVideo ? "Grußvideo" : "Dienstleistung"}</span></div>
+      <h2 style="font-size:24px">${esc(l.title)}</h2>
+      <p class="muted" style="margin:0">${p.plz} ${esc(p.city)}</p>
+      <p style="margin:0;max-width:62ch">${esc(l.desc)}</p>
+      <button class="btn ghost" data-report="${l.id}" style="align-self:flex-start">Anzeige melden</button>
+    </div>
+    <aside>
+      <p class="price num" style="font-size:30px;margin:0">${fmt(l.price)} Credits</p>
+      ${canOrder ? `<form id="order-form" class="stack" data-id="${l.id}">
+        <div><label class="lbl" for="o-note">${isVideo ? "Für wen ist das Video? Was soll gesagt werden?" : "Nachricht zur Buchung"}</label>
+        <textarea class="input" id="o-note" rows="3">${isVideo ? "Für meine Schwester Julia zum 30. Geburtstag!" : ""}</textarea></div>
+        <button class="btn block" type="submit">${isVideo ? "Grußvideo bestellen" : "Jetzt buchen"}</button>
+        <p class="small muted" style="margin:0">Deine Credits werden sicher verwahrt und erst nach Erledigung an ${esc(p.name)} ausgezahlt.</p>
+        <div id="order-msg"></div>
+      </form>` : `<p class="note warn">In der Kund:innen-Ansicht kannst du hier buchen.</p>`}
+      <div class="card stack" style="gap:8px">
+        <div class="row"><span class="logo"><span class="mark">${esc(p.name[0])}</span></span><span><strong>${esc(p.name)}</strong><br><span class="verified">✔ Identität verifiziert</span></span></div>
+        <p class="small" style="margin:0">${esc(p.bio)}</p>
+        ${canOrder ? `<button class="btn ghost" data-chatwith="${l.p}">Chatten (${p.chat} Credits / Nachricht)</button>` : ""}
+      </div>
+    </aside>
+  </div>`;
+  d.showModal();
+}
+
+function placeOrder(id, note) {
+  const l = listingById(id), msg = $("#order-msg");
+  if (S.credits < l.price) {
+    msg.innerHTML = `<p class="note err">Nicht genügend Credits. Du hast ${fmt(S.credits)}, brauchst ${fmt(l.price)}. <button class="btn accent" data-nav="credits" style="margin-top:6px">Credits aufladen</button></p>`;
+    return;
+  }
+  S.credits -= l.price;
+  S.orders.unshift({ id: Date.now(), listing: id, buyer: "Du (Demo-Kundin)", note, status: "OPEN", price: l.price, fee: l.price - share(l.price), mine: true });
+  $("#dlg").close();
+  S.flash = { kind: "ok", text: `Gebucht: „${l.title}“. ${fmt(l.price)} Credits sind reserviert, bis ${PROVIDERS[l.p].name} die Leistung erledigt hat.` };
+  go("bookings");
+}
+
+/* ---------- Kund:in: Credits ---------- */
+function viewCredits() {
+  return `<div class="stack" style="gap:22px">
+    <div><h1 style="font-size:26px">Credits</h1>
+    <p class="muted" style="margin:6px 0 0">Dein Guthaben: <strong class="num" style="color:var(--brand)">${fmt(S.credits)} Credits</strong>. Damit buchst du Dienstleistungen, bestellst Grußvideos und chattest mit Anbieterinnen.</p></div>
+    ${flashHtml()}
+    <div class="packs">${PACKS.map((p) => `<div class="card pack">
+      <span class="badge b-accent">${p.label}</span>
+      <span class="big">${fmt(p.credits)}</span><span class="muted">Credits</span>
+      <strong style="font-size:20px">${euro(p.euro)}</strong>
+      <span class="small muted">${(p.euro * 100 / p.credits).toFixed(1).replace(".", ",")} Cent pro Credit</span>
+      <button class="btn block" data-buy="${p.id}">Kaufen</button>
+    </div>`).join("")}</div>
+    <p class="small muted">In der echten App läuft die Zahlung über Stripe (Karte, PayPal, Klarna, Apple Pay). In der Demo werden die Credits direkt gutgeschrieben.</p>
+  </div>`;
+}
+
+/* ---------- Kund:in: Chat ---------- */
+function chatPanel(pid, asProvider) {
+  const p = PROVIDERS[pid], msgs = S.chats[pid] || [];
+  const other = asProvider ? "Du (Demo-Kundin)" : p.name;
+  return `<div class="card stack">
+    <div class="row between"><h2 style="font-size:20px">Chat mit ${esc(other)}</h2>
+    ${asProvider ? `<span class="badge b-ok">Antworten sind für dich kostenlos</span>` : `<span class="badge b-brand">${p.chat} Credits / Nachricht</span>`}</div>
+    <div class="msgs" aria-live="polite">${msgs.length ? msgs.map((m) => {
+      const mine = asProvider ? !m.me : m.me;
+      return `<div class="msg ${mine ? "me" : ""}">${esc(m.text)}<div class="meta">${m.t}${m.cost && !asProvider ? ` · ${m.cost} Credits` : ""}${m.cost && asProvider ? ` · +${share(m.cost)} Credits Verdienst` : ""}</div></div>`;
+    }).join("") : `<p class="muted" style="margin:auto">Schreib die erste Nachricht.</p>`}
+    ${S.typing === pid ? `<p class="typing">${esc(p.name)} schreibt …</p>` : ""}</div>
+    <form id="chat-form" class="stack" data-pid="${pid}" data-asprovider="${asProvider ? 1 : 0}">
+      <textarea class="input" id="chat-text" rows="2" placeholder="Deine Nachricht …"></textarea>
+      <div class="row between"><span class="small muted">${asProvider ? "Kund:innen zahlen pro Nachricht, du verdienst mit." : `Guthaben: <span class="num">${fmt(S.credits)}</span> Credits`}</span><button class="btn" type="submit">Senden</button></div>
+      ${flashHtml()}
+    </form>
+    <p class="small muted" style="margin:0">Zu deiner Sicherheit: Teile keine Bank- oder Ausweisdaten im Chat. Unzulässige Inhalte werden automatisch blockiert.</p>
+  </div>`;
+}
+function viewChat() {
+  const ids = Object.keys(S.chats);
+  if (!ids.length) return `<p class="card muted">Noch keine Chats. Öffne eine Anzeige und tippe auf „Chatten“.</p>`;
+  if (!S.chats[S.activeChat]) S.activeChat = ids[0];
+  return `<div class="stack"><h1 style="font-size:26px">Nachrichten</h1>
+    <div class="chat"><div class="convlist stack" style="gap:8px">${ids.map((id) => {
+      const last = S.chats[id].at(-1);
+      return `<button data-conv="${id}" aria-current="${id === S.activeChat}"><strong>${esc(PROVIDERS[id].name)}</strong><br><span class="small muted">${last ? esc(last.text.slice(0, 42)) : "Noch keine Nachrichten"}</span></button>`;
+    }).join("")}</div>
+    ${chatPanel(S.activeChat, false)}</div></div>`;
+}
+function sendChat(pid, text, asProvider) {
+  if (!text.trim()) { S.flash = { kind: "err", text: "Bitte schreibe eine Nachricht." }; return render(); }
+  const bad = blocked(text);
+  if (bad) { S.flash = { kind: "err", text: "Die Nachricht enthält unzulässige Inhalte und wurde nicht gesendet." }; return render(); }
+  const p = PROVIDERS[pid];
+  if (asProvider) {
+    (S.chats[pid] ||= []).push({ me: false, text, t: now() });
+    return render();
+  }
+  if (S.credits < p.chat) { S.flash = { kind: "err", text: "Nicht genügend Credits. Bitte lade dein Guthaben auf." }; return render(); }
+  S.credits -= p.chat;
+  S.earnings[pid] += share(p.chat);
+  S.stats.revenue += p.chat - share(p.chat);
+  (S.chats[pid] ||= []).push({ me: true, text, cost: p.chat, t: now() });
+  S.typing = pid; render();
+  setTimeout(() => {
+    S.typing = null;
+    const replies = ["Hallo! Danke für deine Nachricht. Wann würde es dir passen?", "Das klingt gut, das bekomme ich hin.", "Gern! Buch mich einfach über die Anzeige, dann ist alles abgesichert.", "Am Wochenende hätte ich Zeit. Samstagvormittag?"];
+    S.chats[pid].push({ me: false, text: replies[S.chats[pid].length % replies.length], t: now() });
+    if (S.view === "chat" || S.view === "pchat") render();
+  }, 1400);
+}
+
+/* ---------- Kund:in: Buchungen ---------- */
+const STATUS = { OPEN: ["Offen", "b-warn"], DELIVERED: ["Erledigt", "b-ok"], CANCELLED: ["Storniert", "b-mute"] };
+function viewBookings() {
+  const mine = S.orders.filter((o) => o.mine);
+  return `<div class="stack" style="gap:18px"><h1 style="font-size:26px">Meine Buchungen</h1>${flashHtml()}
+    <div class="card">${mine.length ? `<div class="list">${mine.map((o) => {
+      const l = listingById(o.listing), [txt, cls] = STATUS[o.status];
+      return `<div class="row between"><span><strong>${esc(l.title)}</strong><br><span class="small muted">bei ${esc(PROVIDERS[l.p].name)} · <span class="num">${fmt(o.price)}</span> Credits${o.status === "DELIVERED" && l.type === "GREETING_VIDEO" ? ' · <span style="color:var(--brand)">Video ist da</span>' : ""}</span></span>
+      <span class="row"><span class="badge ${cls}">${txt}</span>${o.status === "OPEN" ? `<button class="btn ghost" data-cancel="${o.id}">Stornieren</button>` : ""}</span></div>`;
+    }).join("")}</div>` : `<p class="muted" style="margin:0">Noch nichts gebucht. <button class="btn ghost" data-nav="search">Angebote entdecken</button></p>`}</div>
+    <p class="small muted">Tipp für die Vorführung: Wechsle oben auf „Anbieterin“, wähle die passende Person und markiere die Buchung als erledigt.</p></div>`;
+}
+
+/* ---------- Anbieterin ---------- */
+function viewProvider() {
+  const pid = S.providerAs, p = PROVIDERS[pid];
+  const mine = LISTINGS.filter((l) => l.p === pid);
+  const orders = S.orders.filter((o) => listingById(o.listing).p === pid);
+  return `<div class="stack" style="gap:22px">
+    <div class="row between">
+      <div><h1 style="font-size:26px">Hallo ${esc(p.name)}!</h1><p class="muted" style="margin:2px 0 0">${p.plz} ${esc(p.city)} · <span class="verified">✔ verifiziert</span></p></div>
+      <label class="row small">Angemeldet als
+        <select class="input" id="provider-as" style="width:auto">${Object.entries(PROVIDERS).map(([id, x]) => `<option value="${id}" ${id === pid ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+      </label>
+    </div>
+    ${flashHtml()}
+    <div class="stats">
+      <div class="card stat"><span class="small muted">Verdient (auszahlbar)</span><div class="v">${fmt(S.earnings[pid])} Credits</div><span class="small muted">≈ ${euro(S.earnings[pid] / 10)}</span></div>
+      <div class="card stat"><span class="small muted">Offene Buchungen</span><div class="v">${orders.filter((o) => o.status === "OPEN").length}</div></div>
+      <div class="card stat"><span class="small muted">Chat-Preis</span><div class="v">${p.chat} Credits</div><span class="small muted">pro Nachricht, du erhältst ${share(p.chat)}</span></div>
+    </div>
+    <section class="card stack"><h2 style="font-size:18px">Eingegangene Buchungen</h2>
+      ${orders.length ? `<div class="list">${orders.map((o) => {
+        const l = listingById(o.listing), [txt, cls] = STATUS[o.status];
+        return `<div class="stack" style="gap:8px"><div class="row between"><span><strong>${esc(l.title)}</strong> von ${esc(o.buyer)}<br><span class="small muted"><span class="num">${fmt(o.price)}</span> Credits, du erhältst <span class="num">${fmt(o.price - o.fee)}</span> (Gebühr ${fmt(o.fee)})</span></span><span class="badge ${cls}">${txt}</span></div>
+        ${o.note ? `<p class="note" style="background:var(--soft);margin:0">„${esc(o.note)}“</p>` : ""}
+        ${o.status === "OPEN" ? `<div class="row"><button class="btn" data-deliver="${o.id}">${l.type === "GREETING_VIDEO" ? "Video hochladen und erledigen" : "Als erledigt markieren"}</button><button class="btn ghost" data-cancel="${o.id}">Ablehnen</button></div>` : ""}</div>`;
+      }).join("")}</div>` : `<p class="muted" style="margin:0">Noch keine Buchungen für ${esc(p.name)}.</p>`}
+    </section>
+    <div class="two">
+      <section class="card stack"><div class="row between"><h2 style="font-size:18px">Meine Anzeigen</h2><button class="btn" data-newlisting>+ Neue Anzeige</button></div>
+        <div class="list">${mine.map((l) => `<div class="row between"><span>${esc(l.title)}<br><span class="small muted">${l.type === "GREETING_VIDEO" ? "Grußvideo" : "Dienstleistung"} · ${fmt(l.price)} Credits</span></span><span class="badge b-ok">Aktiv</span></div>`).join("")}</div>
+      </section>
+      <section class="card stack"><h2 style="font-size:18px">Auszahlung</h2>
+        <p class="small muted" style="margin:0">Ab 200 Credits auszahlbar · 1 Credit = 0,10 €</p>
+        <form id="payout-form" class="stack"><div class="fields"><input class="input" id="po-credits" type="number" min="200" value="${Math.max(200, S.earnings[pid])}" aria-label="Credits"><input class="input" id="po-iban" value="DE89 3704 0044 0532 0130 00" aria-label="IBAN"></div>
+        <button class="btn accent" type="submit">Auszahlung beantragen</button></form>
+      </section>
+    </div>
+  </div>`;
+}
+function viewProviderChat() {
+  const pid = S.providerAs;
+  if (!S.chats[pid]) return `<div class="stack"><h1 style="font-size:26px">Nachrichten</h1><p class="card muted">Noch keine Chats für ${esc(PROVIDERS[pid].name)}. Schreib ihr in der Kund:innen-Ansicht eine Nachricht.</p></div>`;
+  return `<div class="stack"><h1 style="font-size:26px">Nachrichten</h1>${chatPanel(pid, true)}</div>`;
+}
+
+/* ---------- Admin ---------- */
+function viewAdmin() {
+  const tabs = [["design", "Design & Texte"], ["verify", "Verifizierung", S.verifications.length], ["reports", "Meldungen", S.reports.length], ["cats", "Kategorien"], ["users", "Nutzer:innen"]];
+  const body = { design: adminDesign, verify: adminVerify, reports: adminReports, cats: adminCats, users: adminUsers }[S.adminTab]();
+  return `<div class="stack" style="gap:20px">
+    <div class="row between"><h1 style="font-size:26px">Admin-Bereich</h1><span class="badge b-mute">Zahlen sind Beispieldaten</span></div>
+    <div class="stats">
+      <div class="card stat"><span class="small muted">Nutzer:innen</span><div class="v">${fmt(S.stats.users)}</div></div>
+      <div class="card stat"><span class="small muted">Aktive Anzeigen</span><div class="v">${LISTINGS.length}</div></div>
+      <div class="card stat"><span class="small muted">Verkaufte Credits</span><div class="v">${fmt(S.stats.soldCredits)}</div><span class="small muted">≈ ${euro(S.stats.soldCredits / 10)} Umsatz</span></div>
+      <div class="card stat"><span class="small muted">Plattform-Einnahmen (${S.settings.fee} %)</span><div class="v">${fmt(S.stats.revenue)} Credits</div><span class="small muted">≈ ${euro(S.stats.revenue / 10)}</span></div>
+    </div>
+    <div class="tabs" role="tablist">${tabs.map(([k, l, n]) => `<button role="tab" data-atab="${k}" aria-selected="${S.adminTab === k}">${l}${n ? ` <span class="pill">${n}</span>` : ""}</button>`).join("")}</div>
+    ${flashHtml()}
+    <section class="card">${body}</section>
+  </div>`;
+}
+function field(id, label, html, full) { return `<div class="${full ? "full" : ""}"><label class="lbl" for="${id}">${label}</label>${html}</div>`; }
+function adminDesign() {
+  const s = S.settings;
+  const txt = (k, l, full) => field("s-" + k, l, `<input class="input" id="s-${k}" data-set="${k}" value="${esc(s[k])}">`, full);
+  const font = (k, l) => field("s-" + k, l, `<select class="input" id="s-${k}" data-set="${k}">${FONTS.map((f) => `<option ${s[k] === f ? "selected" : ""}>${f}</option>`).join("")}</select>`);
+  const col = (k, l) => field("s-" + k, l, `<div class="colorrow"><input type="color" data-set="${k}" value="${s[k]}" aria-label="${l} wählen"><input class="input" id="s-${k}" data-set="${k}" value="${s[k]}" style="font-family:ui-monospace,monospace"></div>`);
+  const presets = [["Petrol (Standard)", "#0f766e", "#f59e0b", "#f8fafc"], ["Beere", "#9d174d", "#0ea5e9", "#fdf8fa"], ["Waldgrün", "#3f6212", "#ea580c", "#f9faf5"], ["Nachtblau", "#1e3a8a", "#facc15", "#f7f8fc"]];
+  return `<div class="editor">
+    <div class="stack" style="gap:22px">
+      <p class="small muted" style="margin:0">Jede Änderung gilt sofort für die ganze Seite. Wechsle danach auf „Seite ansehen“.</p>
+      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Name & Texte</legend>
+        ${txt("siteName", "Name der Plattform")}${txt("tagline", "Slogan")}${txt("heroTitle", "Überschrift Startseite", true)}
+        ${field("s-heroText", "Text Startseite", `<textarea class="input" id="s-heroText" data-set="heroText" rows="3">${esc(s.heroText)}</textarea>`, true)}
+        ${txt("footerText", "Footer-Text", true)}
+      </fieldset>
+      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Schriften</legend>${font("headingFont", "Überschriften")}${font("bodyFont", "Fließtext")}</fieldset>
+      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Farben & Form</legend>
+        <div class="full row">${presets.map(([n, b, a, bg]) => `<button class="btn ghost small" data-preset="${b},${a},${bg}"><span style="width:14px;height:14px;border-radius:50%;background:${b};display:inline-block"></span>${n}</button>`).join("")}</div>
+        ${col("brand", "Hauptfarbe")}${col("accent", "Akzentfarbe")}${col("bg", "Hintergrund")}${col("ink", "Textfarbe")}
+        ${field("s-radius", `Eckenradius: <span class="num" id="radius-val">${s.radius}</span> px`, `<input type="range" id="s-radius" data-set="radius" min="0" max="28" value="${s.radius}" style="width:100%">`)}
+      </fieldset>
+      <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;margin-bottom:8px">Geschäftsmodell</legend>
+        ${field("s-fee", "Plattformgebühr in %", `<input class="input" type="number" id="s-fee" data-set="fee" min="0" max="50" value="${s.fee}">`)}
+        <p class="small muted full" style="margin:0" id="fee-note">Gilt für Buchungen, Grußvideos und Chat-Nachrichten. Bei ${s.fee} % bleiben von 100 Credits ${100 - s.fee} bei der Anbieterin.</p>
+      </fieldset>
+      <div class="row"><button class="btn" data-nav="search">Seite ansehen</button><button class="btn ghost" data-resetdesign>Auf Standard zurücksetzen</button></div>
+    </div>
+    <div class="stack" style="position:sticky;top:64px"><span class="small muted">Vorschau</span><div id="preview">${adminPreview()}</div></div>
+  </div>`;
+}
+function adminPreview() {
+  const s = S.settings;
+  return `<div style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg)">
+    <div class="row" style="background:var(--surface);padding:10px 14px"><span class="logo"><span class="mark" style="width:30px;height:30px;font-size:14px">${esc((s.siteName.trim()[0] || "N").toUpperCase())}</span><span><span class="name" style="font-size:16px">${esc(s.siteName)}</span><span class="tagline">${esc(s.tagline)}</span></span></span></div>
+    <div style="margin:12px;padding:16px;background:var(--brand);color:#fff;border-radius:var(--radius)"><div class="head" style="font-weight:700;font-size:18px">${esc(s.heroTitle)}</div><span class="btn accent" style="margin-top:10px;padding:5px 12px;font-size:13px">Suchen</span></div>
+    <div style="margin:12px;display:grid">${card(LISTINGS[6])}</div>
+  </div>`;
+}
+function adminVerify() {
+  return `<p class="small muted" style="margin-top:0">Prüfe Alter (mind. 18) und Identität jeder Anbieterin, zum Beispiel per Videocall mit Ausweis, bevor ihre Anzeigen sichtbar werden.</p>
+  ${S.verifications.length ? `<div class="list">${S.verifications.map((v) => `<div class="row between"><span><strong>${esc(v.name)}</strong> · ${esc(v.city)}<br><span class="small muted">Hinweis: ${esc(v.note)}</span></span><span class="row"><button class="btn" data-verify="${v.id}">Freischalten</button><button class="btn danger" data-reject="${v.id}">Ablehnen</button></span></div>`).join("")}</div>` : `<p class="muted" style="margin:0">Keine offenen Anfragen.</p>`}`;
+}
+function adminReports() {
+  return S.reports.length ? `<div class="list">${S.reports.map((r) => { const l = listingById(r.listing); return `<div class="stack" style="gap:8px"><span><strong>${esc(l.title)}</strong> <span class="small muted">von ${esc(PROVIDERS[l.p].name)}</span></span><p class="note err" style="margin:0">${esc(r.reason)}</p><div class="row"><button class="btn danger" data-resolve="${r.id}">Anzeige deaktivieren</button><button class="btn ghost" data-resolve="${r.id}">Verwerfen</button></div></div>`; }).join("")}</div>` : `<p class="muted" style="margin:0">Keine offenen Meldungen.</p>`;
+}
+function adminCats() {
+  return `<form id="cat-form" class="row" style="margin-bottom:12px"><input class="input" id="cat-name" placeholder="Neue Kategorie, z. B. Umzugshilfe" style="max-width:320px"><button class="btn" type="submit">Hinzufügen</button></form>
+  <div class="list">${CATS.map((c) => `<div class="row between"><span>${esc(c)}</span><span class="small muted num">${LISTINGS.filter((l) => l.cat === c).length} Anzeigen</span></div>`).join("")}</div>`;
+}
+function adminUsers() {
+  return `<div class="tablewrap"><table><thead><tr><th>Name</th><th>Rolle</th><th>Ort</th><th>Verdienst</th><th>Status</th></tr></thead><tbody>
+  ${Object.entries(PROVIDERS).map(([id, p]) => `<tr><td>${esc(p.name)}</td><td>Anbieterin</td><td>${esc(p.city)}</td><td class="num">${fmt(S.earnings[id])}</td><td><span class="badge b-ok">verifiziert</span></td></tr>`).join("")}
+  <tr><td>Demo-Kundin</td><td>Kund:in</td><td>Köln</td><td class="num">–</td><td><span class="badge b-mute">aktiv</span></td></tr>
+  </tbody></table></div>`;
+}
+
+/* ---------- Events ---------- */
+document.addEventListener("click", (e) => {
+  if (e.target.id === "dlg") { e.target.close(); return; }
+  const t = e.target.closest("button"); if (!t) return;
+  const d = t.dataset;
+  if (d.role) { S.role = d.role; S.view = { customer: "search", provider: "pdash", admin: "admin" }[d.role]; render(); return; }
+  if (t.id === "reset") { S = initialState(); render(); toast("Demo zurückgesetzt"); return; }
+  if (t.id === "logo") { go(S.role === "provider" ? "pdash" : "search"); return; }
+  if (d.nav) { if ($("#dlg").open) $("#dlg").close(); go(d.nav); return; }
+  if (d.open) { openListing(+d.open); return; }
+  if ("close" in d) { $("#dlg").close(); return; }
+  if (d.quick) {
+    if (d.quick === "clear") S.filters = { q: "", place: "", cat: "", type: "" };
+    else { const [k, v] = d.quick.split(":"); S.filters = { q: "", place: "", cat: "", type: "", [k]: v }; }
+    render(); return;
+  }
+  if (d.chatwith) { $("#dlg").close(); S.chats[d.chatwith] ||= []; S.activeChat = d.chatwith; go("chat"); return; }
+  if (d.report) { $("#dlg").close(); S.reports.push({ id: Date.now(), listing: +d.report, reason: "In der Demo gemeldet: bitte prüfen." }); toast("Danke! Die Meldung liegt jetzt im Admin-Bereich."); return; }
+  if (d.conv) { S.activeChat = d.conv; render(); return; }
+  if (d.buy) {
+    const p = PACKS.find((x) => x.id === d.buy);
+    S.credits += p.credits; S.stats.soldCredits += p.credits;
+    S.flash = { kind: "ok", text: `${fmt(p.credits)} Credits für ${euro(p.euro)} gutgeschrieben (Demo, keine echte Zahlung).` };
+    render(); return;
+  }
+  if (d.cancel) {
+    const o = S.orders.find((x) => x.id === +d.cancel);
+    if (o && o.status === "OPEN") { o.status = "CANCELLED"; if (o.mine) S.credits += o.price; S.flash = { kind: "ok", text: `Storniert. ${fmt(o.price)} Credits gehen zurück an die Kundin.` }; }
+    render(); return;
+  }
+  if (d.deliver) {
+    const o = S.orders.find((x) => x.id === +d.deliver), l = listingById(o.listing);
+    o.status = "DELIVERED"; S.earnings[l.p] += o.price - o.fee; S.stats.revenue += o.fee;
+    S.flash = { kind: "ok", text: `Erledigt! ${fmt(o.price - o.fee)} Credits für ${PROVIDERS[l.p].name}, ${fmt(o.fee)} Credits Gebühr für die Plattform.` };
+    render(); return;
+  }
+  if ("newlisting" in d) { toast("In der echten App öffnet sich hier das Anzeigen-Formular."); return; }
+  if (d.atab) { S.adminTab = d.atab; render(); return; }
+  if (d.preset) { const [b, a, bg] = d.preset.split(","); Object.assign(S.settings, { brand: b, accent: a, bg }); render(); return; }
+  if ("resetdesign" in d) { S.settings = { ...DEFAULT_SETTINGS }; render(); toast("Design zurückgesetzt"); return; }
+  if (d.verify || d.reject) {
+    const id = +(d.verify || d.reject), v = S.verifications.find((x) => x.id === id);
+    S.verifications = S.verifications.filter((x) => x.id !== id);
+    S.flash = { kind: "ok", text: d.verify ? `${v.name} ist freigeschaltet. Ihre Anzeigen sind jetzt sichtbar.` : `Anfrage von ${v.name} abgelehnt.` };
+    render(); return;
+  }
+  if (d.resolve) { S.reports = S.reports.filter((x) => x.id !== +d.resolve); S.flash = { kind: "ok", text: "Meldung bearbeitet." }; render(); return; }
+});
+
+document.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.id === "search-form") {
+    S.filters = { q: $("#f-q").value.trim(), place: $("#f-place").value.trim(), cat: $("#f-cat").value, type: $("#f-type").value };
+    render(); return;
+  }
+  if (f.id === "order-form") { placeOrder(+f.dataset.id, $("#o-note").value.trim()); return; }
+  if (f.id === "chat-form") { sendChat(f.dataset.pid, $("#chat-text").value, f.dataset.asprovider === "1"); return; }
+  if (f.id === "payout-form") {
+    const n = +$("#po-credits").value, pid = S.providerAs;
+    if (n < 200) { S.flash = { kind: "err", text: "Mindestens 200 Credits pro Auszahlung." }; }
+    else if (n > S.earnings[pid]) { S.flash = { kind: "err", text: `Dein Verdienst reicht nicht aus. Verfügbar: ${fmt(S.earnings[pid])} Credits.` }; }
+    else { S.earnings[pid] -= n; S.flash = { kind: "ok", text: `Auszahlung über ${euro(n / 10)} beantragt. Überweisung in der Regel innerhalb von 5 Werktagen.` }; }
+    render(); return;
+  }
+  if (f.id === "cat-form") {
+    const n = $("#cat-name").value.trim();
+    if (n.length < 2) { S.flash = { kind: "err", text: "Bitte gib einen Namen mit mindestens 2 Zeichen an." }; }
+    else if (CATS.includes(n)) { S.flash = { kind: "err", text: "Diese Kategorie gibt es schon." }; }
+    else { CATS.push(n); S.flash = { kind: "ok", text: `Kategorie „${n}“ angelegt.` }; }
+    render(); return;
+  }
+});
+
+document.addEventListener("input", (e) => {
+  const k = e.target.dataset?.set; if (!k) return;
+  let v = e.target.value;
+  if (k === "radius" || k === "fee") v = Math.max(0, Math.min(k === "fee" ? 50 : 28, +v || 0));
+  if (["brand", "accent", "bg", "ink"].includes(k) && !/^#[0-9a-fA-F]{6}$/.test(v)) return;
+  S.settings[k] = v;
+  applyBrand();
+  // Nur Vorschau und Partnerfeld aktualisieren, damit Farbwähler und Cursor erhalten bleiben
+  document.querySelectorAll(`[data-set="${k}"]`).forEach((el) => { if (el !== e.target) el.value = v; });
+  $("#preview").innerHTML = adminPreview();
+  if (k === "radius") $("#radius-val").textContent = v;
+  if (k === "fee") $("#fee-note").textContent = `Gilt für Buchungen, Grußvideos und Chat-Nachrichten. Bei ${v} % bleiben von 100 Credits ${100 - v} bei der Anbieterin.`;
+});
+document.addEventListener("change", (e) => {
+  if (e.target.id === "provider-as") { S.providerAs = e.target.value; render(); }
+});
+
+render();
+</script>
