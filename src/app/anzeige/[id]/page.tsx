@@ -6,6 +6,7 @@ import { orderListing } from "@/app/actions/orders";
 import { ActionForm, SubmitButton } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { Gallery } from "@/components/gallery";
+import { ListingCard } from "@/components/listing-card";
 import { getCurrentUser } from "@/lib/auth";
 import { LISTING_TYPE_LABEL } from "@/lib/config";
 import { db } from "@/lib/db";
@@ -24,8 +25,15 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   const publiclyVisible = listing.active && listing.provider.verification === "VERIFIED" && !listing.provider.banned;
   if (!publiclyVisible && !isOwner && user?.role !== "ADMIN") notFound();
   const { provider } = listing;
+  const more = await db.listing.findMany({
+    where: { providerId: provider.id, active: true, id: { not: listing.id } },
+    include: { category: true, images: { orderBy: { position: "asc" }, select: { url: true } } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
 
   return (
+    <div className="space-y-12">
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
       <article className="card space-y-4">
         {!publiclyVisible && (
@@ -102,6 +110,18 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           </details>
         )}
       </aside>
+    </div>
+    {more.length > 0 && (
+      <section>
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+          <h2 className="text-2xl font-bold tracking-tight">Weitere Angebote von {provider.name}</h2>
+          <Link href={`/anbieterin/${provider.id}`} className="text-sm font-medium text-primary hover:underline">Ganzes Profil ansehen →</Link>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {more.map((l) => <ListingCard key={l.id} listing={{ ...l, provider: { name: provider.name, avatarUrl: provider.avatarUrl } }} />)}
+        </div>
+      </section>
+    )}
     </div>
   );
 }

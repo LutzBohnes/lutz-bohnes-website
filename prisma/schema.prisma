@@ -61,6 +61,10 @@ model User {
   city               String?
   postalCode         String?
   avatarUrl          String?
+  /// Sprachen, in denen die Anbieterin ihre Dienstleistungen anbietet
+  languages          String[]           @default([])
+  /// Erfahrung in Jahren (freiwillige Angabe)
+  experienceYears    Int?
   // Guthaben zum Ausgeben (gekaufte Credits)
   credits            Int                @default(0)
   // Verdiente Credits (Anbieterinnen), auszahlbar

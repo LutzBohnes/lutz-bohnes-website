@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
-import { MAX_CHAT_PRICE, MIN_CHAT_PRICE } from "@/lib/config";
+import { LANGUAGE_CHOICES, MAX_CHAT_PRICE, MIN_CHAT_PRICE } from "@/lib/config";
 import { db } from "@/lib/db";
 import { findBlockedTerm } from "@/lib/moderation";
 import { deleteImage, saveImage, UploadError } from "@/lib/storage";
@@ -15,19 +15,40 @@ const profileSchema = z.object({
   city: z.string().trim().max(80).optional(),
   postalCode: z.string().trim().regex(/^\d{5}$|^$/, "Bitte gib eine 5-stellige PLZ an.").optional(),
   chatPrice: z.coerce.number().int().min(MIN_CHAT_PRICE).max(MAX_CHAT_PRICE).optional(),
+  experienceYears: z.union([z.literal(""), z.coerce.number().int().min(0, "Erfahrung: 0 bis 60 Jahre.").max(60, "Erfahrung: 0 bis 60 Jahre.")]).optional(),
 });
 
 export async function updateProfile(_: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
-  const parsed = profileSchema.safeParse(Object.fromEntries(formData));
+  const parsed = profileSchema.safeParse({
+    name: formData.get("name") ?? undefined,
+    bio: formData.get("bio") ?? undefined,
+    city: formData.get("city") ?? undefined,
+    postalCode: formData.get("postalCode") ?? undefined,
+    chatPrice: formData.get("chatPrice") ?? undefined,
+    experienceYears: formData.get("experienceYears") ?? undefined,
+  });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const { chatPrice, ...data } = parsed.data;
+  const { chatPrice, experienceYears, ...data } = parsed.data;
+  const languages = formData
+    .getAll("languages")
+    .map(String)
+    .filter((l): l is (typeof LANGUAGE_CHOICES)[number] => (LANGUAGE_CHOICES as readonly string[]).includes(l));
   if (findBlockedTerm(data.name, data.bio)) {
     return { error: "Dein Profil enthält unzulässige Inhalte. Erotische Angebote sind nicht erlaubt." };
   }
   await db.user.update({
     where: { id: user.id },
-    data: { ...data, ...(user.role !== "USER" && chatPrice ? { chatPrice } : {}) },
+    data: {
+      ...data,
+      ...(user.role !== "USER"
+        ? {
+            languages,
+            experienceYears: experienceYears === "" || experienceYears === undefined ? null : experienceYears,
+            ...(chatPrice ? { chatPrice } : {}),
+          }
+        : {}),
+    },
   });
   revalidatePath("/konto", "layout");
   return { ok: "Profil gespeichert." };

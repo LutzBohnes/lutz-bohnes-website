@@ -4,7 +4,7 @@ import { ActionForm, SubmitButton } from "@/components/action-form";
 import { Avatar } from "@/components/avatar";
 import { PageHeader, Panel, StatusBadge } from "@/components/dashboard";
 import { requireUser } from "@/lib/auth";
-import { MAX_CHAT_PRICE, MIN_CHAT_PRICE } from "@/lib/config";
+import { LANGUAGE_CHOICES, MAX_CHAT_PRICE, MIN_CHAT_PRICE } from "@/lib/config";
 import { getSettings } from "@/lib/settings";
 
 export const metadata = { title: "Profil" };
@@ -81,6 +81,22 @@ export default async function ProfilePage() {
                   <label className="label" htmlFor="bio">Über mich</label>
                   <textarea id="bio" name="bio" rows={5} defaultValue={user.bio ?? ""} className="input" placeholder="Wer bist du, was kannst du besonders gut?" />
                 </div>
+                <div>
+                  <label className="label" htmlFor="experienceYears">Erfahrung (Jahre)</label>
+                  <input id="experienceYears" name="experienceYears" type="number" min={0} max={60} defaultValue={user.experienceYears ?? ""} className="input max-w-40" />
+                  <p className="mt-1 text-xs text-slate-500">Wie lange machst du das schon, z. B. als Friseurin, Erzieherin oder im Garten?</p>
+                </div>
+                <fieldset>
+                  <legend className="label">Sprachen</legend>
+                  <div className="flex flex-wrap gap-2">
+                    {LANGUAGE_CHOICES.map((l) => (
+                      <label key={l} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-300 px-3 py-1 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary">
+                        <input type="checkbox" name="languages" value={l} defaultChecked={user.languages.includes(l)} className="sr-only" />
+                        {l}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
                 <div>
                   <label className="label" htmlFor="chatPrice">Chat-Preis (Credits pro Nachricht)</label>
                   <input id="chatPrice" name="chatPrice" type="number" min={MIN_CHAT_PRICE} max={MAX_CHAT_PRICE} defaultValue={user.chatPrice} className="input max-w-40" />

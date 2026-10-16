@@ -43,6 +43,8 @@ async function main() {
       city: "Köln",
       postalCode: "50667",
       bio: "Rentnerin mit viel Zeit und Herz – ich helfe gern beim Einkaufen und im Garten.",
+      languages: ["Deutsch"],
+      experienceYears: 12,
     },
   });
   const lena = await db.user.upsert({
@@ -58,6 +60,8 @@ async function main() {
       postalCode: "10115",
       bio: "Lehramtsstudentin, Mathe & Englisch. Außerdem nehme ich gern persönliche Grußvideos auf.",
       chatPrice: 3,
+      languages: ["Deutsch", "Englisch"],
+      experienceYears: 3,
     },
   });
   await db.user.upsert({

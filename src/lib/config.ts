@@ -40,3 +40,19 @@ export const LISTING_TYPE_LABEL = {
   SERVICE: "Dienstleistung",
   GREETING_VIDEO: "Grußvideo",
 } as const;
+
+/** Sprachen, die Anbieterinnen im Profil angeben und nach denen gefiltert werden kann. */
+export const LANGUAGE_CHOICES = [
+  "Deutsch",
+  "Englisch",
+  "Türkisch",
+  "Arabisch",
+  "Russisch",
+  "Polnisch",
+  "Ukrainisch",
+  "Italienisch",
+  "Spanisch",
+  "Französisch",
+  "Rumänisch",
+  "Griechisch",
+] as const;
