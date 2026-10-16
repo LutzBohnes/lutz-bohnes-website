@@ -126,6 +126,14 @@ label.lbl { display: block; font-size: 13px; font-weight: 600; color: #34433f; m
 .pgrid button { border: 0; padding: 0; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--soft); }
 .pgrid img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
 .pgrid button:hover img { transform: scale(1.06); }
+.icopick { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; color: var(--muted); padding: 0; }
+.icopick:hover { border-color: var(--brand); color: var(--brand); }
+.icopick[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.iconbtn { width: 38px; height: 38px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 10px; color: var(--muted); flex: none; padding: 0; }
+.iconbtn:hover { background: var(--soft); color: var(--ink); }
+.iconbtn.on { background: var(--brand); color: #fff; }
+.iconbtn.danger:hover { background: var(--err-bg); color: #c4321f; }
+.iconbtn.danger.on { background: #c4321f; color: #fff; }
 .plform { grid-template-columns: 1fr 2fr auto; align-items: end; }
 @media (max-width: 700px) { .plform { grid-template-columns: 1fr; } }
 .facts li { display: flex; align-items: center; gap: 10px; padding-block: 5px; font-size: 14px; }
@@ -338,6 +346,14 @@ const ICONS = {
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M21.5 20h-19"/>',
   pin: '<path d="M12 21s6.5-5.6 6.5-11a6.5 6.5 0 0 0-13 0c0 5.4 6.5 11 6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
   check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  pencil: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M5.5 7l1 12.5h11l1-12.5M9 7V4.5h6V7"/>',
+  car: '<path d="M5 16.5V12l2-5h10l2 5v4.5"/><path d="M3.5 16.5h17M5 12h14"/><circle cx="8" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/>',
+  wrench: '<path d="M15 4.5a4.5 4.5 0 0 0-4.3 5.8L4.5 16.5a2 2 0 0 0 2.8 2.8l6.2-6.2A4.5 4.5 0 0 0 19.5 9l-2.8 2.8-2.7-.6-.6-2.7L16.2 5.7A4.5 4.5 0 0 0 15 4.5Z"/>',
+  box: '<path d="M3.5 8 12 4l8.5 4v8.5L12 20.5l-8.5-4V8Z"/><path d="m3.5 8 8.5 4 8.5-4M12 12v8.5"/>',
+  laptop: '<rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3 18.5h18"/>',
+  music: '<path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/>',
+  camera: '<path d="M4 8h3l1.5-2.5h7L17 8h3v11H4V8Z"/><circle cx="12" cy="13.5" r="3.5"/>',
   share: '<circle cx="17.5" cy="5.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17.5" cy="18.5" r="2.5"/><path d="m8.7 10.8 6.6-4M8.7 13.2l6.6 4"/>',
   link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/>',
   eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/>',
@@ -358,7 +374,7 @@ const ICONS = {
 };
 const ic = (n, cls = "") => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ""}</svg>`;
 
-const CAT_META = {
+const CAT_META_SEED = {
   "Einkaufshilfe": { icon: "bag", c: ["#f6d9bd", "#e48a4f"] },
   "Haushalt & Putzen": { icon: "broom", c: ["#d6ecf0", "#4f9fb0"] },
   "Kinderbetreuung": { icon: "baby", c: ["#fbe0e4", "#e17689"] },
@@ -371,7 +387,10 @@ const CAT_META = {
   "Kochen & Backen": { icon: "pot", c: ["#fbe7c9", "#d98c2b"] },
   "Grußvideos": { icon: "video", c: ["#ffe0d8", "#ff6b4a"] },
 };
+let CAT_META = JSON.parse(JSON.stringify(CAT_META_SEED));
 let CATS = Object.keys(CAT_META);
+const CAT_ICON_CHOICES = ["tag", "bag", "broom", "baby", "heart", "book", "paw", "leaf", "scissors", "needle", "pot", "video", "car", "wrench", "box", "laptop", "music", "camera", "sparkle", "home", "users", "star"];
+const CAT_COLORS = [["#e3ecfb", "#4f74c9"], ["#f9e1d6", "#d0663f"], ["#dff0e6", "#3f8f62"], ["#efe0f6", "#8f55b0"], ["#fdf0cf", "#c7922a"], ["#dceff2", "#3b8c9c"]];
 
 /* Illustriertes Beispielbild je Kategorie (SVG als data: URI), damit die Demo ohne externe Bilder auskommt. */
 function coverArt(cat, v = 0) {
@@ -500,7 +519,7 @@ function initialState() {
     ],
     reports: [{ id: 1, listing: 8, reason: "Preis wirkt sehr niedrig für 10 Personen, bitte prüfen.", by: "Nutzer #2231", date: "16.10." }],
     payoutQueue: [{ id: 1, p: "sevgi", amount: 900, iban: "DE89 3704 0044 0532 0130 00", date: "16.10." }, { id: 2, p: "fatma", amount: 650, iban: "DE12 1001 0010 0123 4567 89", date: "15.10." }],
-    adminFilter: "",
+    adminFilter: "", catEdit: null, catDel: null, catEditIcon: "tag", catNewIcon: "tag",
     flash: null,
   };
 }
@@ -1118,11 +1137,42 @@ VIEWS["a-payouts"] = () => adminDash(`
   <section class="card flush"><div class="tablewrap"><table style="min-width:680px"><thead><tr><th>Datum</th><th>Anbieterin</th><th>IBAN</th><th>Betrag</th><th></th></tr></thead><tbody>
     ${S.payoutQueue.length ? S.payoutQueue.map((p) => `<tr><td>${p.date}</td><td><span class="row" style="flex-wrap:nowrap;gap:8px">${avatar(p.p, 28)}${esc(P(p.p).name)}</span></td><td style="font-family:ui-monospace,monospace">${p.iban}</td><td class="num"><strong>${euro(p.amount / 10)}</strong></td><td><div class="row" style="flex-wrap:nowrap;justify-content:flex-end"><button class="btn sm" data-paid="${p.id}">Überwiesen</button><button class="btn ghost sm" data-paid="${p.id}" data-rej="1">Ablehnen</button></div></td></tr>`).join("") : `<tr><td colspan="5" class="muted">Keine offenen Auszahlungen</td></tr>`}
   </tbody></table></div></section>`);
-VIEWS["a-cats"] = () => adminDash(`
+function iconPicker(group, value) {
+  return `<div class="row" style="gap:6px" role="radiogroup" aria-label="Symbol">${CAT_ICON_CHOICES.map((n) => `<button type="button" class="icopick" data-icopick="${group}" data-ico="${n}" aria-pressed="${n === value}" aria-label="Symbol ${n}">${ic(n)}</button>`).join("")}</div>`;
+}
+VIEWS["a-cats"] = () => {
+  const count = (c) => S.listings.filter((l) => l.cat === c).length;
+  return adminDash(`
   ${ph("Kategorien", "Nach diesen Dienstleistungen kann auf der Startseite gefiltert werden.")}
   ${flashHtml()}
-  <section class="card"><form id="cat-form" class="row" style="margin-bottom:14px"><input class="input" id="cat-name" placeholder="Neue Kategorie, z. B. Umzugshilfe" style="max-width:320px"><button class="btn" type="submit">${ic("plus")} Hinzufügen</button></form>
-  <div class="list">${CATS.map((c) => `<div class="row"><span class="ico">${ic(CAT_META[c]?.icon || "sparkle")}</span><span class="grow"><strong>${esc(c)}</strong></span><span class="small muted num">${S.listings.filter((l) => l.cat === c).length} Anzeigen</span></div>`).join("")}</div></section>`);
+  <section class="card"><div class="panel-h"><h2>Neue Kategorie</h2></div>
+    <form id="cat-form" class="stack" style="gap:12px">
+      <div class="row"><input class="input" id="cat-name" placeholder="z. B. Umzugshilfe" style="max-width:320px"><button class="btn" type="submit">${ic("plus")} Hinzufügen</button></div>
+      ${iconPicker("new", S.catNewIcon)}
+    </form>
+  </section>
+  <section class="card flush"><div class="list">${CATS.map((c, i) => {
+    const n = count(c), editing = S.catEdit === c, deleting = S.catDel === c;
+    return `<div style="padding:12px 20px">
+      <div class="row" style="flex-wrap:nowrap">
+        <span class="ico">${ic(CAT_META[c]?.icon || "sparkle")}</span>
+        <span class="grow"><strong>${esc(c)}</strong><br><span class="xs muted num">${n} ${n === 1 ? "Anzeige" : "Anzeigen"}</span></span>
+        <button class="iconbtn ${editing ? "on" : ""}" data-catedit="${i}" aria-label="${esc(c)} bearbeiten" title="Bearbeiten">${ic("pencil")}</button>
+        <button class="iconbtn danger ${deleting ? "on" : ""}" data-catdel="${i}" aria-label="${esc(c)} löschen" title="Löschen">${ic("trash")}</button>
+      </div>
+      ${editing ? `<form id="cat-edit-form" class="stack" data-cat="${i}" style="gap:12px;margin-top:12px;background:var(--soft);border-radius:12px;padding:16px">
+        <div><label class="lbl" for="ce-name">Name</label><input class="input" id="ce-name" value="${esc(c)}" style="max-width:320px"></div>
+        <div><span class="lbl">Symbol</span>${iconPicker("edit", S.catEditIcon)}</div>
+        <div class="row"><button class="btn" type="submit">Speichern</button><button class="btn ghost" type="button" data-catcancel>Abbrechen</button></div>
+      </form>` : ""}
+      ${deleting ? `<form id="cat-del-form" class="stack" data-cat="${i}" style="gap:12px;margin-top:12px;background:var(--err-bg);border-radius:12px;padding:16px">
+        <p class="small" style="color:var(--err-ink)">„${esc(c)}“ wirklich löschen?${n ? ` ${n === 1 ? "Die Anzeige wird" : `Die ${n} Anzeigen werden`} vorher verschoben nach:` : ""}</p>
+        ${n ? `<select class="input" id="cd-move" style="max-width:320px"><option value="">Kategorie wählen …</option>${CATS.filter((o) => o !== c).map((o) => `<option>${esc(o)}</option>`).join("")}</select>` : ""}
+        <div class="row"><button class="btn danger" type="submit">Endgültig löschen</button><button class="btn ghost" type="button" data-catcancel>Abbrechen</button></div>
+      </form>` : ""}
+    </div>`;
+  }).join("")}</div></section>`);
+};
 
 VIEWS["a-social"] = () => adminDash(`
   ${ph("Social Media", "Plattformen, die Anbieterinnen in ihrem Profil verlinken können. Danach lässt sich auf der Startseite filtern.")}
@@ -1230,7 +1280,7 @@ document.addEventListener("click", (e) => {
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
   if (d.role) { S.role = d.role; S.view = { customer: "home", provider: "p-home", admin: "a-home" }[d.role]; render(); window.scrollTo({ top: 0 }); return; }
-  if (t.id === "reset") { S = initialState(); CATS = Object.keys(CAT_META); render(); toast("Demo zurückgesetzt"); return; }
+  if (t.id === "reset") { CAT_META = JSON.parse(JSON.stringify(CAT_META_SEED)); CATS = Object.keys(CAT_META); S = initialState(); render(); toast("Demo zurückgesetzt"); return; }
   if (t.id === "logo") { go({ customer: "home", provider: "p-home", admin: "a-home" }[S.role]); return; }
   if (d.nav) { if ($("#dlg").open) $("#dlg").close(); go(d.nav); return; }
   if (d.open) { openListing(+d.open); return; }
@@ -1278,6 +1328,14 @@ document.addEventListener("click", (e) => {
   if (d.pltoggle) { const x = S.platforms.find((y) => y.id === d.pltoggle); x.active = !x.active; render(); return; }
   if (d.pldel) { S.platforms = S.platforms.filter((y) => y.id !== d.pldel); Object.values(S.providers).forEach((p) => delete p.social[d.pldel]); if (S.filters.social === d.pldel) S.filters.social = ""; S.flash = { kind: "ok", text: "Plattform gelöscht." }; render(); return; }
   if (d.plmove) { const i = +d.plmove, j = i + +d.dir; [S.platforms[i], S.platforms[j]] = [S.platforms[j], S.platforms[i]]; render(); return; }
+  if (d.catedit) { const c = CATS[+d.catedit]; S.catDel = null; S.catEdit = S.catEdit === c ? null : c; S.catEditIcon = CAT_META[c]?.icon || "tag"; render(); return; }
+  if (d.catdel) { const c = CATS[+d.catdel]; S.catEdit = null; S.catDel = S.catDel === c ? null : c; render(); return; }
+  if ("catcancel" in d) { S.catEdit = null; S.catDel = null; render(); return; }
+  if (d.icopick) {
+    if (d.icopick === "new") S.catNewIcon = d.ico; else S.catEditIcon = d.ico;
+    t.parentElement.querySelectorAll(".icopick").forEach((b) => b.setAttribute("aria-pressed", String(b === t)));
+    return;
+  }
   if (d.ban) { toast(`${d.ban} würde jetzt gesperrt (in der Demo ohne Wirkung).`); return; }
 });
 
@@ -1338,10 +1396,29 @@ document.addEventListener("submit", (e) => {
   if (f.id === "admin-filter") { S.adminFilter = $("#af-q").value.trim(); render(); return; }
   if (f.id === "cat-form") {
     const n = $("#cat-name").value.trim();
-    if (n.length < 2) S.flash = { kind: "err", text: "Bitte gib einen Namen mit mindestens 2 Zeichen an." };
-    else if (CATS.includes(n)) S.flash = { kind: "err", text: "Diese Kategorie gibt es schon." };
-    else { CATS.push(n); S.flash = { kind: "ok", text: `Kategorie „${n}“ angelegt.` }; }
+    if (n.length < 2 || n.length > 40) S.flash = { kind: "err", text: "Bitte gib einen Namen mit 2 bis 40 Zeichen an." };
+    else if (CATS.some((c) => c.toLowerCase() === n.toLowerCase())) S.flash = { kind: "err", text: "Diese Kategorie gibt es schon." };
+    else { CAT_META[n] = { icon: S.catNewIcon, c: CAT_COLORS[CATS.length % CAT_COLORS.length] }; CATS.push(n); S.catNewIcon = "tag"; S.flash = { kind: "ok", text: `Kategorie „${n}“ angelegt.` }; }
     render(); return;
+  }
+  if (f.id === "cat-edit-form") {
+    const old = CATS[+f.dataset.cat], n = $("#ce-name").value.trim();
+    if (n.length < 2 || n.length > 40) { S.flash = { kind: "err", text: "Bitte gib einen Namen mit 2 bis 40 Zeichen an." }; return render(); }
+    if (n !== old && CATS.some((c) => c.toLowerCase() === n.toLowerCase())) { S.flash = { kind: "err", text: "Diese Kategorie gibt es schon." }; return render(); }
+    const meta = { ...(CAT_META[old] || { c: CAT_COLORS[0] }), icon: S.catEditIcon };
+    delete CAT_META[old]; CAT_META[n] = meta; CATS[+f.dataset.cat] = n;
+    // Anzeigen umhängen; generierte Beispielbilder bekommen das neue Symbol
+    S.listings.filter((l) => l.cat === old).forEach((l) => { l.cat = n; l.photos = l.photos.map((src, v) => src.startsWith("data:image/svg") ? coverArt(n, v) : src); });
+    if (S.filters.cat === old) S.filters.cat = n;
+    S.catEdit = null; S.flash = { kind: "ok", text: `„${n}“ gespeichert.` }; render(); return;
+  }
+  if (f.id === "cat-del-form") {
+    const c = CATS[+f.dataset.cat], affected = S.listings.filter((l) => l.cat === c), target = $("#cd-move")?.value;
+    if (affected.length && !target) { S.flash = { kind: "err", text: `Bitte wähle, wohin ${affected.length === 1 ? "die Anzeige" : `die ${affected.length} Anzeigen`} verschoben werden ${affected.length === 1 ? "soll" : "sollen"}.` }; return render(); }
+    affected.forEach((l) => (l.cat = target));
+    CATS.splice(+f.dataset.cat, 1); delete CAT_META[c];
+    if (S.filters.cat === c) S.filters.cat = "";
+    S.catDel = null; S.flash = { kind: "ok", text: `„${c}“ gelöscht${affected.length ? `, ${affected.length} ${affected.length === 1 ? "Anzeige" : "Anzeigen"} nach „${target}“ verschoben` : ""}.` }; render(); return;
   }
 });
 
