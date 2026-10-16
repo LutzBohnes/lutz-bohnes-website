@@ -213,6 +213,8 @@ tr:first-child td { border-top: 0; }
 .chart .bar:hover b { opacity: .8; }
 .chart .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--night); color: #fff; font-size: 12px; padding: 4px 9px; border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s; z-index: 2; }
 .chart .bar:hover .tip, .chart .bar:focus .tip { opacity: 1; }
+.chart .bar:nth-last-child(-n+2) .tip { left: auto; right: 0; transform: none; }
+.chart .gl + .bar .tip, .chart .gl + .bar + .bar .tip { left: 0; transform: none; }
 .chart .xl { display: flex; gap: 8px; margin-top: 6px; }
 .chart .xl span { flex: 1; text-align: center; font-size: 11px; color: var(--faint); }
 .meter { height: 8px; border-radius: 999px; background: var(--soft); overflow: hidden; }
