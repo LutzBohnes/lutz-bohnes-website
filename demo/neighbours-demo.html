@@ -126,6 +126,8 @@ label.lbl { display: block; font-size: 13px; font-weight: 600; color: #34433f; m
 .pgrid button { border: 0; padding: 0; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--soft); }
 .pgrid img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
 .pgrid button:hover img { transform: scale(1.06); }
+.plform { grid-template-columns: 1fr 2fr auto; align-items: end; }
+@media (max-width: 700px) { .plform { grid-template-columns: 1fr; } }
 .facts li { display: flex; align-items: center; gap: 10px; padding-block: 5px; font-size: 14px; }
 .facts .ico { width: 32px; height: 32px; border-radius: 9px; }
 .facts .ico svg.i { width: 16px; height: 16px; }
@@ -336,6 +338,8 @@ const ICONS = {
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M21.5 20h-19"/>',
   pin: '<path d="M12 21s6.5-5.6 6.5-11a6.5 6.5 0 0 0-13 0c0 5.4 6.5 11 6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
   check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  share: '<circle cx="17.5" cy="5.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17.5" cy="18.5" r="2.5"/><path d="m8.7 10.8 6.6-4M8.7 13.2l6.6 4"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/>',
   eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/>',
   lock: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
   star: '<path d="m12 4 2.4 5 5.4.6-4 3.7 1.1 5.3L12 16l-4.9 2.6 1.1-5.3-4-3.7 5.4-.6L12 4Z"/>',
@@ -410,7 +414,35 @@ const SEED_LISTINGS = [
   { id: 12, p: "anna", cat: "Seniorenhilfe", type: "SERVICE", title: "Begleitung zu Arzt und Behörden", price: 90, n: 1, desc: "Ich begleite Sie zu Terminen, helfe beim Ausfüllen von Formularen und behalte den Überblick." },
 ];
 const LANGS = ["Deutsch", "Englisch", "Türkisch", "Arabisch", "Russisch", "Polnisch", "Ukrainisch", "Italienisch", "Spanisch", "Französisch"];
-const EMPTY_FILTERS = { q: "", place: "", cat: "", type: "", maxPrice: "", minExp: "", lang: "", minRating: "", photosOnly: false };
+const EMPTY_FILTERS = { q: "", place: "", cat: "", type: "", maxPrice: "", minExp: "", lang: "", minRating: "", photosOnly: false, social: "" };
+// Erotik-Plattformen und Link-Sammeldienste sind fest gesperrt, unabhängig von den Admin-Einstellungen.
+const BLOCKED_DOMAINS = ["onlyfans.com", "fansly.com", "mym.fans", "fanvue.com", "justfor.fans", "manyvids.com", "loyalfans.com", "fancentro.com", "pornhub.com", "xvideos.com", "xhamster.com", "chaturbate.com", "stripchat.com", "myfreecams.com", "camsoda.com", "livejasmin.com", "4based.com", "maloum.com", "kaufmich.com", "ladies.de", "linktr.ee", "allmylinks.com", "beacons.ai"];
+const normHost = (h) => h.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, "");
+const isBlockedDomain = (h) => BLOCKED_DOMAINS.some((b) => normHost(h) === b || normHost(h).endsWith("." + b));
+const parseDomains = (str) => [...new Set(str.split(/[,\s]+/).map(normHost).filter((d) => /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d)))];
+function checkSocialUrl(raw, pl) {
+  let u;
+  try { u = new URL(/^https?:\/\//i.test(raw) ? raw : "https://" + raw); } catch { return { error: `Der ${pl.name}-Link ist ungültig.` }; }
+  const host = normHost(u.hostname);
+  if (isBlockedDomain(host)) return { error: "Links zu Erotik-Plattformen sind nicht erlaubt." };
+  const allowed = parseDomains(pl.domains);
+  if (!allowed.some((d) => host === d || host.endsWith("." + d))) return { error: `Der ${pl.name}-Link muss auf ${allowed.join(" oder ")} zeigen.` };
+  u.protocol = "https:";
+  return { url: u.toString() };
+}
+const SEED_PLATFORMS = [
+  { id: "ig", name: "Instagram", domains: "instagram.com", active: true },
+  { id: "tt", name: "TikTok", domains: "tiktok.com", active: true },
+  { id: "yt", name: "YouTube", domains: "youtube.com, youtu.be", active: true },
+  { id: "fb", name: "Facebook", domains: "facebook.com, fb.com", active: true },
+];
+const SEED_SOCIAL = {
+  sevgi: { ig: "https://www.instagram.com/sevgi.haare/" },
+  lena: { tt: "https://www.tiktok.com/@lena.mathe", yt: "https://www.youtube.com/@lena-nachhilfe" },
+  clara: { ig: "https://www.instagram.com/clara.gruesse/", tt: "https://www.tiktok.com/@clara.gruesse" },
+  fatma: { ig: "https://www.instagram.com/fatmas.kueche/" },
+  jana: { yt: "https://www.youtube.com/@jana-gassi" },
+};
 const PACKS = [
   { id: "s", credits: 100, euro: 10, label: "Starter" },
   { id: "m", credits: 550, euro: 50, label: "Beliebt", best: true },
@@ -424,6 +456,7 @@ const DEFAULT_SETTINGS = {
   footerText: "Neighbours.com · Nachbarschaftshilfe, fair und sicher.",
   headingFont: "Playfair Display", bodyFont: "DM Sans",
   brand: "#0d5c56", accent: "#ff6b4a", bg: "#f5f7f6", ink: "#10201e", radius: 14, fee: 20,
+  filterSocial: true, filterPrice: false, filterExperience: false, filterLanguage: false, filterRating: false, filterPhotos: false,
 };
 const BLOCKED = ["escort","erotik","erotisch","sex","nackt","nude","happy end","taschengeld","sugar daddy","intim","fetisch","domina","bdsm","dessous","onlyfans","date gegen","begleitung gegen"];
 const WEEKS = ["4.8.", "11.8.", "18.8.", "25.8.", "1.9.", "8.9.", "15.9.", "22.9.", "29.9.", "6.10.", "13.10.", "jetzt"];
@@ -431,10 +464,11 @@ const WEEKS = ["4.8.", "11.8.", "18.8.", "25.8.", "1.9.", "8.9.", "15.9.", "22.9
 function initialState() {
   const listings = SEED_LISTINGS.map((l) => ({ ...l, active: true, photos: Array.from({ length: l.n }, (_, v) => coverArt(l.cat, v)) }));
   const providers = JSON.parse(JSON.stringify(PROVIDERS));
-  Object.values(providers).forEach((p) => (p.avatar = null));
+  Object.entries(providers).forEach(([id, p]) => { p.avatar = null; p.social = { ...(SEED_SOCIAL[id] || {}) }; });
   return {
     role: "customer", view: "home",
     filters: { ...EMPTY_FILTERS }, profileId: null,
+    platforms: SEED_PLATFORMS.map((x) => ({ ...x })),
     credits: 250, settings: { ...DEFAULT_SETTINGS },
     listings, providers, nextId: 100,
     earnings: { anna: 412, lena: 238, sevgi: 960, marie: 540, jana: 188, fatma: 705, clara: 120 },
@@ -588,12 +622,13 @@ function filtered() {
     }
     if (cat && l.cat !== cat) return false;
     if (type && l.type !== type) return false;
-    const f = S.filters;
-    if (f.maxPrice && l.price > +f.maxPrice) return false;
-    if (f.minExp && p.exp < +f.minExp) return false;
-    if (f.lang && !p.langs.includes(f.lang)) return false;
-    if (f.minRating && p.rating < +f.minRating) return false;
-    if (f.photosOnly && l.photos.length === 0) return false;
+    const f = S.filters, st = S.settings;
+    if (st.filterPrice && f.maxPrice && l.price > +f.maxPrice) return false;
+    if (st.filterExperience && f.minExp && p.exp < +f.minExp) return false;
+    if (st.filterLanguage && f.lang && !p.langs.includes(f.lang)) return false;
+    if (st.filterRating && f.minRating && p.rating < +f.minRating) return false;
+    if (st.filterPhotos && f.photosOnly && l.photos.length === 0) return false;
+    if (st.filterSocial && f.social && !p.social[f.social]) return false;
     return true;
   });
 }
@@ -616,7 +651,10 @@ function card(l) {
 }
 VIEWS.home = () => {
   const s = S.settings, f = S.filters, res = filtered();
-  const extra = [f.maxPrice, f.minExp, f.lang, f.minRating, f.photosOnly].filter(Boolean).length;
+  const st = S.settings, activePlatforms = S.platforms.filter((x) => x.active);
+  const showSocial = st.filterSocial && activePlatforms.length > 0;
+  const extra = [st.filterPrice && f.maxPrice, st.filterExperience && f.minExp, st.filterLanguage && f.lang, st.filterRating && f.minRating, st.filterPhotos && f.photosOnly, showSocial && f.social].filter(Boolean).length;
+  const anyExtra = showSocial || st.filterPrice || st.filterExperience || st.filterLanguage || st.filterRating || st.filterPhotos;
   return `<div class="stack" style="gap:40px">
     <section class="hero">
       <span class="kicker">${ic("shield")} Alle Anbieterinnen persönlich verifiziert</span>
@@ -628,16 +666,17 @@ VIEWS.home = () => {
         <select class="input" id="f-cat" aria-label="Dienstleistung"><option value="">Alle Dienstleistungen</option>${CATS.map((c) => `<option ${f.cat === c ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
         <select class="input" id="f-type" aria-label="Art"><option value="">Alle Arten</option><option value="SERVICE" ${f.type === "SERVICE" ? "selected" : ""}>Dienstleistung</option><option value="GREETING_VIDEO" ${f.type === "GREETING_VIDEO" ? "selected" : ""}>Grußvideo</option></select>
         <button class="btn accent" type="submit">Suchen</button>
-        <details class="more" ${extra ? "open" : ""}>
+        ${anyExtra ? `<details class="more" ${extra ? "open" : ""}>
           <summary>Weitere Filter${extra ? ` <span class="pill" style="font-size:11px;padding:1px 8px">${extra}</span>` : ""}</summary>
           <div class="more-grid">
-            <select class="input" id="f-price" aria-label="Preis bis"><option value="">Preis: egal</option>${[50, 100, 200, 500].map((v) => `<option value="${v}" ${f.maxPrice == v ? "selected" : ""}>bis ${v} Credits (${v / 10} €)</option>`).join("")}</select>
-            <select class="input" id="f-exp" aria-label="Erfahrung"><option value="">Erfahrung: egal</option>${[1, 3, 5, 10].map((v) => `<option value="${v}" ${f.minExp == v ? "selected" : ""}>mind. ${v} ${v === 1 ? "Jahr" : "Jahre"}</option>`).join("")}</select>
-            <select class="input" id="f-lang" aria-label="Sprache"><option value="">Sprache: egal</option>${LANGS.map((v) => `<option ${f.lang === v ? "selected" : ""}>${v}</option>`).join("")}</select>
-            <select class="input" id="f-rating" aria-label="Bewertung"><option value="">Bewertung: egal</option>${["4.5", "4.8", "5"].map((v) => `<option value="${v}" ${f.minRating === v ? "selected" : ""}>ab ${v.replace(".", ",")} ★</option>`).join("")}</select>
-            <label class="input" style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="f-photos" ${f.photosOnly ? "checked" : ""}> Nur mit Fotos</label>
+            ${showSocial ? `<select class="input" id="f-social" aria-label="Social Media"><option value="">Social Media: egal</option>${activePlatforms.map((x) => `<option value="${x.id}" ${f.social === x.id ? "selected" : ""}>mit ${esc(x.name)}</option>`).join("")}</select>` : ""}
+            ${st.filterPrice ? `<select class="input" id="f-price" aria-label="Preis bis"><option value="">Preis: egal</option>${[50, 100, 200, 500].map((v) => `<option value="${v}" ${f.maxPrice == v ? "selected" : ""}>bis ${v} Credits (${v / 10} €)</option>`).join("")}</select>` : ""}
+            ${st.filterExperience ? `<select class="input" id="f-exp" aria-label="Erfahrung"><option value="">Erfahrung: egal</option>${[1, 3, 5, 10].map((v) => `<option value="${v}" ${f.minExp == v ? "selected" : ""}>mind. ${v} ${v === 1 ? "Jahr" : "Jahre"}</option>`).join("")}</select>` : ""}
+            ${st.filterLanguage ? `<select class="input" id="f-lang" aria-label="Sprache"><option value="">Sprache: egal</option>${LANGS.map((v) => `<option ${f.lang === v ? "selected" : ""}>${v}</option>`).join("")}</select>` : ""}
+            ${st.filterRating ? `<select class="input" id="f-rating" aria-label="Bewertung"><option value="">Bewertung: egal</option>${["4.5", "4.8", "5"].map((v) => `<option value="${v}" ${f.minRating === v ? "selected" : ""}>ab ${v.replace(".", ",")} ★</option>`).join("")}</select>` : ""}
+            ${st.filterPhotos ? `<label class="input" style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="f-photos" ${f.photosOnly ? "checked" : ""}> Nur mit Fotos</label>` : ""}
           </div>
-        </details>
+        </details>` : ""}
       </form>
       <div class="chips" aria-label="Kategorien">
         ${CATS.slice(0, 8).map((c) => `<button data-cat="${esc(c)}" aria-pressed="${f.cat === c}">${ic(CAT_META[c]?.icon || "sparkle")}${esc(c)}</button>`).join("")}
@@ -688,7 +727,8 @@ VIEWS.profile = () => {
       </div>
       <div class="cols" style="border-top:1px solid var(--line);padding:22px 24px;grid-template-columns:1.6fr 1fr">
         <div class="stack" style="gap:8px"><h2 style="font-size:19px">Über mich</h2><p style="max-width:62ch;color:#34433f">${esc(p.bio)}</p></div>
-        <ul class="facts" style="list-style:none;padding:0;margin:0">${facts.map(([i, t]) => `<li><span class="ico">${ic(i)}</span>${esc(t)}</li>`).join("")}</ul>
+        <div class="stack" style="gap:14px"><ul class="facts" style="list-style:none;padding:0;margin:0">${facts.map(([i, t]) => `<li><span class="ico">${ic(i)}</span>${esc(t)}</li>`).join("")}</ul>
+        ${(() => { const links = S.platforms.filter((x) => x.active && p.social[x.id]); return links.length ? `<div class="row" style="gap:8px">${links.map((x) => `<a class="btn ghost sm" href="${esc(p.social[x.id])}" target="_blank" rel="noopener noreferrer nofollow ugc">${ic("link")}${esc(x.name)}</a>`).join("")}</div>` : ""; })()}</div>
       </div>
     </section>
     <section class="stack" style="gap:16px">
@@ -988,6 +1028,9 @@ VIEWS["p-profile"] = () => {
           <div class="full"><label class="lbl" for="pr-bio">Über mich</label><textarea class="input" id="pr-bio" rows="5">${esc(p.bio)}</textarea></div>
           <div><label class="lbl" for="pr-exp">Erfahrung (Jahre)</label><input class="input" id="pr-exp" type="number" min="0" max="60" value="${p.exp}"></div>
           <fieldset class="full" style="border:0;padding:0;margin:0"><legend class="lbl">Sprachen</legend><div class="row" style="gap:6px">${LANGS.map((l) => `<label class="badge ${p.langs.includes(l) ? "b-brand" : "b-mute"}" style="cursor:pointer;padding:5px 12px;font-size:13px"><input type="checkbox" name="pr-lang" value="${l}" ${p.langs.includes(l) ? "checked" : ""} style="margin:0 4px 0 0">${l}</label>`).join("")}</div></fieldset>
+          ${S.platforms.some((x) => x.active) ? `<fieldset class="full fields" style="border:0;padding:0;margin:0"><legend class="lbl">Social Media <span class="muted" style="font-weight:400">(erscheint auf deinem Profil)</span></legend>
+            ${S.platforms.filter((x) => x.active).map((x) => `<div><label class="lbl" for="pr-s-${x.id}" style="font-weight:500">${esc(x.name)}</label><input class="input" id="pr-s-${x.id}" data-social="${x.id}" value="${esc(p.social[x.id] || "")}" placeholder="https://${esc(parseDomains(x.domains)[0] || "")}/…"></div>`).join("")}
+          </fieldset>` : ""}
           <div><label class="lbl" for="pr-chat">Chat-Preis (Credits pro Nachricht)</label><input class="input" id="pr-chat" type="number" min="2" max="50" value="${p.chat}"><span class="xs muted">Du erhältst ${100 - S.settings.fee} % davon.</span></div>
           <div class="full"><button class="btn" type="submit">Speichern</button></div>
         </form>
@@ -1000,7 +1043,7 @@ function adminDash(body) {
   return dash("Admin", [
     ["a-home", "Übersicht", "chart"], ["a-listings", "Anzeigen", "grid"], ["a-users", "Nutzer:innen", "users"],
     ["a-verify", "Verifizierung", "shield", S.verifications.length], ["a-reports", "Meldungen", "flag", S.reports.length],
-    ["a-payouts", "Auszahlungen", "wallet", S.payoutQueue.length], ["a-cats", "Kategorien", "tag"], ["a-design", "Design & Texte", "palette"],
+    ["a-payouts", "Auszahlungen", "wallet", S.payoutQueue.length], ["a-cats", "Kategorien", "tag"], ["a-social", "Social Media", "share"], ["a-design", "Design & Texte", "palette"],
   ], body, `<div class="side-card"><strong>${fmt(S.stats.users)}</strong>Nutzer:innen · <span style="color:var(--accent)">+${S.stats.growth} %</span> in 30 Tagen</div>`);
 }
 VIEWS["a-home"] = () => {
@@ -1081,6 +1124,28 @@ VIEWS["a-cats"] = () => adminDash(`
   <section class="card"><form id="cat-form" class="row" style="margin-bottom:14px"><input class="input" id="cat-name" placeholder="Neue Kategorie, z. B. Umzugshilfe" style="max-width:320px"><button class="btn" type="submit">${ic("plus")} Hinzufügen</button></form>
   <div class="list">${CATS.map((c) => `<div class="row"><span class="ico">${ic(CAT_META[c]?.icon || "sparkle")}</span><span class="grow"><strong>${esc(c)}</strong></span><span class="small muted num">${S.listings.filter((l) => l.cat === c).length} Anzeigen</span></div>`).join("")}</div></section>`);
 
+VIEWS["a-social"] = () => adminDash(`
+  ${ph("Social Media", "Plattformen, die Anbieterinnen in ihrem Profil verlinken können. Danach lässt sich auf der Startseite filtern.")}
+  ${flashHtml()}
+  ${S.settings.filterSocial ? "" : `<p class="note warn">Der Social-Media-Filter ist auf der Startseite ausgeblendet. Einschalten unter „Design & Texte“ → „Suche & Filter“.</p>`}
+  <section class="card"><div class="panel-h"><h2>Neue Plattform</h2></div>
+    <form id="platform-form" class="fields plform">
+      <div><label class="lbl" for="pl-name">Name</label><input class="input" id="pl-name" placeholder="z. B. Pinterest"></div>
+      <div><label class="lbl" for="pl-domains">Domain(s)</label><input class="input" id="pl-domains" placeholder="z. B. pinterest.com, pin.it"></div>
+      <button class="btn" type="submit">${ic("plus")} Hinzufügen</button>
+    </form>
+    <p class="xs muted" style="margin-top:10px">Links von Anbieterinnen müssen auf eine dieser Domains zeigen. Erotik-Plattformen (z. B. OnlyFans, Fansly, MYM) und Link-Sammeldienste (z. B. Linktree) sind gesperrt.</p>
+  </section>
+  <section class="card flush"><div class="tablewrap"><table style="min-width:640px"><thead><tr><th></th><th>Plattform</th><th>Domains</th><th>Profile</th><th>Status</th><th></th></tr></thead><tbody>
+    ${S.platforms.map((x, i) => `<tr>
+      <td style="width:60px"><div class="row" style="gap:2px;flex-wrap:nowrap"><button class="btn ghost sm" data-plmove="${i}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="Nach oben" style="padding:4px 8px">▲</button><button class="btn ghost sm" data-plmove="${i}" data-dir="1" ${i === S.platforms.length - 1 ? "disabled" : ""} aria-label="Nach unten" style="padding:4px 8px">▼</button></div></td>
+      <td><strong>${esc(x.name)}</strong></td><td class="small muted">${esc(x.domains)}</td>
+      <td class="num">${Object.values(S.providers).filter((p) => p.social[x.id]).length}</td>
+      <td>${status(x.active ? "ACTIVE" : "PAUSED")}</td>
+      <td><div class="row" style="flex-wrap:nowrap;justify-content:flex-end"><button class="btn ghost sm" data-pltoggle="${x.id}">${x.active ? "Ausblenden" : "Einblenden"}</button><button class="btn ghost sm" data-pldel="${x.id}" style="color:#c4321f">Löschen</button></div></td>
+    </tr>`).join("") || `<tr><td colspan="6" class="muted">Noch keine Plattformen.</td></tr>`}
+  </tbody></table></div></section>`);
+
 function field(id, label, html, full) { return `<div class="${full ? "full" : ""}"><label class="lbl" for="${id}">${label}</label>${html}</div>`; }
 function adminPreview() {
   const s = S.settings;
@@ -1110,6 +1175,10 @@ VIEWS["a-design"] = () => {
           <div class="full row">${presets.map(([n, b, a, bg]) => `<button type="button" class="btn ghost sm" data-preset="${b},${a},${bg}"><span style="display:inline-flex"><span style="width:14px;height:14px;border-radius:50%;background:${b}"></span><span style="width:14px;height:14px;border-radius:50%;background:${a};margin-left:-4px"></span></span>${n}</button>`).join("")}</div>
           ${col("brand", "Hauptfarbe")}${col("accent", "Akzentfarbe")}${col("bg", "Hintergrund")}${col("ink", "Textfarbe")}
           ${field("s-radius", `Eckenradius: <span class="num" id="radius-val">${s.radius}</span> px`, `<input type="range" id="s-radius" data-set="radius" min="0" max="28" value="${s.radius}" style="width:100%">`)}
+        </fieldset>
+        <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;font-size:18px;margin-bottom:10px">Suche & Filter</legend>
+          <p class="small muted full">Welche Zusatzfilter erscheinen auf der Startseite unter „Weitere Filter“?</p>
+          ${[["filterSocial", "Social Media"], ["filterPrice", "Preis bis"], ["filterExperience", "Erfahrung ab"], ["filterLanguage", "Sprache"], ["filterRating", "Bewertung ab"], ["filterPhotos", "Nur mit Fotos"]].map(([k, l]) => `<label class="row" style="gap:8px;font-size:14px;cursor:pointer"><input type="checkbox" data-set="${k}" ${s[k] ? "checked" : ""}> ${l}</label>`).join("")}
         </fieldset>
         <fieldset class="fields" style="border:0;padding:0;margin:0"><legend class="head" style="font-weight:600;font-size:18px;margin-bottom:10px">Geschäftsmodell</legend>
           ${field("s-fee", "Plattformgebühr in %", `<input class="input" type="number" id="s-fee" data-set="fee" min="0" max="50" value="${s.fee}">`)}
@@ -1206,6 +1275,9 @@ document.addEventListener("click", (e) => {
   }
   if (d.resolve) { const r = S.reports.find((x) => x.id === +d.resolve); if (d.deact && r) L(r.listing).active = false; S.reports = S.reports.filter((x) => x.id !== +d.resolve); S.flash = { kind: "ok", text: d.deact ? "Anzeige deaktiviert, Meldung erledigt." : "Meldung verworfen." }; render(); return; }
   if (d.paid) { const p = S.payoutQueue.find((x) => x.id === +d.paid); S.payoutQueue = S.payoutQueue.filter((x) => x.id !== +d.paid); S.flash = { kind: "ok", text: d.rej ? `Auszahlung an ${P(p.p).name} abgelehnt, Betrag zurückgebucht.` : `${euro(p.amount / 10)} an ${P(p.p).name} als überwiesen markiert.` }; render(); return; }
+  if (d.pltoggle) { const x = S.platforms.find((y) => y.id === d.pltoggle); x.active = !x.active; render(); return; }
+  if (d.pldel) { S.platforms = S.platforms.filter((y) => y.id !== d.pldel); Object.values(S.providers).forEach((p) => delete p.social[d.pldel]); if (S.filters.social === d.pldel) S.filters.social = ""; S.flash = { kind: "ok", text: "Plattform gelöscht." }; render(); return; }
+  if (d.plmove) { const i = +d.plmove, j = i + +d.dir; [S.platforms[i], S.platforms[j]] = [S.platforms[j], S.platforms[i]]; render(); return; }
   if (d.ban) { toast(`${d.ban} würde jetzt gesperrt (in der Demo ohne Wirkung).`); return; }
 });
 
@@ -1215,7 +1287,8 @@ document.addEventListener("submit", (e) => {
   if (f.id === "search-form") {
     S.filters = {
       q: $("#f-q").value.trim(), place: $("#f-place").value.trim(), cat: $("#f-cat").value, type: $("#f-type").value,
-      maxPrice: $("#f-price").value, minExp: $("#f-exp").value, lang: $("#f-lang").value, minRating: $("#f-rating").value, photosOnly: $("#f-photos").checked,
+      maxPrice: $("#f-price")?.value || "", minExp: $("#f-exp")?.value || "", lang: $("#f-lang")?.value || "", minRating: $("#f-rating")?.value || "",
+      photosOnly: !!$("#f-photos")?.checked, social: $("#f-social")?.value || "",
     };
     render(); return;
   }
@@ -1241,7 +1314,26 @@ document.addEventListener("submit", (e) => {
     p.name = $("#pr-name").value.trim() || p.name; p.bio = $("#pr-bio").value.trim(); p.chat = Math.min(50, Math.max(2, +$("#pr-chat").value || 2));
     p.exp = Math.min(60, Math.max(0, +$("#pr-exp").value || 0));
     p.langs = [...document.querySelectorAll("input[name=pr-lang]:checked")].map((el) => el.value);
+    const social = {};
+    for (const el of document.querySelectorAll("input[data-social]")) {
+      const raw = el.value.trim(); if (!raw) continue;
+      const res = checkSocialUrl(raw, S.platforms.find((x) => x.id === el.dataset.social));
+      if (res.error) { S.flash = { kind: "err", text: res.error }; return render(); }
+      social[el.dataset.social] = res.url;
+    }
+    S.platforms.filter((x) => !x.active).forEach((x) => { if (p.social[x.id]) social[x.id] = p.social[x.id]; });
+    p.social = social;
     S.flash = { kind: "ok", text: "Profil gespeichert." }; render(); return;
+  }
+  if (f.id === "platform-form") {
+    const name = $("#pl-name").value.trim(), domains = parseDomains($("#pl-domains").value);
+    const bad = domains.find(isBlockedDomain);
+    if (name.length < 2) S.flash = { kind: "err", text: "Bitte gib einen Namen mit mindestens 2 Zeichen an." };
+    else if (!domains.length) S.flash = { kind: "err", text: "Bitte gib mindestens eine Domain an, z. B. pinterest.com." };
+    else if (bad) S.flash = { kind: "err", text: `${bad} ist eine Erotik- oder Link-Sammel-Plattform und kann nicht angelegt werden.` };
+    else if (S.platforms.some((x) => x.name.toLowerCase() === name.toLowerCase())) S.flash = { kind: "err", text: "Diese Plattform gibt es schon." };
+    else { S.platforms.push({ id: "p" + Date.now(), name, domains: domains.join(", "), active: true }); S.flash = { kind: "ok", text: `${name} angelegt. Anbieterinnen können den Link jetzt im Profil eintragen.` }; }
+    render(); return;
   }
   if (f.id === "admin-filter") { S.adminFilter = $("#af-q").value.trim(); render(); return; }
   if (f.id === "cat-form") {
@@ -1255,7 +1347,7 @@ document.addEventListener("submit", (e) => {
 
 document.addEventListener("input", (e) => {
   const k = e.target.dataset?.set; if (!k) return;
-  let v = e.target.value;
+  let v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
   if (k === "radius" || k === "fee") v = Math.max(0, Math.min(k === "fee" ? 50 : 28, +v || 0));
   if (["brand", "accent", "bg", "ink"].includes(k) && !/^#[0-9a-fA-F]{6}$/.test(v)) return;
   S.settings[k] = v;
