@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
-import { FONT_CHOICES } from "@/lib/config";
+import { CATEGORY_ICONS, FONT_CHOICES } from "@/lib/config";
 import { db } from "@/lib/db";
 import { findBlockedTerm } from "@/lib/moderation";
 import { isBlockedDomain, parseDomains } from "@/lib/social";
@@ -63,32 +63,50 @@ function slugify(name: string) {
     .replace(/^-|-$/g, "");
 }
 
+function categoryIcon(formData: FormData) {
+  const icon = String(formData.get("icon") ?? "tag");
+  return (CATEGORY_ICONS as readonly string[]).includes(icon) ? icon : "tag";
+}
+
 export async function createCategory(_: ActionState, formData: FormData): Promise<ActionState> {
   await requireAdmin();
   const name = String(formData.get("name") ?? "").trim();
-  if (name.length < 2) return { error: "Name zu kurz." };
+  if (name.length < 2 || name.length > 40) return { error: "Bitte gib einen Namen mit 2 bis 40 Zeichen an." };
   const slug = slugify(name);
-  if (await db.category.findUnique({ where: { slug } })) return { error: "Kategorie existiert bereits." };
-  await db.category.create({ data: { name, slug } });
+  if (await db.category.findUnique({ where: { slug } })) return { error: "Diese Kategorie gibt es schon." };
+  await db.category.create({ data: { name, slug, icon: categoryIcon(formData) } });
   revalidatePath("/", "layout");
   return { ok: `Kategorie „${name}“ angelegt.` };
 }
 
-export async function renameCategory(formData: FormData) {
-  await requireAdmin();
-  const name = String(formData.get("name") ?? "").trim();
-  if (name.length < 2) return;
-  await db.category.update({ where: { id: String(formData.get("id")) }, data: { name } });
-  revalidatePath("/", "layout");
-}
-
-export async function deleteCategory(formData: FormData) {
+/** Name und Symbol ändern. Der Slug (für Links) bleibt gleich, damit geteilte Such-Links weiter funktionieren. */
+export async function updateCategory(_: ActionState, formData: FormData): Promise<ActionState> {
   await requireAdmin();
   const id = String(formData.get("id"));
-  // Nur löschbar, wenn keine Anzeigen mehr daran hängen.
-  if ((await db.listing.count({ where: { categoryId: id } })) > 0) return;
+  const name = String(formData.get("name") ?? "").trim();
+  if (name.length < 2 || name.length > 40) return { error: "Bitte gib einen Namen mit 2 bis 40 Zeichen an." };
+  const clash = await db.category.findFirst({ where: { name: { equals: name, mode: "insensitive" }, id: { not: id } } });
+  if (clash) return { error: "Diese Kategorie gibt es schon." };
+  await db.category.update({ where: { id }, data: { name, icon: categoryIcon(formData) } });
+  revalidatePath("/", "layout");
+  return { ok: "Gespeichert." };
+}
+
+/** Löschen; vorhandene Anzeigen werden vorher in die gewählte Kategorie verschoben. */
+export async function deleteCategory(_: ActionState, formData: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const id = String(formData.get("id"));
+  const moveTo = String(formData.get("moveTo") ?? "");
+  const count = await db.listing.count({ where: { categoryId: id } });
+  if (count > 0) {
+    if (!moveTo || moveTo === id || !(await db.category.findUnique({ where: { id: moveTo } }))) {
+      return { error: `Bitte wähle, wohin ${count === 1 ? "die Anzeige" : `die ${count} Anzeigen`} verschoben werden ${count === 1 ? "soll" : "sollen"}.` };
+    }
+    await db.listing.updateMany({ where: { categoryId: id }, data: { categoryId: moveTo } });
+  }
   await db.category.delete({ where: { id } });
   revalidatePath("/", "layout");
+  return { ok: "Kategorie gelöscht." };
 }
 
 export async function setVerification(formData: FormData) {

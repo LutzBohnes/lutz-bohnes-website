@@ -100,6 +100,8 @@ model Category {
   id       String    @id @default(cuid())
   slug     String    @unique
   name     String
+  /// Name eines Symbols aus CATEGORY_ICONS
+  icon     String    @default("tag")
   listings Listing[]
 }
 

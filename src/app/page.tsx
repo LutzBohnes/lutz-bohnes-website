@@ -130,8 +130,8 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           </form>
           <div className="mt-6 flex flex-wrap gap-2">
             {categories.slice(0, 8).map((c) => (
-              <a key={c.id} href={`/?kategorie=${c.slug}`} className={`rounded-full border px-3.5 py-1.5 text-sm transition ${kategorie === c.slug ? "border-white bg-white text-slate-900" : "border-white/30 hover:bg-white/10"}`}>
-                {c.name}
+              <a key={c.id} href={`/?kategorie=${c.slug}`} className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition ${kategorie === c.slug ? "border-white bg-white text-slate-900" : "border-white/30 hover:bg-white/10"}`}>
+                <Icon name={c.icon} size={15} />{c.name}
               </a>
             ))}
           </div>

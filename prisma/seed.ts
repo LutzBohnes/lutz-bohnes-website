@@ -4,22 +4,22 @@ import bcrypt from "bcryptjs";
 const db = new PrismaClient();
 
 const CATEGORIES = [
-  ["einkaufshilfe", "Einkaufshilfe"],
-  ["haushalt", "Haushalt & Putzen"],
-  ["kinderbetreuung", "Kinderbetreuung"],
-  ["seniorenhilfe", "Seniorenhilfe"],
-  ["nachhilfe", "Nachhilfe"],
-  ["tierbetreuung", "Tierbetreuung"],
-  ["garten", "Garten"],
-  ["beauty", "Beauty & Friseur"],
-  ["naehen", "Nähen & Reparaturen"],
-  ["kochen", "Kochen & Backen"],
-  ["gruesse", "Grußvideos"],
+  ["einkaufshilfe", "Einkaufshilfe", "bag"],
+  ["haushalt", "Haushalt & Putzen", "broom"],
+  ["kinderbetreuung", "Kinderbetreuung", "baby"],
+  ["seniorenhilfe", "Seniorenhilfe", "heart"],
+  ["nachhilfe", "Nachhilfe", "book"],
+  ["tierbetreuung", "Tierbetreuung", "paw"],
+  ["garten", "Garten", "leaf"],
+  ["beauty", "Beauty & Friseur", "scissors"],
+  ["naehen", "Nähen & Reparaturen", "needle"],
+  ["kochen", "Kochen & Backen", "pot"],
+  ["gruesse", "Grußvideos", "video"],
 ];
 
 async function main() {
-  for (const [slug, name] of CATEGORIES) {
-    await db.category.upsert({ where: { slug }, update: {}, create: { slug, name } });
+  for (const [slug, name, icon] of CATEGORIES) {
+    await db.category.upsert({ where: { slug }, update: {}, create: { slug, name, icon } });
   }
   await db.siteSettings.upsert({ where: { id: "site" }, update: {}, create: { id: "site" } });
   const PLATFORMS = [

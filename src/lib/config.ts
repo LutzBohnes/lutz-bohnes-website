@@ -56,3 +56,9 @@ export const LANGUAGE_CHOICES = [
   "Rumänisch",
   "Griechisch",
 ] as const;
+
+/** Symbole, die im Admin-Bereich für Kategorien auswählbar sind (Namen aus components/icon.tsx). */
+export const CATEGORY_ICONS = [
+  "tag", "bag", "broom", "baby", "heart", "book", "paw", "leaf", "scissors", "needle", "pot", "video",
+  "car", "wrench", "box", "laptop", "music", "camera", "sparkle", "home", "users", "star",
+] as const;

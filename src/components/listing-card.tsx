@@ -20,7 +20,7 @@ export function ListingCard({ listing }: Props) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={cover} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
         ) : (
-          <div className="grid h-full place-items-center font-heading text-5xl font-bold text-primary/70">{listing.category.name.charAt(0)}</div>
+          <div className="grid h-full place-items-center text-primary/70"><Icon name={listing.category.icon} size={56} /></div>
         )}
         {cover && <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/45 to-transparent" />}
         <span className="absolute bottom-3 left-3 rounded-full bg-white px-3 py-1 font-heading text-sm font-bold tabular-nums text-slate-900 shadow">
