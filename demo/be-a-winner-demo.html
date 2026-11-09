@@ -1,0 +1,1079 @@
+<title>Be a Winner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: Handy-App mit fester Tab-Leiste unten. Anzeigetafel-Typo für Zahlen und Ränge,
+   Gold nur für das, was zählt (bewiesene Wins, Platz 1, die Haupt-Aktion). Dunkel zuerst. */
+:root {
+  --bg: #121110;
+  --surface: #1c1a18;
+  --surface-2: #26231f;
+  --line: #34302a;
+  --ink: #f4efe6;
+  --muted: #a39b8e;
+  --gold: #f2b632;
+  --gold-ink: #1a1408;
+  --ok: #57c78a;
+  --late: #e8964a;
+  --miss: #e0605a;
+  --silver: #c9ccd3;
+  --bronze: #cd8a55;
+  --font-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-body: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius: 16px;
+  --tabbar-h: 64px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f6f3ee; --surface: #ffffff; --surface-2: #efe9df; --line: #e0d8cb;
+    --ink: #1b1813; --muted: #6e665a; --gold: #c98a00; --gold-ink: #ffffff;
+    --ok: #1f8f55; --late: #b9631c; --miss: #c23a33; --silver: #7d838f; --bronze: #a8622c;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f6f3ee; --surface: #ffffff; --surface-2: #efe9df; --line: #e0d8cb;
+  --ink: #1b1813; --muted: #6e665a; --gold: #c98a00; --gold-ink: #ffffff;
+  --ok: #1f8f55; --late: #b9631c; --miss: #c23a33; --silver: #7d838f; --bronze: #a8622c;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.45;
+  -webkit-tap-highlight-color: transparent;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+img { max-width: 100%; display: block; }
+
+.app {
+  max-width: 560px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Kopf */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--bg); display: flex; align-items: center; justify-content: space-between;
+  padding-block: 14px 10px; gap: 12px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 10; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: .02em; text-transform: uppercase; line-height: 1; }
+.brand b { color: var(--gold); font-weight: 800; }
+.top .sub { color: var(--muted); font-size: 13px; text-align: right; }
+.demo-pill { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); border-radius: 99px; padding: 2px 8px; }
+
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin: 8px 0 0; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.section-title small { font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--muted); text-transform: none; letter-spacing: 0; }
+.muted { color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+
+/* Hero: nächster Win */
+.hero { background: var(--surface); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--line); }
+.hero .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+.hero h2 { margin: 0; font-size: 24px; line-height: 1.2; text-wrap: balance; }
+.countdown { font-family: var(--font-display); font-size: 44px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.countdown.late { color: var(--late); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; border-radius: 14px; padding: 14px 18px; font-weight: 800; font-size: 16px;
+  background: var(--surface-2); color: var(--ink);
+}
+.btn.primary { background: var(--gold); color: var(--gold-ink); }
+.btn.block { width: 100%; }
+.btn.ghost { background: transparent; border: 1px solid var(--line); }
+.btn.small { padding: 8px 12px; font-size: 13px; border-radius: 10px; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* Tagesslots */
+.slots { display: flex; flex-direction: column; }
+.slot { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.slot:first-child { border-top: 0; }
+.slot .ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; background: var(--surface-2); }
+.slot .ic.done { background: var(--gold); color: var(--gold-ink); }
+.slot .ic.late { background: var(--late); color: var(--gold-ink); }
+.slot .ic.miss { background: transparent; border: 2px solid var(--miss); color: var(--miss); }
+.slot .t { min-width: 0; }
+.slot .t b { display: block; overflow-wrap: anywhere; }
+.slot .t span { font-size: 12px; color: var(--muted); }
+.slot .time { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); }
+
+/* Team-Leiste */
+.team-strip { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.team-strip::-webkit-scrollbar { display: none; }
+.mate { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 62px; background: none; border: 0; padding: 0; }
+.mate span { font-size: 12px; font-weight: 600; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ring { position: relative; width: 56px; height: 56px; }
+.ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring .av { position: absolute; inset: 5px; }
+.av { border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #fff; font-size: 16px; }
+.av.sm { width: 36px; height: 36px; font-size: 13px; flex: none; }
+
+/* Feed */
+.post { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.post-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+.post-head .who { flex: 1; min-width: 0; }
+.post-head .who b { display: block; }
+.post-head .who span { font-size: 12px; color: var(--muted); }
+.post-photo { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: var(--surface-2); max-width: 100%; }
+.post-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.post-body .title { font-weight: 800; font-size: 17px; overflow-wrap: anywhere; }
+.badge { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 99px; white-space: nowrap; }
+.badge.ok { color: var(--ok); border: 1px solid var(--ok); }
+.badge.late { color: var(--late); border: 1px solid var(--late); }
+.reacts { display: flex; gap: 8px; flex-wrap: wrap; }
+.react { border: 1px solid var(--line); background: var(--surface-2); border-radius: 99px; padding: 5px 11px; font-size: 14px; display: inline-flex; gap: 6px; align-items: center; font-variant-numeric: tabular-nums; }
+.react.on { border-color: var(--gold); }
+.day-sep { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+/* Rangliste */
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 12px; padding: 4px; gap: 4px; }
+.seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px; font-weight: 700; color: var(--muted); }
+.seg button.on { background: var(--surface); color: var(--ink); }
+.rank-list { display: flex; flex-direction: column; gap: 10px; }
+.rank { display: grid; grid-template-columns: 40px 36px 1fr auto; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; text-align: left; width: 100%; }
+.rank.me { border-color: var(--gold); }
+.rank .pos { font-family: var(--font-display); font-size: 30px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; color: var(--muted); }
+.rank .pos.p1 { color: var(--gold); } .rank .pos.p2 { color: var(--silver); } .rank .pos.p3 { color: var(--bronze); }
+.rank .nm { min-width: 0; }
+.rank .nm b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank .nm span { font-size: 12px; color: var(--muted); }
+.rank .score { font-family: var(--font-display); font-size: 34px; font-weight: 800; line-height: 1; text-align: right; font-variant-numeric: tabular-nums; }
+.rank .score small { display: block; font-family: var(--font-body); font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-top: 6px; }
+.bar i { display: block; height: 100%; background: var(--gold); border-radius: 99px; }
+
+/* Wochenplanung */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.input, textarea.input { width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 16px; }
+textarea.input { resize: vertical; min-height: 70px; }
+.input:focus { border-color: var(--gold); outline: none; }
+.day-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.day-card.past { opacity: .55; }
+.day-card h3 { margin: 0; font-size: 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.day-card h3 label { font-size: 13px; font-weight: 600; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.plan-row { display: grid; grid-template-columns: minmax(0,1fr) 112px; gap: 8px; align-items: end; }
+.plan-row .field { min-width: 0; }
+.plan-row .input { padding: 10px; }
+.save-bar { position: sticky; bottom: calc(var(--tabbar-h) + 12px + env(safe-area-inset-bottom, 0px)); z-index: 4; }
+.hint { font-size: 13px; color: var(--muted); }
+.week-grid { display: grid; grid-template-columns: 64px repeat(3, 1fr); gap: 6px; align-items: center; font-size: 13px; }
+.week-grid .cell { height: 26px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; font-weight: 800; font-size: 12px; }
+.week-grid .cell.done { background: var(--gold); color: var(--gold-ink); }
+.week-grid .cell.late { background: var(--late); color: var(--gold-ink); }
+.week-grid .cell.miss { background: transparent; border: 1.5px solid var(--miss); color: var(--miss); }
+.week-grid .cell.none { background: transparent; border: 1px dashed var(--line); }
+.week-grid .hd { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; text-align: center; }
+
+/* Tab-Leiste */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+.tabbar nav { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); height: var(--tabbar-h); }
+.tabbar button { border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 700; color: var(--muted); }
+.tabbar button svg { width: 24px; height: 24px; }
+.tabbar button.on { color: var(--gold); }
+
+/* Overlays */
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: var(--bg); width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; border-radius: 22px 22px 0 0;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet .grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: -8px auto 12px; }
+.camera { position: fixed; inset: 0; z-index: 40; background: #000; display: flex; flex-direction: column; color: #fff; }
+.camera video, .camera img.shot { flex: 1; width: 100%; min-height: 0; object-fit: cover; }
+.camera .cam-top { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); left: 16px; right: 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.camera .cam-top b { background: rgba(0,0,0,.55); padding: 6px 12px; border-radius: 99px; font-size: 14px; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.camera .cam-bottom { padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; justify-content: space-around; gap: 12px; background: #000; }
+.camera .cam-bottom.col { flex-direction: column; align-items: stretch; }
+.camera .cam-bottom .input { background: #1c1c1c; border-color: #333; color: #fff; }
+.shutter { width: 74px; height: 74px; border-radius: 50%; border: 5px solid #fff; background: transparent; padding: 0; }
+.shutter::after { content: ""; display: block; width: 100%; height: 100%; border-radius: 50%; background: #fff; transform: scale(.84); }
+.round { width: 48px; height: 48px; border-radius: 50%; border: 0; background: rgba(255,255,255,.16); color: #fff; font-size: 20px; display: grid; place-items: center; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(14px + env(safe-area-inset-top, 0px)); z-index: 50;
+  background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: 14px; font-weight: 700; max-width: min(92vw, 480px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.empty { text-align: center; padding: 28px 12px; color: var(--muted); }
+.login { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+.login h1 { font-family: var(--font-display); font-size: 56px; line-height: .95; text-transform: uppercase; margin: 0; }
+.login h1 b { color: var(--gold); }
+.err { color: var(--miss); font-weight: 600; font-size: 14px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast { animation: drop .25s ease-out; }
+  @keyframes drop { from { transform: translate(-50%, -12px); opacity: 0; } }
+}
+
+</style>
+<div id="app"></div>
+<script>window.BAW_CONFIG = {};</script>
+<script>
+/* Be a Winner – Team-App für tägliche Wins mit Foto-Beweis.
+   Ohne Supabase-Konfiguration läuft die App im Demo-Modus (Beispiel-Team, Daten nur auf diesem Gerät). */
+(() => {
+"use strict";
+
+const CFG = window.BAW_CONFIG || {};
+const LIVE = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+const SLOTS = ["morning1", "morning2", "evening"];
+const SLOT = {
+  morning1: { label: "Morgen-Win 1", short: "M1", icon: "☀", def: "06:30", hint: "vor der Arbeit" },
+  morning2: { label: "Morgen-Win 2", short: "M2", icon: "☀", def: "07:30", hint: "vor der Arbeit" },
+  evening:  { label: "Abend-Win", short: "A", icon: "☾", def: "20:00", hint: "1/5 vom Wochenziel" },
+};
+const EMOJIS = ["🔥", "💪", "👏", "🏆"];
+const WD = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+const WD_LONG = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+const GRACE_MIN = 15;
+
+// ---------- Helfer ----------
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = (n) => String(n).padStart(2, "0");
+const dkey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseKey = (k) => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const mondayOf = (d) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); return addDays(x, -((x.getDay() + 6) % 7)); };
+const hhmm = (t) => String(t || "").slice(0, 5);
+const dueDate = (it) => { const d = parseKey(it.day); const [h, m] = hhmm(it.due_time).split(":").map(Number); d.setHours(h, m, 0, 0); return d; };
+const fmtDay = (k) => { const d = parseKey(k); return `${WD[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`; };
+const fmtTime = (iso) => { const d = new Date(iso); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const todayKey = () => dkey(new Date());
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch { /* egal */ } },
+};
+function hue(id) { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h % 360; }
+function avatar(p, cls = "") {
+  const name = p?.name || "?";
+  const ini = name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  return `<div class="av ${cls}" style="background:hsl(${hue(p?.id)} 45% 42%)" aria-hidden="true">${esc(ini)}</div>`;
+}
+function status(it, now = new Date()) {
+  if (it.proof) return it.proof.on_time ? "done" : "late";
+  const t = dkey(now);
+  if (it.day < t) return "miss";
+  if (it.day > t) return "upcoming";
+  return now > dueDate(it) ? "overdue" : "open";
+}
+function rng(seed) { let s = hue(seed) + 1; return () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646; }
+
+// ---------- Demo-Daten ----------
+const DEMO_TEAM = [
+  { id: "demo-max", name: "Max", base: 46, goal: "Präsentation fürs Kundenmeeting fertig", m: ["20 Liegestütze", "10 Min Fachartikel lesen"], e: ["Folien 1–4 bauen", "Folien 5–8 bauen", "Zahlen einpflegen", "Probelauf mit Timer", "Feedback einarbeiten"], ics: ["💪", "📖", "📊"] },
+  { id: "demo-sarah", name: "Sarah", base: 52, goal: "15 Neukunden anrufen", m: ["5 km laufen", "Tagesplan schreiben"], e: ["3 Neukunden anrufen", "3 Neukunden anrufen", "3 Neukunden anrufen", "3 Neukunden anrufen", "3 Neukunden anrufen"], ics: ["🏃", "📝", "📞"] },
+  { id: "demo-tom", name: "Tom", base: 33, goal: "Garage komplett aufräumen", m: ["Kalt duschen", "Bett machen + 2 L Wasser bereit"], e: ["Werkzeugwand", "Regale links", "Sperrmüll raus", "Boden fegen", "Regale rechts"], ics: ["🚿", "🛏", "🧰"] },
+  { id: "demo-lena", name: "Lena", base: 40, goal: "Englisch-Zertifikat vorbereiten", m: ["15 Min Yoga", "Vokabeln (Karteikarten)"], e: ["Reading Test 1", "Listening Test 1", "Writing Task", "Speaking üben", "Probeklausur"], ics: ["🧘", "🗂", "🎧"] },
+];
+
+class DemoStore {
+  constructor() { this.key = "baw-demo-v1"; this.s = store.get(this.key); this.cache = new Map(); }
+  get mode() { return "demo"; }
+  persist() { if (!store.set(this.key, this.s)) toast("Speicher voll – älteste Demo-Fotos werden nicht gespeichert."); }
+  async init() { return this.s?.meId || null; }
+  async signUp({ name }) {
+    this.s = { meId: "demo-me", profiles: [{ id: "demo-me", name: name.trim().slice(0, 40) }, ...DEMO_TEAM.map(({ id, name }) => ({ id, name }))],
+      goals: {}, items: [], reactions: [], seeded: {} };
+    this.persist();
+    return "demo-me";
+  }
+  async signIn(a) { return this.signUp(a); }
+  async signOut() { this.s = null; store.del(this.key); }
+  seedWeek(ws) {
+    if (this.s.seeded[ws]) return;
+    this.s.seeded[ws] = true;
+    const mon = parseKey(ws);
+    for (const t of DEMO_TEAM) {
+      this.s.goals[`${t.id}|${ws}`] = t.goal;
+      for (let i = 0; i < 5; i++) {
+        const day = dkey(addDays(mon, i));
+        const r = rng(t.id + day);
+        const times = ["06:" + pad(Math.floor(r() * 4) * 15), "07:" + pad(Math.floor(r() * 4) * 15), (19 + Math.floor(r() * 3)) + ":" + pad(Math.floor(r() * 4) * 15)];
+        SLOTS.forEach((slot, si) => this.s.items.push({
+          id: `${t.id}-${day}-${slot}`, user_id: t.id, day, slot, due_time: times[si],
+          title: slot === "evening" ? t.e[i] : t.m[si], proof: null, demoIcon: t.ics[si],
+        }));
+      }
+    }
+    this.persist();
+  }
+  // Team-Mitglieder „posten“ ihre Wins, sobald die Zeit ran ist (deterministisch pro Win)
+  advance() {
+    const now = new Date();
+    let changed = false;
+    for (const it of this.s.items) {
+      if (it.user_id === this.s.meId || it.proof || it.decided) continue;
+      const due = dueDate(it);
+      if (now - due < 20 * 60000) continue;
+      it.decided = true; changed = true;
+      const r = rng(it.id);
+      if (r() > 0.82) continue;
+      const onTime = r() < 0.78;
+      const at = new Date(due.getTime() + (onTime ? -r() * 40 : 20 + r() * 50) * 60000);
+      it.proof = { id: "p-" + it.id, photo_path: `demo:${it.demoIcon}:${hue(it.id)}`, caption: "", on_time: onTime, created_at: at.toISOString() };
+      for (const m of DEMO_TEAM) if (m.id !== it.user_id && r() < 0.45) this.s.reactions.push({ proof_id: it.proof.id, user_id: m.id, emoji: EMOJIS[Math.floor(r() * 4)] });
+    }
+    if (changed) this.persist();
+  }
+  async loadWeek(ws) {
+    this.seedWeek(ws);
+    this.advance();
+    const we = dkey(addDays(parseKey(ws), 6));
+    const items = this.s.items.filter((i) => i.day >= ws && i.day <= we);
+    const goals = {};
+    for (const p of this.s.profiles) goals[p.id] = this.s.goals[`${p.id}|${ws}`] || "";
+    return { profiles: this.s.profiles, goals, items, reactions: this.s.reactions };
+  }
+  async allTime() {
+    return this.s.profiles.map((p) => {
+      const mine = this.s.items.filter((i) => i.user_id === p.id && i.proof);
+      const base = DEMO_TEAM.find((t) => t.id === p.id)?.base || 0;
+      return { user_id: p.id, wins: base + mine.length, on_time: Math.round(base * 0.8) + mine.filter((i) => i.proof.on_time).length };
+    });
+  }
+  async savePlan(ws, goal, rows, deleteIds) {
+    this.s.goals[`${this.s.meId}|${ws}`] = goal;
+    this.s.items = this.s.items.filter((i) => !deleteIds.includes(i.id));
+    for (const r of rows) {
+      const ex = this.s.items.find((i) => i.user_id === this.s.meId && i.day === r.day && i.slot === r.slot);
+      if (ex) { if (!ex.proof) { ex.title = r.title; ex.due_time = r.due_time; } }
+      else this.s.items.push({ id: uid(), user_id: this.s.meId, ...r, proof: null });
+    }
+    this.persist();
+  }
+  async proveWin(it, blob, caption) {
+    if (it.day !== todayKey()) throw new Error("Ein Win kann nur am geplanten Tag bewiesen werden.");
+    const dataUrl = await blobToDataUrl(blob);
+    const ex = this.s.items.find((i) => i.id === it.id);
+    ex.proof = { id: uid(), photo_path: dataUrl, caption, on_time: new Date() <= new Date(dueDate(it).getTime() + GRACE_MIN * 60000), created_at: new Date().toISOString() };
+    this.persist();
+    return { proof: ex.proof, notified: DEMO_TEAM.length };
+  }
+  async toggleReaction(proofId, emoji) {
+    const i = this.s.reactions.findIndex((r) => r.proof_id === proofId && r.user_id === this.s.meId && r.emoji === emoji);
+    if (i >= 0) this.s.reactions.splice(i, 1); else this.s.reactions.push({ proof_id: proofId, user_id: this.s.meId, emoji });
+    this.persist();
+  }
+  async updateName(name) { this.s.profiles.find((p) => p.id === this.s.meId).name = name; this.persist(); }
+  async photoUrls(paths) {
+    const out = {};
+    for (const p of paths) out[p] = p.startsWith("demo:") ? this.demoPhoto(p) : p;
+    return out;
+  }
+  demoPhoto(path) {
+    if (this.cache.has(path)) return this.cache.get(path);
+    const [, icon, h] = path.split(":");
+    const c = document.createElement("canvas"); c.width = 480; c.height = 640;
+    const g = c.getContext("2d");
+    const grad = g.createLinearGradient(0, 0, 480, 640);
+    grad.addColorStop(0, `hsl(${h} 40% 34%)`); grad.addColorStop(1, `hsl(${(+h + 50) % 360} 45% 16%)`);
+    g.fillStyle = grad; g.fillRect(0, 0, 480, 640);
+    g.globalAlpha = 0.08; g.fillStyle = "#fff";
+    for (let i = 0; i < 9; i++) { g.beginPath(); g.arc((i * 97) % 480, (i * 151) % 640, 40 + i * 9, 0, 7); g.fill(); }
+    g.globalAlpha = 1; g.font = "170px system-ui, 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
+    g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(icon, 240, 300);
+    g.font = "600 22px system-ui, sans-serif"; g.fillStyle = "rgba(255,255,255,.7)"; g.fillText("Beispielfoto", 240, 590);
+    const url = c.toDataURL("image/jpeg", 0.75);
+    this.cache.set(path, url);
+    return url;
+  }
+  pushSupported() { return "Notification" in window; }
+  async pushEnabled() { return !!this.s?.push; }
+  async enablePush() {
+    try { if ("Notification" in window && Notification.permission === "default") await Notification.requestPermission(); } catch { /* im Demo egal */ }
+    this.s.push = true; this.persist();
+    // Demo: in ein paar Sekunden holt jemand aus dem Team einen Win
+    setTimeout(() => this.simulateTeamWin(), 6000);
+  }
+  async disablePush() { this.s.push = false; this.persist(); }
+  async testPush() { notify("🏆 Be a Winner", "Push-Nachrichten sind aktiv."); }
+  simulateTeamWin() {
+    const t = todayKey();
+    const open = this.s.items.filter((i) => i.user_id !== this.s.meId && i.day === t && !i.proof);
+    if (!open.length) { notify("🏆 Be a Winner", "Alle im Team haben heute schon geliefert."); return; }
+    const it = open[Math.floor(Math.random() * open.length)];
+    it.decided = true;
+    it.proof = { id: "p-" + it.id, photo_path: `demo:${it.demoIcon}:${hue(it.id)}`, caption: "", on_time: true, created_at: new Date().toISOString() };
+    this.persist();
+    const who = this.s.profiles.find((p) => p.id === it.user_id)?.name;
+    notify(`🏆 ${who} hat einen Win geholt`, it.title);
+    app.reload();
+  }
+  onChange() { /* Demo: keine Live-Updates */ }
+}
+
+// ---------- Supabase ----------
+class LiveStore {
+  constructor() { this.urlCache = new Map(); }
+  get mode() { return "live"; }
+  async init() {
+    const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm");
+    this.sb = createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } });
+    const { data: { session } } = await this.sb.auth.getSession();
+    this.me = session?.user?.id || null;
+    return this.me;
+  }
+  async signUp({ email, password, name }) {
+    const { data, error } = await this.sb.auth.signUp({ email, password, options: { data: { name: name.trim() } } });
+    if (error) throw new Error(authError(error));
+    if (!data.session) throw new Error("Fast geschafft: Bitte bestätige die E-Mail, die wir dir geschickt haben, und melde dich dann an.");
+    return (this.me = data.user.id);
+  }
+  async signIn({ email, password }) {
+    const { data, error } = await this.sb.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(authError(error));
+    return (this.me = data.user.id);
+  }
+  async signOut() { await this.sb.auth.signOut(); this.me = null; }
+  async loadWeek(ws) {
+    const we = dkey(addDays(parseKey(ws), 6));
+    const [p, g, i] = await Promise.all([
+      this.sb.from("profiles").select("id,name").order("name"),
+      this.sb.from("week_goals").select("user_id,goal").eq("week_start", ws),
+      this.sb.from("planned_wins").select("id,user_id,day,slot,title,due_time,proofs(id,photo_path,caption,on_time,created_at)").gte("day", ws).lte("day", we),
+    ]);
+    for (const r of [p, g, i]) if (r.error) throw r.error;
+    const items = i.data.map((x) => ({ ...x, due_time: hhmm(x.due_time), proof: Array.isArray(x.proofs) ? x.proofs[0] || null : x.proofs || null }));
+    const proofIds = items.filter((x) => x.proof).map((x) => x.proof.id);
+    let reactions = [];
+    if (proofIds.length) {
+      const r = await this.sb.from("reactions").select("proof_id,user_id,emoji").in("proof_id", proofIds);
+      if (r.error) throw r.error;
+      reactions = r.data;
+    }
+    const goals = {};
+    for (const x of g.data) goals[x.user_id] = x.goal;
+    return { profiles: p.data, goals, items, reactions };
+  }
+  async allTime() {
+    const { data, error } = await this.sb.from("leaderboard_all").select("user_id,wins,on_time");
+    if (error) throw error;
+    return data;
+  }
+  async savePlan(ws, goal, rows, deleteIds) {
+    const g = await this.sb.from("week_goals").upsert({ user_id: this.me, week_start: ws, goal, updated_at: new Date().toISOString() });
+    if (g.error) throw g.error;
+    if (deleteIds.length) {
+      const d = await this.sb.from("planned_wins").delete().in("id", deleteIds);
+      if (d.error) throw d.error;
+    }
+    if (rows.length) {
+      const u = await this.sb.from("planned_wins").upsert(rows.map((r) => ({ ...r, user_id: this.me })), { onConflict: "user_id,day,slot" });
+      if (u.error) throw u.error;
+    }
+  }
+  async proveWin(it, blob, caption) {
+    const path = `${this.me}/${it.id}-${Date.now()}.jpg`;
+    const up = await this.sb.storage.from("proofs").upload(path, blob, { contentType: "image/jpeg" });
+    if (up.error) throw up.error;
+    const ins = await this.sb.from("proofs").insert({ planned_win_id: it.id, user_id: this.me, photo_path: path, caption: caption || null }).select().single();
+    if (ins.error) { await this.sb.storage.from("proofs").remove([path]); throw new Error(ins.error.message); }
+    let notified = 0;
+    try { const r = await this.sb.functions.invoke("push", { body: { type: "win", proof_id: ins.data.id } }); notified = r.data?.sent || 0; } catch { /* Push ist optional */ }
+    return { proof: ins.data, notified };
+  }
+  async toggleReaction(proofId, emoji) {
+    const q = this.sb.from("reactions");
+    const ex = await q.select("proof_id").eq("proof_id", proofId).eq("user_id", this.me).eq("emoji", emoji);
+    if (ex.data?.length) await this.sb.from("reactions").delete().eq("proof_id", proofId).eq("user_id", this.me).eq("emoji", emoji);
+    else await this.sb.from("reactions").insert({ proof_id: proofId, user_id: this.me, emoji });
+  }
+  async updateName(name) {
+    const r = await this.sb.from("profiles").update({ name }).eq("id", this.me);
+    if (r.error) throw r.error;
+  }
+  async photoUrls(paths) {
+    const out = {}; const need = [];
+    for (const p of paths) { const c = this.urlCache.get(p); if (c && c.exp > Date.now()) out[p] = c.url; else need.push(p); }
+    if (need.length) {
+      const { data } = await this.sb.storage.from("proofs").createSignedUrls(need, 3600);
+      for (const d of data || []) if (d.signedUrl) { out[d.path] = d.signedUrl; this.urlCache.set(d.path, { url: d.signedUrl, exp: Date.now() + 3500e3 }); }
+    }
+    return out;
+  }
+  pushSupported() { return "serviceWorker" in navigator && "PushManager" in window && !!CFG.vapidPublicKey; }
+  async pushEnabled() {
+    try { const reg = await navigator.serviceWorker.ready; return !!(await reg.pushManager.getSubscription()); } catch { return false; }
+  }
+  async enablePush() {
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") throw new Error("Benachrichtigungen sind für diese App blockiert. Erlaube sie in den Einstellungen deines Handys.");
+    const reg = await navigator.serviceWorker.ready;
+    const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(CFG.vapidPublicKey) });
+    const j = sub.toJSON();
+    const r = await this.sb.from("push_subscriptions").upsert({ endpoint: j.endpoint, user_id: this.me, p256dh: j.keys.p256dh, auth: j.keys.auth });
+    if (r.error) throw r.error;
+  }
+  async disablePush() {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) { await this.sb.from("push_subscriptions").delete().eq("endpoint", sub.endpoint); await sub.unsubscribe(); }
+  }
+  async testPush() { await this.sb.functions.invoke("push", { body: { type: "test" } }); }
+  onChange(cb) {
+    this.sb.channel("baw-feed")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "proofs" }, (e) => cb("proof", e.new))
+      .on("postgres_changes", { event: "*", schema: "public", table: "reactions" }, () => cb("reaction"))
+      .subscribe();
+  }
+}
+function authError(e) {
+  const m = e.message || "";
+  if (/invalid login/i.test(m)) return "E-Mail oder Passwort stimmt nicht.";
+  if (/already registered/i.test(m)) return "Diese E-Mail ist schon registriert. Melde dich an.";
+  if (/password/i.test(m)) return "Das Passwort muss mindestens 6 Zeichen haben.";
+  return m;
+}
+function b64ToBytes(s) {
+  const b = atob((s + "=".repeat((4 - (s.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/"));
+  return Uint8Array.from(b, (c) => c.charCodeAt(0));
+}
+function blobToDataUrl(blob) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); }); }
+async function notify(title, body) {
+  toast(`${title}${body ? " – " + body : ""}`);
+  try {
+    if ("Notification" in window && Notification.permission === "granted") {
+      const reg = "serviceWorker" in navigator ? await navigator.serviceWorker.getRegistration() : null;
+      if (reg) reg.showNotification(title, { body, icon: "icons/icon-192.png" }); else new Notification(title, { body });
+    }
+  } catch { /* Toast reicht */ }
+}
+let toastTimer;
+function toast(msg) {
+  let el = $("#toast");
+  if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.append(el); }
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.hidden = true), 4200);
+}
+
+// ---------- App ----------
+const db = LIVE ? new LiveStore() : new DemoStore();
+const S = { me: null, tab: "heute", ws: dkey(mondayOf(new Date())), week: null, allTime: null, rankMode: "woche", draft: null, photos: {}, busy: false, feedAll: false };
+const TABS = ["heute", "rangliste", "woche", "profil"];
+const root = () => $("#app");
+
+const app = {
+  async start() {
+    try { S.me = await db.init(); } catch (e) { root().innerHTML = `<div class="empty">Verbindung fehlgeschlagen: ${esc(e.message)}</div>`; return; }
+    const h = location.hash.slice(1);
+    if (TABS.includes(h)) S.tab = h;
+    window.addEventListener("hashchange", () => { const t = location.hash.slice(1); if (TABS.includes(t) && t !== S.tab) { S.tab = t; S.draft = null; render(); } });
+    if (!S.me) return renderLogin();
+    await app.reload();
+    db.onChange((kind, row) => {
+      if (kind === "proof" && row?.user_id !== S.me) {
+        const it = S.week?.items.find((i) => i.id === row.planned_win_id);
+        const who = S.week?.profiles.find((p) => p.id === row.user_id)?.name || "Jemand";
+        toast(`🏆 ${who} hat einen Win geholt${it ? ": " + it.title : ""}`);
+      }
+      app.reload();
+    });
+    setInterval(() => {
+      const ws = dkey(mondayOf(new Date()));
+      if (ws !== S.ws) { S.ws = ws; S.draft = null; app.reload(); return; }
+      if (S.tab === "heute" && !document.querySelector(".camera,.sheet-bg")) { if (db.mode === "demo") db.advance(); render(); }
+    }, 30000);
+  },
+  async reload() {
+    try {
+      S.week = await db.loadWeek(S.ws);
+      if (S.tab === "rangliste" || S.allTime) S.allTime = await db.allTime();
+      const paths = S.week.items.filter((i) => i.proof).map((i) => i.proof.photo_path).filter((p) => !S.photos[p]);
+      if (paths.length) Object.assign(S.photos, await db.photoUrls(paths));
+    } catch (e) { toast("Laden fehlgeschlagen: " + (e.message || e)); }
+    if (!document.querySelector(".camera")) render();
+  },
+};
+window.app = app;
+
+const meP = () => S.week?.profiles.find((p) => p.id === S.me) || { id: S.me, name: "Du" };
+const itemsOf = (u) => S.week.items.filter((i) => i.user_id === u);
+const slotOrder = (a, b) => a.day.localeCompare(b.day) || SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot);
+
+function header() {
+  const d = new Date();
+  return `<header class="top">
+    <div class="brand">Be a <b>Winner</b></div>
+    <div class="row">${db.mode === "demo" ? '<span class="demo-pill">Demo</span>' : ""}
+    <div class="sub">${WD_LONG[d.getDay()]}<br>${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}</div></div>
+  </header>`;
+}
+const ICONS = {
+  heute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  rangliste: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg>',
+  woche: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3"/></svg>',
+  profil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>',
+};
+const TAB_LABEL = { heute: "Heute", rangliste: "Rangliste", woche: "Woche", profil: "Profil" };
+function tabbar() {
+  return `<div class="tabbar"><nav aria-label="Navigation">${TABS.map((t) =>
+    `<button data-tab="${t}" class="${S.tab === t ? "on" : ""}" aria-current="${S.tab === t ? "page" : "false"}">${ICONS[t]}${TAB_LABEL[t]}</button>`).join("")}</nav></div>`;
+}
+
+function render() {
+  if (!S.week) { root().innerHTML = `<div class="app">${header()}<div class="empty">Lade …</div></div>`; return; }
+  const scroll = window.scrollY;
+  const view = { heute: viewToday, rangliste: viewRank, woche: viewPlan, profil: viewProfile }[S.tab]();
+  root().innerHTML = `<div class="app">${header()}<main class="stack">${view}</main></div>${tabbar()}`;
+  if (S.tab === "heute") window.scrollTo(0, scroll);
+}
+
+// ----- Heute -----
+function countdown(ms) {
+  const m = Math.round(Math.abs(ms) / 60000);
+  return m >= 60 ? `${Math.floor(m / 60)}:${pad(m % 60)} h` : `${m} Min`;
+}
+function slotRow(it) {
+  const st = status(it);
+  const ic = { done: ["done", "✓"], late: ["late", "✓"], miss: ["miss", "✕"] }[st] || ["", SLOT[it.slot].icon];
+  const sub = { done: "bewiesen · pünktlich", late: "bewiesen · zu spät", miss: "verpasst", overdue: "überfällig – jetzt noch beweisen", open: SLOT[it.slot].hint, upcoming: SLOT[it.slot].hint }[st];
+  return `<div class="slot"><div class="ic ${ic[0]}">${ic[1]}</div>
+    <div class="t"><b>${esc(it.title)}</b><span>${SLOT[it.slot].label} · ${sub}</span></div>
+    ${(st === "open" || st === "overdue") && it.user_id === S.me
+      ? `<button class="btn small primary" data-prove="${it.id}">Foto</button>`
+      : `<span class="time">${hhmm(it.due_time)}</span>`}</div>`;
+}
+function viewToday() {
+  const t = todayKey();
+  const mine = itemsOf(S.me).filter((i) => i.day === t).sort(slotOrder);
+  const planned = itemsOf(S.me).length > 0;
+  const next = mine.find((i) => ["open", "overdue"].includes(status(i)));
+  let hero;
+  if (!planned) {
+    hero = `<section class="hero"><div class="eyebrow"><span>Neue Woche</span><span>${fmtDay(S.ws)} – ${fmtDay(dkey(addDays(parseKey(S.ws), 6)))}</span></div>
+      <h2>Leg fest, was du diese Woche gewinnst.</h2>
+      <p class="muted" style="margin:0">Jeden Tag 2 Wins morgens vor der Arbeit und 1 Win am Abend, der dich 1/5 näher an dein Wochenziel bringt.</p>
+      <button class="btn primary block" data-tab="woche">Woche planen</button></section>`;
+  } else if (next) {
+    const ms = dueDate(next) - new Date();
+    hero = `<section class="hero"><div class="eyebrow"><span>${SLOT[next.slot].label}</span><span>fällig ${hhmm(next.due_time)} Uhr</span></div>
+      <h2>${esc(next.title)}</h2>
+      <div class="countdown ${ms < 0 ? "late" : ""}">${ms < 0 ? "+" + countdown(ms) : countdown(ms)}</div>
+      <div class="muted" style="font-size:13px;margin-top:-6px">${ms < 0 ? "überfällig – zählt noch, aber als „zu spät“" : `bis fällig · ${GRACE_MIN} Min Kulanz`}</div>
+      <button class="btn primary block" data-prove="${next.id}">📸 Win beweisen</button></section>`;
+  } else if (mine.length) {
+    const done = mine.filter((i) => i.proof).length;
+    const upcoming = itemsOf(S.me).filter((i) => i.day > t).sort(slotOrder)[0];
+    hero = `<section class="hero"><div class="eyebrow"><span>Heute</span><span>${done}/${mine.length} Wins</span></div>
+      <h2>${done === mine.length ? "Alle Wins für heute geholt." : "Für heute ist nichts mehr offen."}</h2>
+      ${upcoming ? `<p class="muted" style="margin:0">Nächster Win: ${fmtDay(upcoming.day)} ${hhmm(upcoming.due_time)} – ${esc(upcoming.title)}</p>` : ""}</section>`;
+  } else {
+    const upcoming = itemsOf(S.me).filter((i) => i.day > t).sort(slotOrder)[0];
+    hero = `<section class="hero"><div class="eyebrow"><span>Heute</span><span>frei</span></div>
+      <h2>Heute ist kein Win geplant.</h2>
+      ${upcoming ? `<p class="muted" style="margin:0">Nächster Win: ${fmtDay(upcoming.day)} ${hhmm(upcoming.due_time)} – ${esc(upcoming.title)}</p>` : ""}
+      <button class="btn ghost block" data-tab="woche">Plan ansehen</button></section>`;
+  }
+  const slots = mine.length ? `<section class="card slots">${mine.map(slotRow).join("")}</section>` : "";
+
+  const strip = S.week.profiles.slice().sort((a, b) => (a.id === S.me ? -1 : b.id === S.me ? 1 : 0)).map((p) => {
+    const its = itemsOf(p.id).filter((i) => i.day === t);
+    const done = its.filter((i) => i.proof).length;
+    const frac = its.length ? done / its.length : 0;
+    const C = 2 * Math.PI * 25;
+    return `<button class="mate" data-user="${p.id}"><div class="ring">
+      <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="25" fill="none" stroke="var(--line)" stroke-width="4"/>
+      <circle cx="28" cy="28" r="25" fill="none" stroke="var(--gold)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C * frac} ${C}"/></svg>
+      ${avatar(p)}</div><span>${p.id === S.me ? "Du" : esc(p.name)}</span><span class="muted" style="font-size:11px">${done}/${its.length}</span></button>`;
+  }).join("");
+
+  const proofs = S.week.items.filter((i) => i.proof && (S.feedAll || i.day === t)).sort((a, b) => b.proof.created_at.localeCompare(a.proof.created_at));
+  let lastDay = null;
+  const feed = proofs.map((it) => {
+    const sep = S.feedAll && it.day !== lastDay ? `<div class="day-sep">${it.day === t ? "Heute" : fmtDay(it.day)}</div>` : "";
+    lastDay = it.day;
+    return sep + postCard(it);
+  }).join("");
+  return `${hero}${slots}
+    <h2 class="section-title">Team heute <small>tippen für Wochenplan</small></h2>
+    <div class="team-strip">${strip}</div>
+    <h2 class="section-title">${S.feedAll ? "Wins diese Woche" : "Wins heute"} <small><button class="btn small ghost" data-feedall>${S.feedAll ? "Nur heute" : "Ganze Woche"}</button></small></h2>
+    ${feed || `<div class="empty">Noch kein Foto-Beweis ${S.feedAll ? "diese Woche" : "heute"}. Wer holt den ersten Win?</div>`}`;
+}
+function postCard(it) {
+  const p = S.week.profiles.find((x) => x.id === it.user_id) || { name: "?" };
+  const rs = S.week.reactions.filter((r) => r.proof_id === it.proof.id);
+  const src = S.photos[it.proof.photo_path];
+  return `<article class="post">
+    <div class="post-head">${avatar(p, "sm")}<div class="who"><b>${esc(p.name)}</b><span>${fmtDay(it.day)} ${fmtTime(it.proof.created_at)} · ${SLOT[it.slot].label}</span></div>
+      <span class="badge ${it.proof.on_time ? "ok" : "late"}">${it.proof.on_time ? "pünktlich" : "zu spät"}</span></div>
+    ${src ? `<img class="post-photo" src="${esc(src)}" alt="Foto-Beweis von ${esc(p.name)}: ${esc(it.title)}" loading="lazy">` : `<div class="post-photo"></div>`}
+    <div class="post-body"><div class="title">${esc(it.title)}</div>
+      ${it.proof.caption ? `<div class="muted">${esc(it.proof.caption)}</div>` : ""}
+      <div class="reacts">${EMOJIS.map((e) => {
+        const n = rs.filter((r) => r.emoji === e).length;
+        const on = rs.some((r) => r.emoji === e && r.user_id === S.me);
+        return `<button class="react ${on ? "on" : ""}" data-react="${it.proof.id}" data-emoji="${e}" aria-pressed="${on}">${e}${n ? `<span>${n}</span>` : ""}</button>`;
+      }).join("")}</div></div></article>`;
+}
+
+// ----- Rangliste -----
+function weekStats() {
+  return S.week.profiles.map((p) => {
+    const its = itemsOf(p.id);
+    const proved = its.filter((i) => i.proof);
+    const evenings = its.filter((i) => i.slot === "evening");
+    return { p, wins: proved.length, on_time: proved.filter((i) => i.proof.on_time).length, planned: its.length,
+      goalDone: evenings.filter((i) => i.proof).length, goalTotal: Math.max(5, evenings.length) };
+  });
+}
+function viewRank() {
+  const week = S.rankMode === "woche";
+  let rows;
+  if (week) rows = weekStats();
+  else rows = S.week.profiles.map((p) => { const a = (S.allTime || []).find((x) => x.user_id === p.id) || { wins: 0, on_time: 0 }; return { p, wins: a.wins, on_time: a.on_time }; });
+  rows.sort((a, b) => b.wins - a.wins || b.on_time - a.on_time || a.p.name.localeCompare(b.p.name));
+  let pos = 0, prev = null;
+  const list = rows.map((r, i) => {
+    if (!prev || r.wins !== prev.wins || r.on_time !== prev.on_time) pos = i + 1;
+    prev = r;
+    const sub = week
+      ? `${r.on_time} pünktlich · ${r.wins}/${r.planned} geplant`
+      : `${r.on_time} pünktlich`;
+    return `<button class="rank ${r.p.id === S.me ? "me" : ""}" data-user="${r.p.id}">
+      <div class="pos ${pos <= 3 ? "p" + pos : ""}">${pos}</div>${avatar(r.p, "sm")}
+      <div class="nm"><b>${esc(r.p.name)}${r.p.id === S.me ? " (du)" : ""}</b><span>${sub}</span>
+      ${week ? `<div class="bar" title="Wochenziel ${r.goalDone}/5"><i style="width:${Math.min(100, (r.goalDone / 5) * 100)}%"></i></div>` : ""}</div>
+      <div class="score">${r.wins}<small>Wins</small></div></button>`;
+  }).join("");
+  return `<div class="seg" role="tablist">
+      <button role="tab" data-rank="woche" class="${week ? "on" : ""}" aria-selected="${week}">Diese Woche</button>
+      <button role="tab" data-rank="gesamt" class="${!week ? "on" : ""}" aria-selected="${!week}">Gesamt</button></div>
+    <p class="hint" style="margin:0">${week ? "Gezählt werden nur Wins mit Foto-Beweis. Bei Gleichstand entscheidet, wer öfter pünktlich war. Der goldene Balken zeigt den Fortschritt beim Wochenziel (Abend-Wins von 5)." : "Alle Wins mit Foto-Beweis seit Start."}</p>
+    <div class="rank-list">${list}</div>`;
+}
+
+// ----- Wochenplanung -----
+function buildDraft() {
+  const ws = S.ws, t = todayKey(), now = new Date();
+  const mine = itemsOf(S.me);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const day = dkey(addDays(parseKey(ws), i));
+    if (day < t) continue;
+    const its = mine.filter((x) => x.day === day);
+    const weekend = i >= 5;
+    const slots = {};
+    for (const s of SLOTS) {
+      const ex = its.find((x) => x.slot === s);
+      slots[s] = ex ? { id: ex.id, title: ex.title, time: hhmm(ex.due_time), locked: !!ex.proof }
+        : { id: null, title: "", time: SLOT[s].def, locked: false };
+    }
+    days.push({ day, active: its.length ? true : (!weekend && !(mine.length && !its.length)), slots });
+  }
+  // Heute: Slots, deren Zeit schon vorbei ist, startet man nicht mehr (Start z. B. heute Abend)
+  for (const d of days) if (d.day === t) for (const s of SLOTS) {
+    const sl = d.slots[s];
+    if (!sl.id && dueDate({ day: d.day, due_time: sl.time }) <= now) sl.past = true;
+  }
+  return { goal: S.week.goals[S.me] || "", days };
+}
+function viewPlan() {
+  if (!S.draft) S.draft = buildDraft();
+  const D = S.draft, t = todayKey();
+  const pastCount = itemsOf(S.me).filter((i) => i.day < t).length;
+  const days = D.days.map((d, di) => {
+    const dt = parseKey(d.day);
+    const rows = d.active ? SLOTS.map((s) => {
+      const sl = d.slots[s];
+      const ph = s === "evening" ? (D.goal ? `1/5 von: ${D.goal}` : "1/5 vom Wochenziel") : (s === "morning1" ? "z. B. 20 Liegestütze" : "z. B. 10 Min lesen");
+      const idb = `p-${di}-${s}`;
+      return `<div class="plan-row">
+        <div class="field"><label for="${idb}-t">${SLOT[s].label}${sl.locked ? " · bewiesen" : ""}${sl.past ? " · Zeit vorbei" : ""}</label>
+          <input class="input" id="${idb}-t" data-d="${di}" data-s="${s}" data-f="title" value="${esc(sl.title)}" placeholder="${esc(ph)}" maxlength="120" ${sl.locked ? "disabled" : ""}></div>
+        <div class="field"><label for="${idb}-z">Uhrzeit</label>
+          <input class="input" type="time" id="${idb}-z" data-d="${di}" data-s="${s}" data-f="time" value="${esc(sl.time)}" ${sl.locked ? "disabled" : ""}></div></div>`;
+    }).join("") : "";
+    const hasLocked = SLOTS.some((s) => d.slots[s].locked);
+    return `<section class="day-card"><h3>${WD_LONG[dt.getDay()]} ${dt.getDate()}.${dt.getMonth() + 1}.${d.day === t ? " · heute" : ""}
+      <label for="act-${di}"><input type="checkbox" id="act-${di}" data-active="${di}" ${d.active ? "checked" : ""} ${hasLocked ? "disabled" : ""}> Wins an diesem Tag</label></h3>${rows}
+      ${d.day === t && d.active && SLOTS.some((s) => d.slots[s].past) ? `<p class="hint" style="margin:0">Wins, deren Uhrzeit heute schon vorbei ist, werden nicht gespeichert. Du startest heute mit dem, was noch vor dir liegt.</p>` : ""}</section>`;
+  }).join("");
+  return `<section class="stack" style="gap:12px">
+      <h2 class="section-title" style="margin-top:0">Woche ${fmtDay(S.ws)} – ${fmtDay(dkey(addDays(parseKey(S.ws), 6)))}</h2>
+      <div class="field"><label for="goal">Wochenziel</label>
+        <textarea class="input" id="goal" data-goal maxlength="200" placeholder="Was hast du am Freitag geschafft? z. B. Präsentation fürs Kundenmeeting fertig">${esc(D.goal)}</textarea>
+        <span class="hint">Jeder Abend-Win ist 1/5 davon. Fünf Abende, ein Ziel.</span></div>
+      <button class="btn ghost" data-copy-morning>Morgen-Wins von ${D.days.find((d) => d.active) ? fmtDay(D.days.find((d) => d.active).day) : "erstem Tag"} auf alle Tage übernehmen</button>
+    </section>
+    ${pastCount ? `<p class="hint" style="margin:0">Vergangene Tage dieser Woche (${pastCount} Wins) sind fest und lassen sich nicht mehr ändern.</p>` : ""}
+    ${days || `<div class="empty">Diese Woche ist vorbei. Ab Montag planst du die nächste.</div>`}
+    <div class="save-bar"><button class="btn primary block" data-save-plan ${S.busy ? "disabled" : ""}>${S.busy ? "Speichere …" : "Plan speichern"}</button></div>`;
+}
+function readDraftInput(el) {
+  const D = S.draft;
+  if (el.matches("[data-goal]")) D.goal = el.value;
+  else if (el.dataset.f) {
+    const sl = D.days[+el.dataset.d].slots[el.dataset.s];
+    if (el.dataset.f === "title") sl.title = el.value; else sl.time = el.value;
+    if (el.dataset.f === "time" && D.days[+el.dataset.d].day === todayKey()) {
+      const was = !!sl.past;
+      sl.past = !sl.id && dueDate({ day: todayKey(), due_time: sl.time || "00:00" }) <= new Date();
+      if (was !== sl.past) render();
+    }
+  }
+}
+async function savePlan() {
+  const D = S.draft;
+  const rows = [], keep = new Set();
+  const missing = [];
+  for (const d of D.days) {
+    if (!d.active) continue;
+    for (const s of SLOTS) {
+      const sl = d.slots[s];
+      if (sl.locked) { keep.add(sl.id); continue; }
+      if (sl.past) continue;
+      let title = sl.title.trim();
+      if (!title && s === "evening" && D.goal.trim()) title = `1/5: ${D.goal.trim()}`.slice(0, 120);
+      if (!title) { missing.push(`${fmtDay(d.day)} ${SLOT[s].label}`); continue; }
+      if (!/^\d\d:\d\d$/.test(sl.time)) { missing.push(`${fmtDay(d.day)} ${SLOT[s].label} (Uhrzeit)`); continue; }
+      rows.push({ day: d.day, slot: s, title, due_time: sl.time });
+      if (sl.id) keep.add(sl.id);
+    }
+  }
+  if (missing.length) { toast(`Noch offen: ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? ` und ${missing.length - 3} weitere` : ""}`); return; }
+  if (!rows.length && !keep.size) { toast("Plane mindestens einen Win."); return; }
+  const t = todayKey();
+  const deleteIds = itemsOf(S.me).filter((i) => i.day >= t && !i.proof && !keep.has(i.id) && !rows.some((r) => r.day === i.day && r.slot === i.slot)).map((i) => i.id);
+  S.busy = true; render();
+  try {
+    await db.savePlan(S.ws, D.goal.trim(), rows, deleteIds);
+    S.draft = null; S.busy = false;
+    await app.reload();
+    toast(`Plan gespeichert: ${rows.length + keep.size} Wins diese Woche.`);
+  } catch (e) { S.busy = false; render(); toast("Speichern fehlgeschlagen: " + (e.message || e)); }
+}
+function copyMorning() {
+  const D = S.draft;
+  const src = D.days.find((d) => d.active && (d.slots.morning1.title || d.slots.morning2.title));
+  if (!src) { toast("Trag zuerst an einem Tag deine Morgen-Wins ein."); return; }
+  let n = 0;
+  for (const d of D.days) {
+    if (!d.active || d === src) continue;
+    for (const s of ["morning1", "morning2"]) if (!d.slots[s].locked) { d.slots[s].title = src.slots[s].title; d.slots[s].time = src.slots[s].time; n++; }
+  }
+  render();
+  toast(n ? "Morgen-Wins übernommen." : "Keine weiteren Tage aktiv.");
+}
+
+// ----- Profil -----
+function viewProfile() {
+  const me = meP();
+  const st = weekStats().find((r) => r.p.id === S.me);
+  const iOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  return `<section class="card stack" style="gap:12px"><div class="row">${avatar(me)}<div><b style="font-size:18px">${esc(me.name)}</b><div class="muted" style="font-size:13px">${st?.wins || 0} Wins diese Woche · ${st?.on_time || 0} pünktlich</div></div></div>
+      <div class="field"><label for="nm">Name im Team</label><div class="row"><input class="input" id="nm" value="${esc(me.name)}" maxlength="40" style="flex:1;min-width:0"><button class="btn small" data-save-name>Speichern</button></div></div></section>
+    <section class="card stack" style="gap:10px"><b>Push-Nachrichten</b>
+      <p class="hint" style="margin:0">Du bekommst eine Nachricht, wenn jemand aus dem Team einen Win holt, und eine Erinnerung 15 Minuten bevor dein Win fällig ist.</p>
+      <div id="push-state" class="row"><span class="muted">Prüfe …</span></div>
+      ${iOS && !standalone ? `<p class="hint" style="margin:0">iPhone: Push funktioniert nur, wenn die App auf dem Home-Bildschirm liegt. In Safari auf „Teilen“ tippen, dann „Zum Home-Bildschirm“.</p>` : ""}</section>
+    <section class="card stack" style="gap:10px"><b>So funktioniert's</b>
+      <ol class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+        <li>Montag: Wochenziel und alle Wins mit Uhrzeit festlegen.</li>
+        <li>Jeden Tag 2 Morgen-Wins vor der Arbeit, 1 Abend-Win als 1/5 vom Wochenziel.</li>
+        <li>Ein Win zählt nur mit Live-Foto, und nur am geplanten Tag. Bis ${GRACE_MIN} Min nach der Uhrzeit gilt er als pünktlich.</li>
+        <li>Das ganze Team bekommt eine Push-Nachricht und sieht dein Foto. Die Rangliste zählt deine Wins.</li></ol></section>
+    <button class="btn ghost block" data-logout>${db.mode === "demo" ? "Demo zurücksetzen" : "Abmelden"}</button>`;
+}
+async function renderPushState() {
+  const el = $("#push-state"); if (!el) return;
+  if (!db.pushSupported()) { el.innerHTML = `<span class="muted">${LIVE && !CFG.vapidPublicKey ? "Push ist noch nicht eingerichtet (VAPID-Schlüssel fehlt)." : "Dieser Browser unterstützt keine Push-Nachrichten."}</span>`; return; }
+  const on = await db.pushEnabled();
+  el.innerHTML = on
+    ? `<span class="badge ok">aktiv</span><span class="spacer"></span><button class="btn small" data-push-test>Test</button><button class="btn small ghost" data-push-off>Aus</button>`
+    : `<button class="btn primary block" data-push-on>Push-Nachrichten aktivieren</button>`;
+}
+
+// ----- Nutzer-Detail -----
+function openUser(id) {
+  const p = S.week.profiles.find((x) => x.id === id); if (!p) return;
+  const its = itemsOf(id);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const day = dkey(addDays(parseKey(S.ws), i));
+    const di = its.filter((x) => x.day === day);
+    if (!di.length && i >= 5) continue;
+    days.push({ day, di });
+  }
+  const grid = days.map(({ day, di }) => `<div>${fmtDay(day)}</div>${SLOTS.map((s) => {
+    const it = di.find((x) => x.slot === s);
+    if (!it) return `<div class="cell none"></div>`;
+    const st = status(it);
+    const cls = { done: "done", late: "late", miss: "miss" }[st] || "";
+    return `<div class="cell ${cls}" title="${esc(it.title)}">${st === "done" || st === "late" ? "✓" : st === "miss" ? "✕" : hhmm(it.due_time)}</div>`;
+  }).join("")}`).join("");
+  const today = its.filter((x) => x.day === todayKey()).sort(slotOrder);
+  sheet(`<div class="row">${avatar(p)}<div><b style="font-size:20px">${esc(p.name)}</b><div class="muted" style="font-size:13px">${its.filter((i) => i.proof).length} Wins diese Woche</div></div></div>
+    <div class="field"><label>Wochenziel</label><div>${S.week.goals[id] ? esc(S.week.goals[id]) : '<span class="muted">noch nicht festgelegt</span>'}</div></div>
+    ${days.length && its.length ? `<div class="week-grid"><div></div>${SLOTS.map((s) => `<div class="hd">${SLOT[s].short}</div>`).join("")}${grid}</div>` : `<p class="muted">Noch kein Plan für diese Woche.</p>`}
+    ${today.length ? `<div class="field"><label>Heute</label><div class="slots">${today.map(slotRow).join("")}</div></div>` : ""}`);
+}
+function sheet(html) {
+  closeSheet();
+  const bg = document.createElement("div");
+  bg.className = "sheet-bg";
+  bg.innerHTML = `<div class="sheet stack" role="dialog" aria-modal="true"><div class="grab"></div>${html}<button class="btn ghost block" data-close>Schließen</button></div>`;
+  bg.addEventListener("click", (e) => { if (e.target === bg || e.target.closest("[data-close]")) closeSheet(); });
+  document.body.append(bg);
+}
+function closeSheet() { document.querySelectorAll(".sheet-bg").forEach((x) => x.remove()); }
+
+// ----- Kamera: Beweis nur per Live-Foto -----
+let camStream = null, camFacing = "environment";
+function stopCam() { camStream?.getTracks().forEach((t) => t.stop()); camStream = null; }
+function closeCam() { stopCam(); document.querySelectorAll(".camera").forEach((x) => x.remove()); render(); }
+async function openCamera(itemId) {
+  const it = S.week.items.find((i) => i.id === itemId);
+  if (!it || it.user_id !== S.me || it.proof) return;
+  if (it.day !== todayKey()) { toast("Ein Win kann nur am geplanten Tag bewiesen werden."); return; }
+  const el = document.createElement("div");
+  el.className = "camera";
+  el.innerHTML = `<video playsinline autoplay muted></video>
+    <div class="cam-top"><b>${esc(it.title)}</b><button class="round" data-cam-close aria-label="Schließen">✕</button></div>
+    <div class="cam-bottom"><span style="width:48px"></span><button class="shutter" data-cam-shoot aria-label="Foto aufnehmen"></button><button class="round" data-cam-flip aria-label="Kamera wechseln">⟲</button></div>`;
+  document.body.append(el);
+  el.addEventListener("click", (e) => {
+    if (e.target.closest("[data-cam-close]")) closeCam();
+    else if (e.target.closest("[data-cam-flip]")) { camFacing = camFacing === "environment" ? "user" : "environment"; startStream(el, it); }
+    else if (e.target.closest("[data-cam-shoot]")) shoot(el, it);
+  });
+  await startStream(el, it);
+}
+async function startStream(el, it) {
+  stopCam();
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) throw new Error("no camera api");
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: camFacing, width: { ideal: 1440 }, height: { ideal: 1920 } }, audio: false });
+    const v = $("video", el); v.srcObject = camStream; v.style.transform = camFacing === "user" ? "scaleX(-1)" : "";
+  } catch {
+    // Fallback: Kamera-Aufnahme über das System (z. B. eingebettete Ansicht ohne Kamerazugriff)
+    el.querySelector(".cam-bottom").innerHTML = `<label class="btn primary block" for="cam-file">📸 Foto aufnehmen</label><input id="cam-file" type="file" accept="image/*" capture="environment" hidden>`;
+    $("video", el).remove();
+    el.insertAdjacentHTML("afterbegin", `<div style="flex:1;display:grid;place-items:center;padding:24px;text-align:center;color:#bbb">Live-Kamera nicht verfügbar. Nimm das Foto über die Kamera-App auf.</div>`);
+    $("#cam-file", el).addEventListener("change", async (e) => {
+      const f = e.target.files?.[0]; if (!f) return;
+      const img = new Image(); img.src = URL.createObjectURL(f); await img.decode();
+      preview(el, it, await compress(img, img.naturalWidth, img.naturalHeight, false));
+    });
+  }
+}
+async function shoot(el, it) {
+  const v = $("video", el);
+  if (!v?.videoWidth) return;
+  const blob = await compress(v, v.videoWidth, v.videoHeight, camFacing === "user");
+  stopCam();
+  preview(el, it, blob);
+}
+function compress(src, w, h, mirror) {
+  const max = 1280, k = Math.min(1, max / Math.max(w, h));
+  const c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k);
+  const g = c.getContext("2d");
+  if (mirror) { g.translate(c.width, 0); g.scale(-1, 1); }
+  g.drawImage(src, 0, 0, c.width, c.height);
+  return new Promise((res) => c.toBlob(res, "image/jpeg", 0.82));
+}
+function preview(el, it, blob) {
+  const url = URL.createObjectURL(blob);
+  el.innerHTML = `<img class="shot" src="${url}" alt="Vorschau">
+    <div class="cam-top"><b>${esc(it.title)}</b><button class="round" data-cam-close aria-label="Schließen">✕</button></div>
+    <div class="cam-bottom col"><input class="input" id="cap" maxlength="140" placeholder="Kurzer Kommentar (optional)">
+      <div class="row" style="flex-wrap:nowrap"><button class="btn" data-retake style="flex:1">Nochmal</button><button class="btn primary" data-post style="flex:2">Win posten</button></div></div>`;
+  const fresh = el.cloneNode(true); el.replaceWith(fresh);
+  fresh.addEventListener("click", async (e) => {
+    if (e.target.closest("[data-cam-close]")) closeCam();
+    else if (e.target.closest("[data-retake]")) { fresh.remove(); openCamera(it.id); }
+    else if (e.target.closest("[data-post]")) {
+      const b = e.target.closest("[data-post]"); b.disabled = true; b.textContent = "Lade hoch …";
+      try {
+        const r = await db.proveWin(it, blob, $("#cap", fresh).value.trim());
+        fresh.remove();
+        await app.reload();
+        toast(`🏆 Win gepostet${r.proof.on_time ? "" : " (zu spät)"}${r.notified ? ` – Push an ${r.notified} im Team` : ""}`);
+      } catch (err) { b.disabled = false; b.textContent = "Win posten"; toast("Posten fehlgeschlagen: " + (err.message || err)); }
+    }
+  });
+}
+
+// ----- Login -----
+function renderLogin(mode = "login", err = "") {
+  const reg = mode === "register" || db.mode === "demo";
+  root().innerHTML = `<div class="app"><main class="login">
+    <h1>Be a<br><b>Winner</b></h1>
+    <p class="muted" style="margin:0">Jeden Tag drei Wins. Bewiesen per Foto. Das Team sieht alles.</p>
+    ${db.mode === "demo" ? `<p class="hint" style="margin:0">Demo-Modus: Du spielst mit einem Beispiel-Team (Max, Sarah, Tom, Lena). Alles bleibt auf diesem Gerät.</p>` : ""}
+    <form id="auth" class="stack" style="gap:12px" novalidate>
+      ${reg ? `<div class="field"><label for="a-name">Dein Name</label><input class="input" id="a-name" required maxlength="40" autocomplete="name" placeholder="z. B. Lutz"></div>` : ""}
+      ${db.mode === "live" ? `<div class="field"><label for="a-mail">E-Mail</label><input class="input" id="a-mail" type="email" required autocomplete="email"></div>
+      <div class="field"><label for="a-pw">Passwort</label><input class="input" id="a-pw" type="password" required minlength="6" autocomplete="${reg ? "new-password" : "current-password"}"></div>` : ""}
+      ${err ? `<div class="err">${esc(err)}</div>` : ""}
+      <button class="btn primary block" type="submit">${db.mode === "demo" ? "Demo starten" : reg ? "Konto anlegen" : "Anmelden"}</button>
+      ${db.mode === "live" ? `<button class="btn ghost block" type="button" data-auth-switch>${reg ? "Ich habe schon ein Konto" : "Neu im Team? Konto anlegen"}</button>` : ""}
+    </form></main></div>`;
+  $("[data-auth-switch]")?.addEventListener("click", () => renderLogin(reg ? "login" : "register"));
+  $("#auth").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = $("#a-name")?.value.trim() || "", email = $("#a-mail")?.value.trim(), password = $("#a-pw")?.value;
+    if (reg && !name) return renderLogin(mode, "Bitte gib deinen Namen ein.");
+    if (db.mode === "live" && (!email || !password)) return renderLogin(mode, "Bitte E-Mail und Passwort eingeben.");
+    const btn = e.target.querySelector("[type=submit]"); btn.disabled = true;
+    try {
+      S.me = reg ? await db.signUp({ name, email, password }) : await db.signIn({ email, password });
+      S.tab = "heute"; await app.reload();
+      if (!itemsOf(S.me).length) { S.tab = "woche"; render(); }
+      if (db.mode === "live" && !app.listening) { app.listening = true; db.onChange(() => app.reload()); }
+    } catch (x) { renderLogin(mode, x.message || String(x)); }
+  });
+}
+
+// ----- Events -----
+document.addEventListener("click", async (e) => {
+  const t = e.target.closest("button, [data-tab]");
+  if (!t || t.closest(".camera")) return;
+  if (t.dataset.tab) { closeSheet(); S.tab = t.dataset.tab; S.draft = null; try { history.replaceState(null, "", "#" + S.tab); } catch { /* egal */ } if (S.tab === "rangliste" && !S.allTime) S.allTime = await db.allTime(); render(); window.scrollTo(0, 0); if (S.tab === "profil") renderPushState(); return; }
+  if (t.dataset.prove) { closeSheet(); return openCamera(t.dataset.prove); }
+  if (t.dataset.user) return openUser(t.dataset.user);
+  if (t.dataset.react) { await db.toggleReaction(t.dataset.react, t.dataset.emoji); return app.reload(); }
+  if (t.dataset.rank) { S.rankMode = t.dataset.rank; if (!S.allTime) S.allTime = await db.allTime(); return render(); }
+  if (t.hasAttribute("data-feedall")) { S.feedAll = !S.feedAll; return render(); }
+  if (t.hasAttribute("data-save-plan")) return savePlan();
+  if (t.hasAttribute("data-copy-morning")) return copyMorning();
+  if (t.hasAttribute("data-save-name")) {
+    const v = $("#nm").value.trim(); if (!v) return toast("Der Name darf nicht leer sein.");
+    try { await db.updateName(v.slice(0, 40)); await app.reload(); renderPushState(); toast("Name gespeichert."); } catch (x) { toast(x.message); }
+    return;
+  }
+  if (t.hasAttribute("data-push-on")) { try { await db.enablePush(); toast(db.mode === "demo" ? "Push aktiv. Gleich holt jemand aus dem Team einen Win …" : "Push-Nachrichten aktiv."); } catch (x) { toast(x.message || String(x)); } return renderPushState(); }
+  if (t.hasAttribute("data-push-off")) { await db.disablePush(); toast("Push-Nachrichten aus."); return renderPushState(); }
+  if (t.hasAttribute("data-push-test")) { await db.testPush(); return; }
+  if (t.hasAttribute("data-logout")) { await db.signOut(); S.me = null; S.week = null; S.allTime = null; S.draft = null; return renderLogin(); }
+});
+document.addEventListener("input", (e) => { if (S.tab === "woche" && S.draft && e.target.closest("main")) readDraftInput(e.target); });
+document.addEventListener("change", (e) => {
+  const a = e.target.dataset?.active;
+  if (a !== undefined && S.draft) { S.draft.days[+a].active = e.target.checked; render(); }
+});
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("sw.js").catch(() => { /* z. B. eingebettete Vorschau */ });
+}
+app.start();
+})();
+
+</script>
