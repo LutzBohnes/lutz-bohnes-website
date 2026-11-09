@@ -266,10 +266,10 @@ class LiveStore {
   }
   async proveWin(it, blob, caption) {
     const path = `${this.me}/${it.id}-${Date.now()}.jpg`;
-    const up = await this.sb.storage.from("baw_proofs").upload(path, blob, { contentType: "image/jpeg" });
+    const up = await this.sb.storage.from("baw-proofs").upload(path, blob, { contentType: "image/jpeg" });
     if (up.error) throw up.error;
     const ins = await this.sb.from("baw_proofs").insert({ planned_win_id: it.id, user_id: this.me, photo_path: path, caption: caption || null }).select().single();
-    if (ins.error) { await this.sb.storage.from("baw_proofs").remove([path]); throw new Error(ins.error.message); }
+    if (ins.error) { await this.sb.storage.from("baw-proofs").remove([path]); throw new Error(ins.error.message); }
     let notified = 0;
     try { const r = await this.sb.functions.invoke("baw-push", { body: { type: "win", proof_id: ins.data.id } }); notified = r.data?.sent || 0; } catch { /* Push ist optional */ }
     return { proof: ins.data, notified };
@@ -288,7 +288,7 @@ class LiveStore {
     const out = {}; const need = [];
     for (const p of paths) { const c = this.urlCache.get(p); if (c && c.exp > Date.now()) out[p] = c.url; else need.push(p); }
     if (need.length) {
-      const { data } = await this.sb.storage.from("baw_proofs").createSignedUrls(need, 3600);
+      const { data } = await this.sb.storage.from("baw-proofs").createSignedUrls(need, 3600);
       for (const d of data || []) if (d.signedUrl) { out[d.path] = d.signedUrl; this.urlCache.set(d.path, { url: d.signedUrl, exp: Date.now() + 3500e3 }); }
     }
     return out;
@@ -642,7 +642,7 @@ async function savePlan() {
     await db.savePlan(S.ws, D.goal.trim(), rows, deleteIds);
     S.draft = null; S.busy = false;
     await app.reload();
-    toast(`Plan gespeichert: ${rows.length + keep.size} Wins diese Woche.`);
+    toast(`Plan gespeichert: ${itemsOf(S.me).length} Wins diese Woche.`);
   } catch (e) { S.busy = false; render(); toast("Speichern fehlgeschlagen: " + (e.message || e)); }
 }
 function copyMorning() {

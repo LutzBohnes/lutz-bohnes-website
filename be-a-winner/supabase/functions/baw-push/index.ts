@@ -2,7 +2,7 @@
 //  { type: "win", proof_id }  → vom Handy nach einem Foto-Beweis: Push an alle anderen im Team
 //  { type: "remind" }         → per Cron alle 5 Min (Header x-cron-secret): Erinnerung an fällige Wins
 //  { type: "test" }           → Test-Push an sich selbst
-// Secrets: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT (mailto:...), CRON_SECRET
+// Secrets (Function-Secrets oder Tabelle baw_config): VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT, CRON_SECRET
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 import webpush from "npm:web-push@3.6.7";
 
@@ -12,11 +12,18 @@ const cors = {
 };
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-webpush.setVapidDetails(
-  Deno.env.get("VAPID_SUBJECT") ?? "mailto:team@example.com",
-  Deno.env.get("VAPID_PUBLIC_KEY")!,
-  Deno.env.get("VAPID_PRIVATE_KEY")!,
-);
+// Schlüssel aus Function-Secrets oder (Fallback) aus der nur serverseitig lesbaren Tabelle baw_config
+let cfg: Record<string, string> | null = null;
+async function config() {
+  if (cfg) return cfg;
+  const { data } = await db.from("baw_config").select("key,value");
+  cfg = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
+  for (const k of ["VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT", "CRON_SECRET"]) {
+    const v = Deno.env.get(k); if (v) cfg[k] = v;
+  }
+  webpush.setVapidDetails(cfg.VAPID_SUBJECT ?? "mailto:team@example.com", cfg.VAPID_PUBLIC_KEY, cfg.VAPID_PRIVATE_KEY);
+  return cfg;
+}
 
 type Sub = { endpoint: string; p256dh: string; auth: string };
 
@@ -49,9 +56,10 @@ const json = (data: unknown, status = 200) =>
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   const body = await req.json().catch(() => ({}));
+  const c = await config();
 
   if (body.type === "remind") {
-    if (!Deno.env.get("CRON_SECRET") || req.headers.get("x-cron-secret") !== Deno.env.get("CRON_SECRET")) {
+    if (!c.CRON_SECRET || req.headers.get("x-cron-secret") !== c.CRON_SECRET) {
       return json({ error: "forbidden" }, 403);
     }
     const now = berlinNow();

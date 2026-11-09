@@ -1,5 +1,5 @@
 // Be a Winner – Registrierung nur mit Team-Code. Legt Konto (ohne Bestätigungs-Mail) und Profil an.
-// Secret: BAW_TEAM_CODE
+// Team-Code: Function-Secret BAW_TEAM_CODE oder Tabelle baw_config
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
 const cors = {
@@ -13,7 +13,11 @@ const json = (data: unknown, status = 200) =>
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   const { email, password, name, code } = await req.json().catch(() => ({}));
-  const teamCode = Deno.env.get("BAW_TEAM_CODE");
+  let teamCode = Deno.env.get("BAW_TEAM_CODE");
+  if (!teamCode) {
+    const { data } = await db.from("baw_config").select("value").eq("key", "BAW_TEAM_CODE").maybeSingle();
+    teamCode = data?.value;
+  }
   if (!teamCode || String(code ?? "").trim().toUpperCase() !== teamCode.toUpperCase()) {
     await new Promise((r) => setTimeout(r, 800));
     return json({ error: "Der Team-Code stimmt nicht." }, 403);

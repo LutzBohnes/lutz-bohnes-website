@@ -1,7 +1,7 @@
 // Konfiguration. Leer lassen = Demo-Modus (Daten nur auf diesem Gerät, Beispiel-Team).
-// Für den echten Betrieb mit dem Team: Werte aus Supabase eintragen (siehe README.md).
+// Alle Werte hier sind öffentlich (Publishable Key, öffentlicher VAPID-Schlüssel).
 window.BAW_CONFIG = {
-  supabaseUrl: "",       // z. B. "https://abcd1234.supabase.co"
-  supabaseAnonKey: "",   // Publishable/anon key (darf öffentlich sein)
-  vapidPublicKey: "",    // öffentlicher VAPID-Schlüssel für Push-Nachrichten
+  supabaseUrl: "https://qtwwsffkplwhcxvwqzao.supabase.co",
+  supabaseAnonKey: "sb_publishable_bRqzoJSz3yO4AbwPWTn1BQ_BIMe_4g6",
+  vapidPublicKey: "BJOXh4zTrpuBl-bq9Bk6Lqk6Koe3NcW1fVB61DAMVSZdU1Cg_-G_kkMwEYxv2ApfvFRNfvOsss7zx2c-AYIXaVA",
 };
