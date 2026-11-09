@@ -165,6 +165,14 @@ create policy "BAW Team sieht Fotos" on storage.objects for select to authentica
 create policy "BAW eigene Fotos hochladen" on storage.objects for insert to authenticated
   with check (bucket_id = 'baw-proofs' and (storage.foldername(name))[1] = (select auth.uid())::text);
 
+create policy "BAW eigene Fotos löschen" on storage.objects for delete to authenticated
+  using (bucket_id = 'baw-proofs' and (storage.foldername(name))[1] = (select auth.uid())::text);
+
+-- Server-Konfiguration (VAPID-Schlüssel, CRON_SECRET, BAW_TEAM_CODE): nur für die Edge Functions lesbar
+create table if not exists public.baw_config (key text primary key, value text not null);
+alter table public.baw_config enable row level security;
+revoke all on public.baw_config from anon, authenticated;
+
 -- Live-Updates im Feed --------------------------------------------------------
 do $$ begin
   alter publication supabase_realtime add table public.baw_proofs, public.baw_reactions;
