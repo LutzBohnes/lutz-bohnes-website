@@ -29,7 +29,7 @@ async function send(subs: Sub[], payload: Record<string, unknown>) {
       sent++;
     } catch (e) {
       const code = (e as { statusCode?: number }).statusCode;
-      if (code === 404 || code === 410) await db.from("push_subscriptions").delete().eq("endpoint", s.endpoint);
+      if (code === 404 || code === 410) await db.from("baw_push_subscriptions").delete().eq("endpoint", s.endpoint);
     }
   }));
   return sent;
@@ -55,8 +55,8 @@ Deno.serve(async (req) => {
       return json({ error: "forbidden" }, 403);
     }
     const now = berlinNow();
-    const { data: open } = await db.from("planned_wins")
-      .select("id,user_id,title,due_time,slot,proofs(id)")
+    const { data: open } = await db.from("baw_planned_wins")
+      .select("id,user_id,title,due_time,slot,proofs:baw_proofs(id)")
       .eq("day", now.day).is("reminded_at", null);
     const due = (open ?? []).filter((w) => {
       const m = toMin(w.due_time);
@@ -64,13 +64,13 @@ Deno.serve(async (req) => {
     });
     let sent = 0;
     for (const w of due) {
-      const { data: subs } = await db.from("push_subscriptions").select("endpoint,p256dh,auth").eq("user_id", w.user_id);
+      const { data: subs } = await db.from("baw_push_subscriptions").select("endpoint,p256dh,auth").eq("user_id", w.user_id);
       sent += await send(subs ?? [], {
         title: "⏰ Zeit für deinen Win",
         body: `${w.title} – fällig um ${w.due_time.slice(0, 5)} Uhr. Beweis per Foto!`,
         tag: `remind-${w.id}`, url: "./",
       });
-      await db.from("planned_wins").update({ reminded_at: new Date().toISOString() }).eq("id", w.id);
+      await db.from("baw_planned_wins").update({ reminded_at: new Date().toISOString() }).eq("id", w.id);
     }
     return json({ reminded: due.length, sent });
   }
@@ -80,18 +80,18 @@ Deno.serve(async (req) => {
   if (!user) return json({ error: "unauthorized" }, 401);
 
   if (body.type === "test") {
-    const { data: subs } = await db.from("push_subscriptions").select("endpoint,p256dh,auth").eq("user_id", user.id);
+    const { data: subs } = await db.from("baw_push_subscriptions").select("endpoint,p256dh,auth").eq("user_id", user.id);
     return json({ sent: await send(subs ?? [], { title: "🏆 Be a Winner", body: "Push-Nachrichten sind aktiv.", url: "./" }) });
   }
 
   if (body.type === "win" && typeof body.proof_id === "string") {
-    const { data: proof } = await db.from("proofs")
-      .select("id,user_id,on_time,planned_wins(title,slot),profiles(name)")
+    const { data: proof } = await db.from("baw_proofs")
+      .select("id,user_id,on_time,planned_wins:baw_planned_wins(title,slot),profiles:baw_profiles(name)")
       .eq("id", body.proof_id).single();
     if (!proof || proof.user_id !== user.id) return json({ error: "not found" }, 404);
     // deno-lint-ignore no-explicit-any
     const p = proof as any;
-    const { data: subs } = await db.from("push_subscriptions").select("endpoint,p256dh,auth").neq("user_id", user.id);
+    const { data: subs } = await db.from("baw_push_subscriptions").select("endpoint,p256dh,auth").neq("user_id", user.id);
     const sent = await send(subs ?? [], {
       title: `🏆 ${p.profiles?.name ?? "Jemand"} hat einen Win geholt`,
       body: p.planned_wins?.title ?? "",

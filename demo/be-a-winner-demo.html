@@ -427,33 +427,43 @@ class LiveStore {
     this.sb = createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } });
     const { data: { session } } = await this.sb.auth.getSession();
     this.me = session?.user?.id || null;
+    if (this.me) {
+      const prof = await this.sb.from("baw_profiles").select("id").eq("id", this.me).maybeSingle();
+      if (!prof.data) { await this.sb.auth.signOut(); this.me = null; }
+    }
     return this.me;
   }
-  async signUp({ email, password, name }) {
-    const { data, error } = await this.sb.auth.signUp({ email, password, options: { data: { name: name.trim() } } });
-    if (error) throw new Error(authError(error));
-    if (!data.session) throw new Error("Fast geschafft: Bitte bestätige die E-Mail, die wir dir geschickt haben, und melde dich dann an.");
-    return (this.me = data.user.id);
+  async signUp({ email, password, name, code }) {
+    const { data, error } = await this.sb.functions.invoke("baw-signup", { body: { email, password, name: name.trim(), code } });
+    if (error) {
+      let msg = "Registrierung fehlgeschlagen.";
+      try { msg = (await error.context.json()).error || msg; } catch { /* Standardtext */ }
+      throw new Error(msg);
+    }
+    if (data?.error) throw new Error(data.error);
+    return this.signIn({ email, password });
   }
   async signIn({ email, password }) {
     const { data, error } = await this.sb.auth.signInWithPassword({ email, password });
     if (error) throw new Error(authError(error));
+    const prof = await this.sb.from("baw_profiles").select("id").eq("id", data.user.id).maybeSingle();
+    if (!prof.data) { await this.sb.auth.signOut(); throw new Error("Für diese E-Mail gibt es noch kein Be-a-Winner-Konto. Leg eins mit dem Team-Code an."); }
     return (this.me = data.user.id);
   }
   async signOut() { await this.sb.auth.signOut(); this.me = null; }
   async loadWeek(ws) {
     const we = dkey(addDays(parseKey(ws), 6));
     const [p, g, i] = await Promise.all([
-      this.sb.from("profiles").select("id,name").order("name"),
-      this.sb.from("week_goals").select("user_id,goal").eq("week_start", ws),
-      this.sb.from("planned_wins").select("id,user_id,day,slot,title,due_time,proofs(id,photo_path,caption,on_time,created_at)").gte("day", ws).lte("day", we),
+      this.sb.from("baw_profiles").select("id,name").order("name"),
+      this.sb.from("baw_week_goals").select("user_id,goal").eq("week_start", ws),
+      this.sb.from("baw_planned_wins").select("id,user_id,day,slot,title,due_time,proofs:baw_proofs(id,photo_path,caption,on_time,created_at)").gte("day", ws).lte("day", we),
     ]);
     for (const r of [p, g, i]) if (r.error) throw r.error;
     const items = i.data.map((x) => ({ ...x, due_time: hhmm(x.due_time), proof: Array.isArray(x.proofs) ? x.proofs[0] || null : x.proofs || null }));
     const proofIds = items.filter((x) => x.proof).map((x) => x.proof.id);
     let reactions = [];
     if (proofIds.length) {
-      const r = await this.sb.from("reactions").select("proof_id,user_id,emoji").in("proof_id", proofIds);
+      const r = await this.sb.from("baw_reactions").select("proof_id,user_id,emoji").in("proof_id", proofIds);
       if (r.error) throw r.error;
       reactions = r.data;
     }
@@ -462,47 +472,47 @@ class LiveStore {
     return { profiles: p.data, goals, items, reactions };
   }
   async allTime() {
-    const { data, error } = await this.sb.from("leaderboard_all").select("user_id,wins,on_time");
+    const { data, error } = await this.sb.from("baw_leaderboard_all").select("user_id,wins,on_time");
     if (error) throw error;
     return data;
   }
   async savePlan(ws, goal, rows, deleteIds) {
-    const g = await this.sb.from("week_goals").upsert({ user_id: this.me, week_start: ws, goal, updated_at: new Date().toISOString() });
+    const g = await this.sb.from("baw_week_goals").upsert({ user_id: this.me, week_start: ws, goal, updated_at: new Date().toISOString() });
     if (g.error) throw g.error;
     if (deleteIds.length) {
-      const d = await this.sb.from("planned_wins").delete().in("id", deleteIds);
+      const d = await this.sb.from("baw_planned_wins").delete().in("id", deleteIds);
       if (d.error) throw d.error;
     }
     if (rows.length) {
-      const u = await this.sb.from("planned_wins").upsert(rows.map((r) => ({ ...r, user_id: this.me })), { onConflict: "user_id,day,slot" });
+      const u = await this.sb.from("baw_planned_wins").upsert(rows.map((r) => ({ ...r, user_id: this.me })), { onConflict: "user_id,day,slot" });
       if (u.error) throw u.error;
     }
   }
   async proveWin(it, blob, caption) {
     const path = `${this.me}/${it.id}-${Date.now()}.jpg`;
-    const up = await this.sb.storage.from("proofs").upload(path, blob, { contentType: "image/jpeg" });
+    const up = await this.sb.storage.from("baw_proofs").upload(path, blob, { contentType: "image/jpeg" });
     if (up.error) throw up.error;
-    const ins = await this.sb.from("proofs").insert({ planned_win_id: it.id, user_id: this.me, photo_path: path, caption: caption || null }).select().single();
-    if (ins.error) { await this.sb.storage.from("proofs").remove([path]); throw new Error(ins.error.message); }
+    const ins = await this.sb.from("baw_proofs").insert({ planned_win_id: it.id, user_id: this.me, photo_path: path, caption: caption || null }).select().single();
+    if (ins.error) { await this.sb.storage.from("baw_proofs").remove([path]); throw new Error(ins.error.message); }
     let notified = 0;
-    try { const r = await this.sb.functions.invoke("push", { body: { type: "win", proof_id: ins.data.id } }); notified = r.data?.sent || 0; } catch { /* Push ist optional */ }
+    try { const r = await this.sb.functions.invoke("baw-push", { body: { type: "win", proof_id: ins.data.id } }); notified = r.data?.sent || 0; } catch { /* Push ist optional */ }
     return { proof: ins.data, notified };
   }
   async toggleReaction(proofId, emoji) {
-    const q = this.sb.from("reactions");
+    const q = this.sb.from("baw_reactions");
     const ex = await q.select("proof_id").eq("proof_id", proofId).eq("user_id", this.me).eq("emoji", emoji);
-    if (ex.data?.length) await this.sb.from("reactions").delete().eq("proof_id", proofId).eq("user_id", this.me).eq("emoji", emoji);
-    else await this.sb.from("reactions").insert({ proof_id: proofId, user_id: this.me, emoji });
+    if (ex.data?.length) await this.sb.from("baw_reactions").delete().eq("proof_id", proofId).eq("user_id", this.me).eq("emoji", emoji);
+    else await this.sb.from("baw_reactions").insert({ proof_id: proofId, user_id: this.me, emoji });
   }
   async updateName(name) {
-    const r = await this.sb.from("profiles").update({ name }).eq("id", this.me);
+    const r = await this.sb.from("baw_profiles").update({ name }).eq("id", this.me);
     if (r.error) throw r.error;
   }
   async photoUrls(paths) {
     const out = {}; const need = [];
     for (const p of paths) { const c = this.urlCache.get(p); if (c && c.exp > Date.now()) out[p] = c.url; else need.push(p); }
     if (need.length) {
-      const { data } = await this.sb.storage.from("proofs").createSignedUrls(need, 3600);
+      const { data } = await this.sb.storage.from("baw_proofs").createSignedUrls(need, 3600);
       for (const d of data || []) if (d.signedUrl) { out[d.path] = d.signedUrl; this.urlCache.set(d.path, { url: d.signedUrl, exp: Date.now() + 3500e3 }); }
     }
     return out;
@@ -517,19 +527,19 @@ class LiveStore {
     const reg = await navigator.serviceWorker.ready;
     const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(CFG.vapidPublicKey) });
     const j = sub.toJSON();
-    const r = await this.sb.from("push_subscriptions").upsert({ endpoint: j.endpoint, user_id: this.me, p256dh: j.keys.p256dh, auth: j.keys.auth });
+    const r = await this.sb.from("baw_push_subscriptions").upsert({ endpoint: j.endpoint, user_id: this.me, p256dh: j.keys.p256dh, auth: j.keys.auth });
     if (r.error) throw r.error;
   }
   async disablePush() {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
-    if (sub) { await this.sb.from("push_subscriptions").delete().eq("endpoint", sub.endpoint); await sub.unsubscribe(); }
+    if (sub) { await this.sb.from("baw_push_subscriptions").delete().eq("endpoint", sub.endpoint); await sub.unsubscribe(); }
   }
-  async testPush() { await this.sb.functions.invoke("push", { body: { type: "test" } }); }
+  async testPush() { await this.sb.functions.invoke("baw-push", { body: { type: "test" } }); }
   onChange(cb) {
     this.sb.channel("baw-feed")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "proofs" }, (e) => cb("proof", e.new))
-      .on("postgres_changes", { event: "*", schema: "public", table: "reactions" }, () => cb("reaction"))
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "baw_proofs" }, (e) => cb("proof", e.new))
+      .on("postgres_changes", { event: "*", schema: "public", table: "baw_reactions" }, () => cb("reaction"))
       .subscribe();
   }
 }
@@ -1021,6 +1031,7 @@ function renderLogin(mode = "login", err = "") {
     <form id="auth" class="stack" style="gap:12px" novalidate>
       ${reg ? `<div class="field"><label for="a-name">Dein Name</label><input class="input" id="a-name" required maxlength="40" autocomplete="name" placeholder="z. B. Lutz"></div>` : ""}
       ${db.mode === "live" ? `<div class="field"><label for="a-mail">E-Mail</label><input class="input" id="a-mail" type="email" required autocomplete="email"></div>
+      ${reg ? `<div class="field"><label for="a-code">Team-Code</label><input class="input" id="a-code" required autocomplete="off" autocapitalize="characters" placeholder="bekommst du von deinem Teamleiter"></div>` : ""}
       <div class="field"><label for="a-pw">Passwort</label><input class="input" id="a-pw" type="password" required minlength="6" autocomplete="${reg ? "new-password" : "current-password"}"></div>` : ""}
       ${err ? `<div class="err">${esc(err)}</div>` : ""}
       <button class="btn primary block" type="submit">${db.mode === "demo" ? "Demo starten" : reg ? "Konto anlegen" : "Anmelden"}</button>
@@ -1029,12 +1040,13 @@ function renderLogin(mode = "login", err = "") {
   $("[data-auth-switch]")?.addEventListener("click", () => renderLogin(reg ? "login" : "register"));
   $("#auth").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const name = $("#a-name")?.value.trim() || "", email = $("#a-mail")?.value.trim(), password = $("#a-pw")?.value;
+    const name = $("#a-name")?.value.trim() || "", code = $("#a-code")?.value.trim() || "", email = $("#a-mail")?.value.trim(), password = $("#a-pw")?.value;
     if (reg && !name) return renderLogin(mode, "Bitte gib deinen Namen ein.");
     if (db.mode === "live" && (!email || !password)) return renderLogin(mode, "Bitte E-Mail und Passwort eingeben.");
+    if (db.mode === "live" && reg && !code) return renderLogin(mode, "Bitte gib den Team-Code ein.");
     const btn = e.target.querySelector("[type=submit]"); btn.disabled = true;
     try {
-      S.me = reg ? await db.signUp({ name, email, password }) : await db.signIn({ email, password });
+      S.me = reg ? await db.signUp({ name, email, password, code }) : await db.signIn({ email, password });
       S.tab = "heute"; await app.reload();
       if (!itemsOf(S.me).length) { S.tab = "woche"; render(); }
       if (db.mode === "live" && !app.listening) { app.listening = true; db.onChange(() => app.reload()); }

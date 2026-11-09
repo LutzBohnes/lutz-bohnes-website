@@ -4,11 +4,11 @@ create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
 select cron.schedule(
-  'be-a-winner-remind',
+  'baw-remind',
   '*/5 * * * *',
   $$
   select net.http_post(
-    url := 'https://<PROJECT_REF>.supabase.co/functions/v1/push',
+    url := 'https://<PROJECT_REF>.supabase.co/functions/v1/baw-push',
     headers := jsonb_build_object('Content-Type', 'application/json', 'x-cron-secret', '<CRON_SECRET>'),
     body := '{"type":"remind"}'::jsonb
   );
