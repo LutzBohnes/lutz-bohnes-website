@@ -28,7 +28,7 @@ python3 -m http.server 8000   # dann http://localhost:8000 öffnen
 
 ## Live-Betrieb
 
-- App: https://lutzbohnes.github.io/lutz-bohnes-website/ (Branch `gh-pages`)
+- App: https://lutzbohnes.github.io/lutz-bohnes-website/be-a-winner/ (GitHub Pages vom Branch `claude/keen-turing-yudtx3`, Ordner `/`)
 - Backend: Supabase-Projekt „trainingsplan“, alle Objekte mit Präfix `baw_`
 - Registrierung nur mit Team-Code (Tabelle `baw_config`, Schlüssel `BAW_TEAM_CODE`; dort auch ändern)
 - Erinnerungen: Cron-Job `baw-remind` alle 5 Minuten
